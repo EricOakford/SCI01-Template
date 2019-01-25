@@ -37,7 +37,7 @@
 	(Sort newEventHandler_2 newEventHandler_5 frontSortCode)
 	(saidFeatures add: newEventHandler_5)
 	(saidFeatures add: regions)
-	(saidFeatures add: theDoits)
+	(saidFeatures add: locales)
 	(Sort newEventHandler_3 newEventHandler_6 backSortCode)
 	(saidFeatures add: newEventHandler_6)
 	(newEventHandler release: dispose:)

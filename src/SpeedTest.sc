@@ -97,6 +97,7 @@
 					(TheMenuBar state: ENABLED)
 				)
 				(TheMenuBar state: ENABLED)
+				(HandsOn)
 				(curRoom newRoom: nextRoom)
 			)
 		)

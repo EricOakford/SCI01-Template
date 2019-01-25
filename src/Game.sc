@@ -6,6 +6,7 @@
 (use Sound)
 (use Save)
 (use Motion)
+(use Polygon)
 (use Invent)
 (use User)
 (use System)
@@ -78,7 +79,7 @@
 			(and
 				useSortedFeatures
 				(param1 isKindOf: Collection)
-				(not (OneOf param1 regions theDoits))
+				(not (OneOf param1 regions locales))
 			)
 			(param1 release: dispose:)
 		)
@@ -97,7 +98,7 @@
 	)
 )
 
-(instance demons of EventHandler
+(instance theLocales of EventHandler
 	(properties
 		name "locales"
 	)
@@ -109,7 +110,7 @@
 	)
 	
 	(method (doit)
-		(self eachElementDo: #perform aTOC)
+		(self eachElementDo: #perform addToObstaclesCode)
 		(AddToPic elements)
 	)
 )
@@ -126,143 +127,39 @@
 	)
 )
 
-(instance aTOC of Code
-	(properties)
-	
-	(method (doit param1 &tmp temp0 temp1)
-		(asm
-			pushi    #signal
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			ldi      16384
-			or      
-			not     
-			bnt      code_0226
-			pushi    #xStep
-			pushi    0
-			lag      ego
-			send     4
-			push    
-			pushi    3
-			pushi    #view
-			pushi    0
-			lag      ego
-			send     4
-			push    
-			pushi    2
-			pushi    0
-			callk    CelWide,  6
-			push    
-			ldi      2
-			div     
-			add     
-			sat      temp0
-			pushi    #yStep
-			pushi    0
-			lag      ego
-			send     4
-			push    
-			ldi      2
-			mul     
-			sat      temp1
-			pushi    297
-			pushi    1
-			pushi    102
-			pushi    8
-			pushi    #brLeft
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			lat      temp0
-			sub     
-			push    
-			pushi    2
-			pushi    1
-			pushi    1
-			pushi    #y
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			callk    CoordPri,  2
-			push    
-			callk    CoordPri,  4
-			push    
-			lat      temp1
-			sub     
-			push    
-			pushi    #brRight
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			lat      temp0
-			add     
-			push    
-			pushi    2
-			pushi    1
-			pushi    1
-			pushi    #y
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			callk    CoordPri,  2
-			push    
-			callk    CoordPri,  4
-			push    
-			lat      temp1
-			sub     
-			push    
-			pushi    #brRight
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			lat      temp0
-			add     
-			push    
-			pushi    #y
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			lat      temp1
-			add     
-			push    
-			pushi    #brLeft
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			lat      temp0
-			sub     
-			push    
-			pushi    #y
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			lat      temp1
-			add     
-			push    
-			pushi    109
-			pushi    0
-			pushi    #new
-			pushi    0
-			class    35
-			send     4
-			send     24
-			push    
-			lag      curRoom
-			send     6
-code_0226:
-			ret     
-		)
-	)
+(instance addToObstaclesCode of Code
+   (properties
+      name  "aTOC"
+   )
+
+   (method (doit thePV &tmp dX dY)
+      (if (not (& (thePV signal?) ignrAct))
+         (= dX (+ (ego xStep?) (/ (CelWide (ego view?) facingSouth 0) 2)))
+         (= dY (* (ego yStep?) 2))
+         (curRoom addObstacle:
+            ((Polygon new:)
+               init: 
+                  ;; left top
+                  (- (thePV brLeft?) dX) 
+                  (- (CoordPri PTopOfBand (CoordPri (thePV y?))) dY)
+
+                  ;; right top
+                  (+ (thePV brRight?) dX) 
+                  (- (CoordPri PTopOfBand (CoordPri (thePV y?))) dY)
+
+                  ;; right bottom
+                  (+ (thePV brRight?) dX) 
+                  (+ (thePV y?) dY)
+
+                  ;; left bottom
+                  (- (thePV brLeft?) dX) 
+                  (+ (thePV y?) dY),
+
+               yourself:
+            )
+         )
+      )
+   )
 )
 
 (class Game of Object
@@ -282,7 +179,7 @@ code_0226:
 		((= saidFeatures sFeatures) add:)
 		((= sounds theSounds) add:)
 		((= regions theRegions) add:)
-		((= theDoits demons) add:)
+		((= locales theLocales) add:)
 		((= addToPics theAddToPics) add:)
 		((= timers theTimers) add:)
 		(= curSaveDir (GetSaveDir))
@@ -354,7 +251,7 @@ code_0226:
 		(cast eachElementDo: #dispose eachElementDo: #delete)
 		(timers eachElementDo: #delete)
 		(regions eachElementDo: #perform DisposeNonKeptRegion release:)
-		(theDoits eachElementDo: #dispose release:)
+		(locales eachElementDo: #dispose release:)
 		(Animate 0)
 		(= prevRoomNum curRoomNum)
 		(= curRoomNum newRoomNumber)
@@ -446,7 +343,7 @@ code_0226:
 					(not (if useSortedFeatures (== (pEvent type?) evSAID)))
 					(or
 						(regions handleEvent: pEvent)
-						(theDoits handleEvent: pEvent)
+						(locales handleEvent: pEvent)
 					)
 				)
 			)
@@ -685,7 +582,7 @@ code_0226:
 			((= temp2 (ScriptID theScriptNumbers))
 				number: theScriptNumbers
 			)
-			(theDoits add: temp2)
+			(locales add: temp2)
 			(temp2 init:)
 			(++ temp0)
 		)
@@ -733,7 +630,7 @@ code_0226:
 	)
 	
 	(method (dispose)
-		(theDoits delete: self)
+		(locales delete: self)
 		(DisposeScript number)
 	)
 	

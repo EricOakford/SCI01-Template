@@ -18,7 +18,7 @@
 (use System)
 
 (public
-	SCI01 0
+	SCI01 0 ;Replace "SCI01" with the game's internal name here (up to 6 characters)
 	SetUpEgo 1	
 	HandsOn 2
 	HandsOff 3
@@ -28,7 +28,12 @@
 	Bclr 7
 	AddToScore 8
 	EgoDead	9
-
+	AskQuit 10
+	AskRestart 11
+	AboutGame 12
+	PrintDontHaveIt 13
+	PrintAlreadyDoneThat 14
+	PrintNotCloseEnough 15
 )
 
 (local
@@ -63,11 +68,11 @@
 	lastEvent							;the last event (used by save/restore game)
 	modelessDialog						;the modeless Dialog known to User and Intrface
 	bigFont =  USERFONT					;large font
-	global27 =  12						;Unused/unknown purpose
+	volume =  12						;current game volume
 	version								;pointer to 'incver' version string
                                         ;WARNING!  Must be set in room 0
                                         ;(usually to {x.yyy    } or {x.yyy.zzz})
-	theDoits		;list of objects to get doits each cycle
+	locales
 	curSaveDir		;address of current save drive/directory string
 	;31-49 are unused
 	global31
@@ -111,7 +116,7 @@
 							;no feature claims a user event
 	approachCode			;pointer to code that translates verbs
 							;into bits
-	useObstacles =  TRUE	;will Ego use PolyPath or not?
+	useObstacles =  FALSE	;will Ego use PolyPath or not? (default is FALSE)
 	;77 to 99 are unused
 	global77
 	global78
@@ -137,7 +142,7 @@
 	global98
 	global99
 	isEgoLocked
-	deathSound	= sDeath	;default death music
+	deathMusic	= sDeath	;default death music
 	musicChannels
 	global103
 	testingCheats	;debug mode enabled
@@ -206,13 +211,14 @@
 
 (procedure (EgoDead message &tmp printRet)
 	;This procedure handles when Ego dies. It closely matches that of QFG1EGA.
-	;To use it: "(EgoDead {death message})". You can add a title and icon in the same way as a normal Print message.
+	;To use it: "(EgoDead {death message})".
+	;You can add a title and icon in the same way as a normal Print message.
 	(HandsOff)
 	(Wait 100)
 	(= normalCursor ARROW_CURSOR)
 	(theGame setCursor: normalCursor TRUE)
 	(SFX stop:)
-	(music number: deathSound play:)
+	(music number: deathMusic play:)
 		(repeat
 			(= printRet
 				(Print message
@@ -235,6 +241,48 @@
 					)
 				)
 		)
+)
+;These three procedures were moved from MENU.SC to allow them to work properly after restoring a game.
+;Apparently, Sierra themselves had the same problem, and addressed it in the same way, as shown in QFG2.
+;On the plus side, you can just customize the messages here!
+(procedure (AskQuit)
+	(= quit
+		(Print {Are you just going to quit and leave me here all alone like this?}
+			#title   {Quit}
+			#font    bigFont
+			#button  {Quit} 1
+			#button  {Oops} 0
+		)
+	)
+)
+
+(procedure (AskRestart)
+	(if
+		(Print "You mean you want to start over again from the very beginning?"
+		#title   {Restart}
+		#font    bigFont
+		#button  {Restart} 1
+		#button  {Oops} 0
+		)
+		(theGame restart:)
+	)
+)
+(procedure (AboutGame)
+	(Print "SCI01 Template Game\nBy Eric Oakford"
+			#title "About"
+	)
+)
+
+(procedure (PrintDontHaveIt)
+	(Print {You don't have it.})
+)
+
+(procedure (PrintAlreadyDoneThat)
+	(Print {You've already done that.})
+)
+
+(procedure (PrintNotCloseEnough)
+	(Print {You're not close enough.})
 )
 
 (instance egoObj of Ego
@@ -275,7 +323,7 @@
 	)
 )
 
-(instance SCI01 of Game
+(instance SCI01 of Game ;Replace "SCI01" with the game's internal name here (up to 6 characters)
 	(properties)
 	
 	(method (init)
