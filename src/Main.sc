@@ -28,12 +28,9 @@
 	Bclr 7
 	AddToScore 8
 	EgoDead	9
-	AskQuit 10
-	AskRestart 11
-	AboutGame 12
-	PrintDontHaveIt 13
-	PrintAlreadyDoneThat 14
-	PrintNotCloseEnough 15
+	PrintDontHaveIt 10
+	PrintAlreadyDoneThat 11
+	PrintNotCloseEnough 12
 )
 
 (local
@@ -242,37 +239,6 @@
 				)
 		)
 )
-;These three procedures were moved from MENU.SC to allow them to work properly after restoring a game.
-;Apparently, Sierra themselves had the same problem, and addressed it in the same way, as shown in QFG2.
-;On the plus side, you can just customize the messages here!
-(procedure (AskQuit)
-	(= quit
-		(Print {Are you just going to quit and leave me here all alone like this?}
-			#title   {Quit}
-			#font    bigFont
-			#button  {Quit} 1
-			#button  {Oops} 0
-		)
-	)
-)
-
-(procedure (AskRestart)
-	(if
-		(Print "You mean you want to start over again from the very beginning?"
-		#title   {Restart}
-		#font    bigFont
-		#button  {Restart} 1
-		#button  {Oops} 0
-		)
-		(theGame restart:)
-	)
-)
-(procedure (AboutGame)
-	(Print "SCI01 Template Game\nBy Eric Oakford"
-			#title "About"
-	)
-)
-
 (procedure (PrintDontHaveIt)
 	(Print {You don't have it.})
 )

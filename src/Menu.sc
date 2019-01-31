@@ -117,8 +117,10 @@ $500 soundM
          ;**************      SIERRA MENU    **************
 
          (aboutI
-            (AboutGame) ;moved to MAIN.SC as a procedure to prevent graphical glitches after restoring a game.
-         )
+			(Print "SCI01 Template Game\nBy Eric Oakford"
+			#title "About"
+			)
+		 )
 
          (helpI
             (Print  "DURING THE GAME:\n
@@ -154,12 +156,27 @@ $500 soundM
          )
 
          (restartI
-            (AskRestart) ;moved to MAIN.SC as a procedure to prevent graphical glitches after restoring a game.
+            (if
+				(Print "You mean you want to start over again from the very beginning?"
+				#title   {Restart}
+				#font    bigFont
+				#button  {Restart} 1
+				#button  {Oops} 0
+				)
+		(theGame restart:)
+			)
          )
 
          (quitI
-         	(AskQuit) ;moved to MAIN.SC as a procedure to prevent graphical glitches after restoring a game.
-         )
+			(= quit
+				(Print {Are you just going to quit and leave me here all alone like this?}
+					#title   {Quit}
+					#font    bigFont
+					#button  {Quit} 1
+					#button  {Oops} 0
+				)
+			)
+		 )
 
          ;**************      ACTION MENU    **************
 
