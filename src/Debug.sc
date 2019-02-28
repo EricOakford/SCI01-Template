@@ -116,6 +116,10 @@
 							(= castFirst (cast next: castFirst))
 						)
 					)
+					(KEY_ALT_i
+						(= castFirst (GetNumber {ID number of the object?}))
+						(ego get: castFirst)
+					)
 					(KEY_ALT_m (theGame showMem:))
 					(KEY_ALT_e
 						(Format

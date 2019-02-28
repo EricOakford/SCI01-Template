@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# 990)
-(include sci.sh)
+(include system.sh) (include sci2.sh)
 (use Main)
 (use Intrface)
 (use System)
@@ -18,6 +18,26 @@
 	[butbuf1 4] = [{Restore} {__Save__} {Replace} {Replace}]
 	[butbuf2 4] = [{Select the game that you would like to restore.} {Type the description of this saved game.} {This directory/disk can hold no more saved games. You must replace one of your saved games or use Change Directory to save on a different directory/disk.} {This directory/disk can hold no more saved games. You must replace one of your saved games or use Change Directory to save on a different directory/disk.}]
 )
+
+(define  GAMESSHOWN 8)     ;the number of games displayed in the selector
+(define  MAXGAMES 20)      ;maximum number of games in a save directory
+(define  COMMENTSIZE 36)   ;size of user's description of the game
+;SCICompanion doesn't support equation defines
+;(define  COMMENTBUFF (/ (+ 1 COMMENTSIZE) 2))
+
+(define  DIRECTORYSIZE 29) ;size of the save directory name
+;(define  DIRECTORYBUFF (/ (+ 1 DIRECTORYSIZE) 2))
+
+;(define  BUFFERSIZE (+ (* MAXGAMES (/ (+ 1 COMMENTSIZE) 2)) 1))
+
+
+(enum
+   RESTORE        ;Restore games
+   HAVESPACE      ;Save, with space on disk
+   NOSPACE        ;Save, no space on disk but games to replace
+   NOREPLACE      ;Save, no space on disk, no games to replace
+)
+
 (procedure (GetDirectory param1 &tmp temp0 [temp1 33] [temp34 40])
 	(asm
 code_075a:
@@ -92,23 +112,31 @@ code_07bc:
 	)
 )
 
-(procedure (localproc_04a1)
-	(return
-		(cond 
-			((== self Restore) 0)
-			((localproc_07db) 1)
-			(numGames 2)
-			(else 3)
-		)
-	)
+   (procedure (GetStatus)
+      (return
+         (cond
+            ((== self Restore)
+               RESTORE
+            )
+            ((HaveSpace)
+               HAVESPACE
+            )
+            (numGames
+               NOSPACE
+            )
+            (else
+               NOREPLACE
+            )
+         )
+	  )
+  )
+
+(procedure (HaveSpace)
+	(if (< numGames MAXGAMES) (CheckFreeSpace curSaveDir))
 )
 
-(procedure (localproc_07db)
-	(if (< numGames 20) (CheckFreeSpace curSaveDir))
-)
-
-(procedure (localproc_07ea)
-	(Print 990 3 #font 0)
+(procedure (NeedDescription)
+	(Print {You must type a description for the game.} #font 0)
 )
 
 (class SysWindow of Object
@@ -181,7 +209,7 @@ code_07bc:
 			)
 			(return 0)
 		)
-		(if (== (= theStatus (localproc_04a1)) 1)
+		(if (== (= theStatus (GetStatus)) 1)
 			(editI
 				text: (StrCpy param1 param2)
 				font: smallFont
@@ -226,340 +254,148 @@ code_07bc:
 		(return 1)
 	)
 	
-	(method (doit param1 &tmp temp0 temp1 temp2 temp3 [temp4 361] [temp365 21] [temp386 40])
-		(asm
-			pushSelf
-			class    Restore
-			eq?     
-			bnt      code_026e
-			lap      argc
-			bnt      code_026e
-			lap      param1
-			bnt      code_026e
-			pushi    2
-			pushi    0
-			pushi    4
-			lea      @temp386
-			push    
-			pushi    990
-			pushi    0
-			pushi    #name
-			pushi    0
-			lag      theGame
-			send     4
-			push    
-			callk    Format,  8
-			push    
-			callk    FileIO,  4
-			sat      temp1
-			push    
-			ldi      65535
-			eq?     
-			bnt      code_0267
-			ret     
-code_0267:
-			pushi    2
-			pushi    1
-			lst      temp1
-			callk    FileIO,  4
-code_026e:
-			pushi    #init
-			pushi    3
-			lsp      param1
-			lea      @temp4
-			push    
-			lea      @temp365
-			push    
-			self     10
-			not     
-			bnt      code_0287
-			ldi      65535
-			ret     
-code_0287:
-			lsl      theStatus
-			dup     
-			ldi      0
-			eq?     
-			bnt      code_02a1
-			lal      numGames
-			bnt      code_02be
-			lofsa    okI
-			jmp      code_02be
-			lofsa    changeDirI
-			jmp      code_02be
-code_02a1:
-			dup     
-			ldi      1
-			eq?     
-			bnt      code_02ae
-			lofsa    editI
-			jmp      code_02be
-code_02ae:
-			dup     
-			ldi      2
-			eq?     
-			bnt      code_02bb
-			lofsa    okI
-			jmp      code_02be
-code_02bb:
-			lofsa    changeDirI
-code_02be:
-			toss    
-			sal      default
-			pushi    #doit
-			pushi    1
-			push    
-			super    Dialog,  6
-			sal      i
-			pushi    #indexOf
-			pushi    1
-			pushi    #cursor
-			pushi    0
-			lofsa    selectorI
-			send     4
-			push    
-			lofsa    selectorI
-			send     6
-			sal      selected
-			push    
-			ldi      18
-			mul     
-			sat      temp3
-			lsl      i
-			lofsa    changeDirI
-			eq?     
-			bnt      code_0389
-			pushi    1
-			lsg      curSaveDir
-			call     GetDirectory,  2
-			bnt      code_0287
-			pushi    3
-			pushi    #name
-			pushi    0
-			lag      theGame
-			send     4
-			push    
-			lea      @temp4
-			push    
-			lea      @temp365
-			push    
-			callk    GetSaveFiles,  6
-			sal      numGames
-			push    
-			ldi      65535
-			eq?     
-			bnt      code_031d
-			ldi      65535
-			sat      temp2
-			jmp      code_0499
-code_031d:
-			lal      theStatus
-			sat      temp0
-			pushi    0
-			call     localproc_04a1,  0
-			sal      theStatus
-			push    
-			dup     
-			ldi      0
-			eq?     
-			bnt      code_0333
-			jmp      code_0379
-code_0333:
-			dup     
-			lat      temp0
-			eq?     
-			bnt      code_0364
-			pushi    #contains
-			pushi    1
-			lofsa    editI
-			push    
-			self     6
-			bnt      code_0379
-			pushi    #cursor
-			pushi    1
-			pushi    1
-			pushi    2
-			lsp      param1
-			lea      @temp4
-			push    
-			callk    StrCpy,  4
-			push    
-			callk    StrLen,  2
-			push    
-			pushi    83
-			pushi    0
-			lofsa    editI
-			send     10
-			jmp      code_0379
-code_0364:
-			pushi    #dispose
-			pushi    0
-			pushi    102
-			pushi    3
-			lsp      param1
-			lea      @temp4
-			push    
-			lea      @temp365
-			push    
-			self     14
-code_0379:
-			toss    
-			pushi    #setSize
-			pushi    0
-			pushi    83
-			pushi    0
-			lofsa    selectorI
-			send     8
-			jmp      code_0287
-code_0389:
-			lsl      theStatus
-			ldi      2
-			eq?     
-			bnt      code_03bf
-			lsl      i
-			lofsa    okI
-			eq?     
-			bnt      code_03bf
-			pushi    #doit
-			pushi    1
-			pushi    2
-			lsp      param1
-			lat      temp3
-			leai     @temp4
-			push    
-			callk    StrCpy,  4
-			push    
-			lofsa    GetReplaceName
-			send     6
-			bnt      code_0287
-			lal      selected
-			lati     temp365
-			sat      temp2
-			jmp      code_0499
-			jmp      code_0287
-code_03bf:
-			lsl      theStatus
-			ldi      1
-			eq?     
-			bnt      code_0440
-			lsl      i
-			lofsa    okI
-			eq?     
-			bt       code_03d9
-			lsl      i
-			lofsa    editI
-			eq?     
-			bnt      code_0440
-code_03d9:
-			pushi    1
-			lsp      param1
-			callk    StrLen,  2
-			push    
-			ldi      0
-			eq?     
-			bnt      code_03ee
-			pushi    0
-			call     localproc_07ea,  0
-			jmp      code_0287
-code_03ee:
-			ldi      65535
-			sat      temp2
-			ldi      0
-			sal      i
-code_03f6:
-			lsl      i
-			lal      numGames
-			lt?     
-			bnt      code_0418
-			pushi    2
-			lsp      param1
-			lsl      i
-			ldi      18
-			mul     
-			leai     @temp4
-			push    
-			callk    StrCmp,  4
-			sat      temp2
-			not     
-			bnt      code_0413
-code_0413:
-			+al      i
-			jmp      code_03f6
-code_0418:
-			lat      temp2
-			not     
-			bnt      code_0426
-			lal      i
-			lati     temp365
-			jmp      code_0438
-code_0426:
-			lsl      numGames
-			ldi      20
-			eq?     
-			bnt      code_0436
-			lal      selected
-			lati     temp365
-			jmp      code_0438
-code_0436:
-			lal      numGames
-code_0438:
-			sat      temp2
-			jmp      code_0499
-			jmp      code_0287
-code_0440:
-			lsl      i
-			lofsa    okI
-			eq?     
-			bnt      code_0456
-			lal      selected
-			lati     temp365
-			sat      temp2
-			jmp      code_0499
-			jmp      code_0287
-code_0456:
-			lsl      i
-			ldi      0
-			eq?     
-			bt       code_0467
-			lsl      i
-			lofsa    cancelI
-			eq?     
-			bnt      code_0471
-code_0467:
-			ldi      65535
-			sat      temp2
-			jmp      code_0499
-			jmp      code_0287
-code_0471:
-			lsl      theStatus
-			ldi      1
-			eq?     
-			bnt      code_0287
-			pushi    #cursor
-			pushi    1
-			pushi    1
-			pushi    2
-			lsp      param1
-			lat      temp3
-			leai     @temp4
-			push    
-			callk    StrCpy,  4
-			push    
-			callk    StrLen,  2
-			push    
-			pushi    83
-			pushi    0
-			lofsa    editI
-			send     10
-			jmp      code_0287
-code_0499:
-			pushi    #dispose
-			pushi    0
-			self     4
-			lat      temp2
-			ret     
-		)
-	)
+   (method  (doit theComment
+                  &tmp  fd ret offset 
+                        [names 361] [nums 21]
+                        [str 100] [dir 40]
+            )
+
+      ;If restore: is called with a TRUE parameter, do nothing if there
+      ;are no saved games.  This allows optionally presenting the user
+      ;with his saved games at the start of the game.
+      (if
+         (and
+            (== self Restore)
+            argc
+            theComment
+         )
+
+         (= fd (FileIO fileOpen (Format @str 990 0 (theGame name?))))
+         (if (== fd -1)
+            ;no directory -> no saved games
+            (return)
+         )
+         (FileIO fileClose fd)
+      )
+
+      (if (not (self init: theComment @names @nums))
+         (return -1)
+      )
+
+      (repeat
+         (= default
+            (switch theStatus
+               (RESTORE
+                  (if numGames okI else changeDirI)
+               )
+               (HAVESPACE
+                  ;Edit item of save games is active if present
+                  editI
+               )
+               (NOSPACE
+                  ;If there are save-games to replace, 'Replace'
+                  ;button is active.
+                  okI
+               )
+               (else
+                  ;Otherwise 'Change Directory' button is active.
+                  changeDirI
+               )
+            )
+         )
+
+         (= i (super doit: default))
+
+         (= selected (selectorI indexOf: (selectorI cursor?)))
+         (= offset (* selected (/ (+ 1 COMMENTSIZE) 2)))
+         (cond
+            ((== i changeDirI)
+               ;; kill save window to save hunk
+               (self dispose:)
+               (if (GetDirectory curSaveDir)
+                  (= numGames
+                     (GetSaveFiles (theGame name?) @names @nums)
+                  )
+                  (if (== numGames -1)
+                     (= ret -1)
+                     (break)
+                  )
+               )
+               ;; open save back up with new directory
+               (self init: theComment @names @nums)
+            )
+
+            ((and (== theStatus NOSPACE) (== i okI))
+               (self dispose:)
+               (if (GetReplaceName doit: (StrCpy theComment @[names offset]))
+                  (= ret [nums selected])
+                  (break)
+               )
+               (self init: theComment @names @nums)
+            )
+
+            ((and (== theStatus HAVESPACE) (or (== i okI) (== i editI)))
+               (if (== (StrLen theComment) 0)
+                  (self dispose:)
+                  (NeedDescription)
+                  (self init: theComment @names @nums)
+                  (continue)
+               )
+
+               (= ret -1)
+               (for  ((= i 0))
+                     (< i numGames)
+                     ((++ i))
+
+                  (= ret (StrCmp theComment @[names (* i (/ (+ 1 COMMENTSIZE) 2))]))
+                  (breakif (not ret))
+               )
+
+               (cond
+                  ((not ret)
+                     (= ret [nums i])
+                  )
+                  ((== numGames MAXGAMES)
+                     (= ret [nums selected])
+                  )
+                  (else
+                     ; find the lowest unused game number
+                     (for ((= ret 0)) TRUE ((++ ret))
+                        (for ((= i 0)) (< i numGames) ((++ i))
+                           (breakif (== ret [nums i])) ; this number is used
+                        )
+                        (if (== i numGames)  ; checked all entries in nums
+                           (break)           ; and none matched
+                        )
+                     )
+                  )
+               )
+               (break)
+            )
+            ((== i okI)
+               (= ret [nums selected])
+               (break)
+            )
+
+            ((or (== i -1) (== i cancelI))
+               (= ret -1)
+               (break)
+            )
+
+            ((== theStatus HAVESPACE)
+               (editI
+                  cursor:
+                     (StrLen (StrCpy theComment @[names offset])),
+                  draw:
+               )
+            )
+         )
+      )
+      (DisposeScript FILE)
+      (self dispose:)
+;      (DisposeScript SAVE)
+      (return ret)
+   )
 )
 
 (class Restore of SRDialog
@@ -635,7 +471,7 @@ code_0499:
 		(= temp0 (super doit: newName))
 		(self dispose:)
 		(if (not (StrLen param1))
-			(localproc_07ea)
+			(NeedDescription)
 			(= temp0 0)
 		)
 		(return (if (== temp0 newName) else (== temp0 button1)))
