@@ -19,14 +19,14 @@
 
 (public
 	SCI01 0 ;Replace "SCI01" with the game's internal name here (up to 6 characters)
-	SetUpEgo 1	
+	AnimateCast 1	
 	HandsOn 2
 	HandsOff 3
 	cls 4
 	Btst 5
 	Bset 6
 	Bclr 7
-	AddToScore 8
+	SolvePuzzle 8
 	EgoDead	9
 	PrintDontHaveIt 10
 	PrintAlreadyDoneThat 11
@@ -142,7 +142,7 @@
 	deathMusic	= sDeath	;default death music
 	musicChannels
 	global103
-	testingCheats	;debug mode enabled
+	debugging	;debug mode enabled
 	detailLevel		;detail level (0 = low, 1 = mid, 2 = high, 3 = ultra)
 	music			;music object, current playing music
 	colorCount
@@ -150,11 +150,11 @@
 					;and used in determining detail level. (used in conjunction with detailLevel)
 	global109
 	SFX				;sound effect being played
-	[gameFlags 10]	;each global can have 16 flags. 10 globals * 16 flags = 160 flags. If you need more flags, just incrase the array!
+	[gameFlags 10]	;each global can have 16 flags. 10 globals * 16 flags = 160 flags. If you need more flags, just increase the array!
 )
 
-(procedure (SetUpEgo)
-	;Used to set up the ego, generally in a room's init() method.
+(procedure (AnimateCast)
+	;Used to animate the cast, generally in a room's init() method.
 	(Animate (cast elements?) 0)
 )
 
@@ -197,7 +197,7 @@
 	oldState
 )
 
-(procedure (AddToScore flag points)
+(procedure (SolvePuzzle flag points)
 	;Adds an amount to the player's current score. A flag (one used with
 	;Bset, Bclr, and Btst) is used so that a score is only added once.
 		(if (not (Btst flag))
@@ -206,7 +206,7 @@
 	)
 )		
 
-(procedure (EgoDead message &tmp printRet)
+(procedure (EgoDead &tmp printRet)
 	;This procedure handles when Ego dies. It closely matches that of QFG1EGA.
 	;To use it: "(EgoDead {death message})".
 	;You can add a title and icon in the same way as a normal Print message.
@@ -218,7 +218,7 @@
 	(music number: deathMusic play:)
 		(repeat
 			(= printRet
-				(Print message
+				(Print
 					&rest
 					#width 250
 					#button	{Restore} 1
@@ -240,26 +240,28 @@
 		)
 )
 (procedure (PrintDontHaveIt)
-	(Print {You don't have it.})
+	(Print "You don't have it.")
 )
 
 (procedure (PrintAlreadyDoneThat)
-	(Print {You've already done that.})
+	(Print "You've already done that.")
 )
 
 (procedure (PrintNotCloseEnough)
-	(Print {You're not close enough.})
+	(Print "You're not close enough.")
 )
 
 (instance egoObj of Ego
-	(properties)
+	(properties
+		name "ego"
+	)
 )
 
 (instance statusCode of Code
 	(properties)
 	
-	(method (doit str)
-		(Format str 0 0 score possibleScore) ;Note: This is stored in text.000 to allow for the title and score to be aligned properly.
+	(method (doit strg)
+		(Format strg "___Template Game__________________Score: %d of %d" score possibleScore)
 	)
 )
 
@@ -293,20 +295,20 @@
 	(properties)
 	
 	(method (init)
-		(= testingCheats ENABLED) ;Set to ENABLED if you want to enable the debug features.
-		(SysWindow color: BLACK back: vWHITE) ;These colors can be changed to suit your preferences.
+		(= debugging ENABLED) ;Set to ENABLED if you want to enable the debug features.
+		(SysWindow color: vBLACK back: vWHITE) ;These colors can be changed to suit your preferences.
 		(= colorCount (Graph GDetect))
 		(= systemWindow SysWindow)
 		(super init:)
-		(= musicChannels (DoSound NumVoices))
+		(= musicChannels (DoSound sndDISPOSE))
 		(= ego egoObj)
 		(User alterEgo: ego)
 		(= possibleScore 0)	;Set the maximum score here
 		(= showStyle 0)
-		(TheMenuBar init: hide:)
+		(TheMenuBar init: draw: hide:)
 		(StatusLine code: statusCode disable:) ;hide the status code at startup
 		(StopWalk init:)
-		(if testingCheats
+		(if debugging
 			(self setCursor: normalCursor (HaveMouse) 300 170)
 		else
 			(HandsOff)
@@ -325,14 +327,14 @@
 		(super doit:)
 	)
 	
-	(method (startRoom roomNum)
+	(method (startRoom roomNum &tmp [temp0 12])
 		(LoadMany FALSE EXTRA QSOUND GROOPER FORCOUNT SIGHT DPATH)
-		(ego setCycle: StopWalk vEgoStand)	;Moved from init to fix "Memory Fragmented" error when changing rooms
-		(if testingCheats
+		(ego setCycle: StopWalk vEgoStand)
+		(if debugging
 			(if
 				(and
-					(u> (MemoryInfo 1) (+ 20 (MemoryInfo 0)))
-					(Print {Memory fragmented.} #button {Debug} 1)
+					(u> (MemoryInfo LargestPtr) (+ 20 (MemoryInfo FreeHeap)))
+					(Print "Memory fragmented." #button {Debug} 1)
 				)
 				(SetDebug)
 			)
@@ -342,18 +344,21 @@
 	)
 	
 	(method (handleEvent event)
+		(if (event claimed?)
+			(return)
+		)
 		(super handleEvent: event)
 		(switch (event type?)
-				;Add global parser commands here.
-				(evSAID
-					(cond
-						((Said 'die') ;This should be commented out in your game; it is only used to test the EgoDead procedure.
-							(EgoDead {It's all over for now. Please try again.} #title {You're dead.})
-						)
+			;Add global parser commands here.
+			(evSAID
+				(cond
+					((Said 'die') ;This should be commented out in your game; it is only used to test the EgoDead procedure.
+						(EgoDead "It's all over for now. Please try again." #title {You're dead.})
 					)
 				)
 			)
-		(if testingCheats
+		)
+		(if debugging
 			(if
 				(and
 					(== (event type?) mouseDown)
@@ -366,7 +371,6 @@
 					(if (event claimed?) (return))
 				)
 			)
-			(super handleEvent: event)
 			(if (event claimed?) (return))
 			(switch (event type?)
 				(keyDown

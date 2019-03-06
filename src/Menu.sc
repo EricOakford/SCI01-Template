@@ -71,31 +71,31 @@ $500 soundM
 (class TheMenuBar kindof MenuBar       ;**   MENUBAR
    (method (init)
       (AddMenu { \01 }
-         {About game`^a:Help`#1}
+         { About game`^a: Help`#1}
       )
 
       (AddMenu { File }
-         {Save Game`#5:Restore Game`#7:--!
-         :Restart Game`#9:Quit`^q}
+         { Save Game`#5: Restore Game`#7:--!
+         : Restart Game`#9: Quit`^q}
       )
 
       (AddMenu { Action }
-         {Pause Game`^p:Inventory`^I:Retype`#3:}
+         { Pause Game`^p: Inventory`^I: Retype`#3:}
 	  )
 
       (AddMenu { Speed }
-         {Change...`^s:--!:Faster`+:Normal`=:Slower`-}
+         { Change...`^s:--!: Faster`+: Normal`=: Slower`-}
       )
 
       (AddMenu { Sound }
-         {Volume...`^v:Sound Off`#2=1}
+         { Volume...`^v: Sound Off`#2=1}
       )
       (SetMenu soundI
         #text
             (if (DoSound SoundOn)
-               {Turn sound off}
+               { Sound off}
             else
-               {Turn sound on}
+               { Sound on}
             )
      )
 
@@ -111,8 +111,8 @@ $500 soundM
 ;      (SetMenu teleportI   109 'tp')
    )
 
-   (method (handleEvent event &tmp i oldPause newVol curSpeed newSpeed)
-      (switch (super handleEvent: event)
+   (method (handleEvent event &tmp i newVol [str 300])
+      (switch (super handleEvent: event (User blocks?))
 
          ;**************      SIERRA MENU    **************
 

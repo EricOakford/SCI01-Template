@@ -29,7 +29,7 @@
 				(ego posn: 146 153 loop: 1)
 			)
 		)
-		(SetUpEgo)
+		(AnimateCast)
 		(ego init:)
 		(ego get: iTestObject)
 	)
@@ -42,7 +42,7 @@
 					((Said 'look>')
 						(cond
 							((Said '[/!*,room]')
-								(Print {This is an empty room.})
+								(Print "This is an empty room.")
 							)
 						)
 					)

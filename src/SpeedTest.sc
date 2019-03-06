@@ -24,7 +24,7 @@
 
 (instance speedTest of Room
 	(properties
-		picture 10
+		picture pSpeedTest
 		style IRISIN
 	)
 	
@@ -77,14 +77,14 @@
 			(0 (= cycles 1))
 			(1
 				(theGame setSpeed: 6)
-				(= cycles (if testingCheats 1 else 30))
+				(= cycles (if debugging 1 else 30))
 			)
 			(2
-				(if testingCheats
+				(if debugging
 					(repeat
 						(= inputRoom 0)
 						(= nextRoom
-							(Print {Where to, boss?}
+							(Print "Where to, boss?"
 								#edit @inputRoom 5
 								#window SysWindow
 							)
