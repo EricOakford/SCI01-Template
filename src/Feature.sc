@@ -37,17 +37,17 @@
 				(if lookStr
 					(Print lookStr)
 				else
-					(Printf {The %s looks like any other %s.} description description)
+					(Printf "The %s looks like any other %s." description description)
 				)
 			)
-			(2 (Printf {You cannot open the %s.} description))
-			(3 (Printf {You cannot close the %s.} description))
-			(4 (Printf {The %s has no smell.} description))
-			(5 (Printf {You cannot move the %s.} description))
-			(6 (Printf {You wouldn't want to eat the %s.} description))
-			(7 (Printf {You cannot get the %s.} description))
-			(8 (Printf {You can't climb the %s.} description))
-			(9 (Printf {The %s has nothing to say.} description))
+			(2 (Printf "You cannot open the %s." description))
+			(3 (Printf "You cannot close the %s." description))
+			(4 (Printf "The %s has no smell." description))
+			(5 (Printf "You cannot move the %s." description))
+			(6 (Printf "You wouldn't want to eat the %s." description))
+			(7 (Printf "You cannot get the %s." description))
+			(8 (Printf "You can't climb the %s." description))
+			(9 (Printf "The %s has nothing to say." description))
 		)
 	)
 	
@@ -140,15 +140,15 @@
 	)
 	
 	(method (notInFar)
-		(Printf {You don't see the %s.} description)
+		(Printf "You don't see the %s." description)
 	)
 	
 	(method (notInNear)
-		(Printf {You're not close enough.} description)
+		(Printf "You're not close enough." description)
 	)
 	
 	(method (notFacing &tmp temp0)
-		(Printf {You're not facing the %s.} description)
+		(Printf "You're not facing the %s." description)
 	)
 	
 	(method (facingMe param1 &tmp temp0 temp1)
