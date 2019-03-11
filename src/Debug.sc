@@ -75,7 +75,9 @@
 							ALT-C   Control\n
 							ALT-I Get InvItem\n
 							ALT-D Internal debugger\n
-							ALT-E   Show ego\n} #window SysWindow)
+							ALT-E   Show ego\n
+c							ALT-O Path Maker
+							} #window SysWindow)
 					)
 					(KEY_ALT_s
 						(= castFirst (cast first:))
@@ -119,6 +121,9 @@
 					(KEY_ALT_i
 						(= castFirst (GetNumber {ID number of the object?}))
 						(ego get: castFirst)
+					)
+					(KEY_ALT_o
+						(MakePath doit:)
 					)
 					(KEY_ALT_m (theGame showMem:))
 					(KEY_ALT_e
