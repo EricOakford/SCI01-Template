@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# 950)
-(include sci.sh)
+(script# FEATURE)
+(include system.sh) (include sci2.sh)
 (use Main)
 (use Intrface)
 (use System)
@@ -31,23 +31,23 @@
 		lookStr 0
 	)
 	
-	(procedure (localproc_0004 param1)
-		(switch param1
-			(1
+	(procedure (localproc_0004 theVerb)
+		(switch theVerb
+			(verbLook
 				(if lookStr
 					(Print lookStr)
 				else
 					(Printf "The %s looks like any other %s." description description)
 				)
 			)
-			(2 (Printf "You cannot open the %s." description))
-			(3 (Printf "You cannot close the %s." description))
-			(4 (Printf "The %s has no smell." description))
-			(5 (Printf "You cannot move the %s." description))
-			(6 (Printf "You wouldn't want to eat the %s." description))
-			(7 (Printf "You cannot get the %s." description))
-			(8 (Printf "You can't climb the %s." description))
-			(9 (Printf "The %s has nothing to say." description))
+			(verbOpen (Printf "You cannot open the %s." description))
+			(verbClose (Printf "You cannot close the %s." description))
+			(verbSmell (Printf "The %s has no smell." description))
+			(verbMove (Printf "You cannot move the %s." description))
+			(verbEat (Printf "You wouldn't want to eat the %s." description))
+			(verbGet (Printf "You cannot get the %s." description))
+			(verbClimb (Printf "You can't climb the %s." description))
+			(verbTalk (Printf "The %s has nothing to say." description))
 		)
 	)
 	
@@ -72,8 +72,8 @@
 	
 	(method (handleEvent event &tmp temp0 temp1)
 		(cond 
-			((event claimed?) (return 1))
-			((not description) (return 0))
+			((event claimed?) (return TRUE))
+			((not description) (return FALSE))
 		)
 		(switch (event type?)
 			(evSAID
@@ -84,7 +84,7 @@
 					((IsObject actions) (actions handleEvent: event self))
 				)
 			)
-			(evMOUSEBUTTON
+			(mouseDown
 				(cond 
 					((not (& (= temp0 (event modifiers?)) $0007)))
 					((not (self onMe: event)))
@@ -96,14 +96,14 @@
 							)
 							(self doVerb: (& $7fff shiftClick))
 						)
-						(event claimed: 1)
+						(event claimed: TRUE)
 					)
 					((& temp0 $0004)
 						(if
 						(or (& contClick $8000) (self passedChecks: contClick))
 							(self doVerb: (& $7fff contClick))
 						)
-						(event claimed: 1)
+						(event claimed: TRUE)
 					)
 				)
 			)
@@ -169,10 +169,10 @@
 		)
 		(return
 			(if (<= temp1 sightAngle)
-				(return 1)
+				(return TRUE)
 			else
 				(self notFacing:)
-				(return 0)
+				(return FALSE)
 			)
 		)
 	)
@@ -201,16 +201,16 @@
 					(GetDistance (temp0 x?) (temp0 y?) x y)
 					longRangeDist
 				)
-				(return 1)
+				(return TRUE)
 			else
 				(self notInFar:)
-				(return 0)
+				(return FALSE)
 			)
 		)
 	)
 	
 	(method (isNotHidden)
-		(return 1)
+		(return TRUE)
 	)
 	
 	(method (onMe param1 param2 &tmp temp0 temp1)

@@ -760,7 +760,19 @@
 	DETAIL_ULTRA ;added by EO
 )
 
-
+; SCI01 verb defines
+;(added by EO)
+(enum 1
+	verbLook
+	verbOpen
+	verbClose
+	verbSmell
+	verbMove
+	verbEat
+	verbGet
+	verbClimb
+	verbTalk
+)
 
 
 ;ษออออออออออออออออออออออออออป
