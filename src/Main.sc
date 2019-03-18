@@ -257,6 +257,46 @@
 	)
 )
 
+(instance VerbCode of Code
+	(properties)
+	
+	(method (doit description theVerb &tmp [str 100])
+		(switch theVerb
+			(verbLook
+				(if (description lookStr?)
+					(Print (description lookStr?))
+				else
+					(Print (Format @str "Why, look! It's %s." (description description?)))
+				)
+			)
+			(verbOpen
+				(Print (Format @str "You can't open %s." (description description?)))
+			)
+			(verbClose
+				(Print (Format @str "You can't close %s." (description description?)))
+			)
+			(verbSmell
+				(Print (Format @str "To you, %s has no distinct smell." (description description?)))
+			)
+			(verbMove
+				(Print (Format @str "You can't move %s." (description description?)))
+			)
+			(verbEat
+				(Print (Format @str "Don't be silly, you can't eat %s!" (description description?)))
+			)
+			(verbGet
+				(Print (Format @str "You can't get %s." (description description?)))
+			)
+			(verbClimb
+				(Print (Format @str "You can't climb %s." (description description?)))
+			)
+			(verbTalk
+				(Print (Format @str "Don't bother trying to talk to %s." (description description?)))
+			)
+		)
+	)
+)
+
 (instance statusCode of Code
 	(properties)
 	
@@ -302,6 +342,7 @@
 		(super init:)
 		(= musicChannels (DoSound sndDISPOSE))
 		(= ego egoObj)
+		(= doVerbCode VerbCode)
 		(User alterEgo: ego)
 		(= possibleScore 0)	;Set the maximum score here
 		(= showStyle 0)
@@ -350,7 +391,7 @@
 		(super handleEvent: event)
 		(switch (event type?)
 			;Add global parser commands here.
-			(evSAID
+			(saidEvent
 				(cond
 					((Said 'die') ;This should be commented out in your game; it is only used to test the EgoDead procedure.
 						(EgoDead "It's all over for now. Please try again." #title {You're dead.})

@@ -37,7 +37,7 @@
 		(super handleEvent: event)
 		(switch (event type?)
 			; handle Said's, etc...	
-			(evSAID
+			(saidEvent
 				(cond
 					((Said 'look>')
 						(cond

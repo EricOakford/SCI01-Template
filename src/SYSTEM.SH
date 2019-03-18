@@ -450,22 +450,25 @@
 ;ศอออออออออออออออผ
 
 ;Event types
-(define  nullEvt     $0000)
-(define  mouseDown   $0001)
-(define  mouseUp     $0002)
-(define  keyDown     $0004)
-(define  keyUp       $0008)
-(define  direction   $0040)
+(define  nullEvt     $0000) ;sci.sh = evNULL
+(define  mouseDown   $0001) ;sci.sh = evMOUSEBUTTON
+(define  mouseUp     $0002) ;sci.sh = evMOUSERELEASE
+(define  keyDown     $0004) ;sci.sh = evKEYBOARD
+(define  keyUp       $0008) ;sci.sh = evKEYUP
+(define  menuStart   $0010) ;sci.sh = evMENUSTART
+(define  menuHit     $0020) ;sci.sh = evMENUHIT
+(define  direction   $0040) ;sci.sh = evJOYSTICK
+(define  saidEvent   $0080) ;sci.sh = evSAID
 (define  speechEvent $0080)
-(define  joyDown     $0100)
-(define  joyUp       $0200)
+(define  joyDown     $0100) ;sci.sh = evJOYDOWN
+(define  joyUp       $0200) ;sci.sh = evJOYUP
 (define  walkEvent   $1000)
 (define  helpEvent   $2000)
 (define  userEvent   $4000)
 
 (define  allEvents   $7fff)
 
-(define  leaveIt     $8000)
+(define  leaveIt     $8000) ;sci.sh = evNOJOYSTICK
 
 (define  speechNoun  1)
 (define  speechVerb  0)
