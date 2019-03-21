@@ -10,8 +10,8 @@
 (use System)
 
 (public
-	proc954_0 0
-	proc954_1 1
+	TurnIfSaid 0
+	GoToIfSaid 1
 )
 
 (local
@@ -20,7 +20,7 @@
 	local2
 	egoAvoider
 )
-(procedure (proc954_0 param1 param2 param3 param4 param5 param6 &tmp temp0 temp1)
+(procedure (TurnIfSaid param1 param2 param3 param4 param5 param6 &tmp temp0 temp1)
 	(asm
 		pushi    102
 		pushi    4
@@ -89,7 +89,7 @@ code_007f:
 	)
 )
 
-(procedure (proc954_1 param1 param2 param3 &tmp temp0)
+(procedure (GoToIfSaid param1 param2 param3 &tmp temp0)
 	(asm
 		pushi    4
 		dup     
@@ -230,7 +230,7 @@ code_0140:
 	)
 	
 	(method (cue &tmp newEvent)
-		(User canControl: 1 canInput: 1)
+		(User canControl: TRUE canInput: TRUE)
 		((= newEvent (Event new:)) type: 128)
 		(Parse (User inputLineAddr?) newEvent)
 		(ego setAvoider: egoAvoider)

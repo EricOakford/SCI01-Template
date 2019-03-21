@@ -80,11 +80,11 @@
 		(if useSortedFeatures
 			(__proc984_0)
 		else
-			(saidFeatures add: cast features)
+			(sortedFeatures add: cast features)
 		)
-		(if TheMenuBar (saidFeatures addToFront: TheMenuBar))
-		(if approachCode (saidFeatures addToFront: approachCode))
-		(saidFeatures
+		(if TheMenuBar (sortedFeatures addToFront: TheMenuBar))
+		(if approachCode (sortedFeatures addToFront: approachCode))
+		(sortedFeatures
 			addToEnd: theGame
 			handleEvent: param1
 			release:

@@ -71,7 +71,9 @@
 )
 
 (instance sFeatures of EventHandler
-	(properties)
+	(properties
+		name "sortedFeatures"
+	)
 	
 	(method (delete param1)
 		(super delete: param1)
@@ -176,7 +178,7 @@
 		(= obj Save)
 		((= cast theCast) add:)
 		((= features theFeatures) add:)
-		((= saidFeatures sFeatures) add:)
+		((= sortedFeatures sFeatures) add:)
 		((= sounds theSounds) add:)
 		((= regions theRegions) add:)
 		((= locales theLocales) add:)
@@ -225,7 +227,7 @@
 	
 	(method (replay)
 		(if lastEvent (lastEvent dispose:))
-		(saidFeatures release:)
+		(sortedFeatures release:)
 		(if modelessDialog (modelessDialog dispose:))
 		(cast eachElementDo: #perform RestoreUpdate)
 		(theGame setCursor: waitCursor 1)

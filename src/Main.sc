@@ -94,7 +94,7 @@
 	animationDelay =  10
 	perspective				;player's viewing angle: degrees away from vertical along y axis
 	features				;locations that may respond to events
-	saidFeatures
+	sortedFeatures
 	useSortedFeatures		;enable cast & feature sorting?
 	isDemoGame				;enabled if this is a game demo, and not a full game.??
 	egoBlindSpot			;actors behind ego within angle 
