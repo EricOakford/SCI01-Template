@@ -169,7 +169,7 @@ $500 soundM
 
          (quitI
 			(= quit
-				(Print {Are you just going to quit and leave me here all alone like this?}
+				(Print "Are you just going to quit and leave me here all alone like this?"
 					#title   {Quit}
 					#font    bigFont
 					#button  {Quit} 1
