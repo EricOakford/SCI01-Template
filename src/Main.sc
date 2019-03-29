@@ -374,7 +374,7 @@
 		(if debugging
 			(if
 				(and
-					(u> (MemoryInfo LargestPtr) (+ 20 (MemoryInfo FreeHeap)))
+					(u> (MemoryInfo FreeHeap) (+ 20 (MemoryInfo LargestPtr)))
 					(Print "Memory fragmented." #button {Debug} 1)
 				)
 				(SetDebug)
