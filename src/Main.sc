@@ -396,6 +396,11 @@
 					((Said 'die') ;This should be commented out in your game; it is only used to test the EgoDead procedure.
 						(EgoDead "It's all over for now. Please try again." #title {You're dead.})
 					)
+					((Said 'cheat')
+						(Print "Okay, you win.")
+						(Print "(Game over.)" #at -1 152)
+						(= quit TRUE)
+					)
 				)
 			)
 		)
