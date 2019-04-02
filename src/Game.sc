@@ -221,7 +221,7 @@
 		(self setCursor: normalCursor (HaveMouse))
 		(while (not quit)
 			(self doit:)
-			(= overRun (Wait speed))
+			(= aniInterval (Wait speed))
 		)
 	)
 	
@@ -243,7 +243,7 @@
 		(Sound pause: 0)
 		(while (not quit)
 			(self doit:)
-			(= overRun (Wait speed))
+			(= aniInterval (Wait speed))
 		)
 	)
 	
@@ -338,29 +338,29 @@
 		(StatusLine doit:)
 	)
 	
-	(method (handleEvent pEvent)
+	(method (handleEvent event)
 		(cond 
 			(
 				(and
-					(not (if useSortedFeatures (== (pEvent type?) evSAID)))
+					(not (if useSortedFeatures (== (event type?) saidEvent)))
 					(or
-						(regions handleEvent: pEvent)
-						(locales handleEvent: pEvent)
+						(regions handleEvent: event)
+						(locales handleEvent: event)
 					)
 				)
 			)
-			(script (script handleEvent: pEvent))
+			(script (script handleEvent: event))
 		)
-		(pEvent claimed?)
+		(event claimed?)
 	)
 	
 	(method (showMem)
 		(Printf
 			{Free Heap: %u Bytes\nLargest ptr: %u Bytes\nFreeHunk: %u KBytes\nLargest hunk: %u Bytes}
-			(MemoryInfo 1)
-			(MemoryInfo 0)
-			(>> (MemoryInfo 3) $0006)
-			(MemoryInfo 2)
+			(MemoryInfo FreeHeap)
+			(MemoryInfo LargestPtr)
+			(>> (MemoryInfo FreeHunk) $0006)
+			(MemoryInfo LargestHandle)
 		)
 	)
 	
@@ -381,7 +381,7 @@
 		(Animate (cast elements?) 0)
 		(Wait 0)
 		(Animate (cast elements?) 0)
-		(while (> (Wait 0) animationDelay)
+		(while (> (Wait 0) aniThreshold)
 			(breakif (== (= temp0 (cast firstTrue: #isExtra)) 0))
 			(temp0 addToPic:)
 			(Animate (cast elements?) 0)
@@ -451,9 +451,9 @@
 		(DisposeScript number)
 	)
 	
-	(method (handleEvent pEvent)
-		(if script (script handleEvent: pEvent))
-		(pEvent claimed?)
+	(method (handleEvent event)
+		(if script (script handleEvent: event))
+		(event claimed?)
 	)
 	
 	(method (setScript theScript)
@@ -538,12 +538,12 @@
 		(super dispose:)
 	)
 	
-	(method (handleEvent pEvent)
+	(method (handleEvent event)
 		(cond 
-			((super handleEvent: pEvent))
-			(controls (controls handleEvent: pEvent))
+			((super handleEvent: event))
+			(controls (controls handleEvent: event))
 		)
-		(pEvent claimed?)
+		(event claimed?)
 	)
 	
 	(method (newRoom newRoomNumber)
@@ -636,8 +636,8 @@
 		(DisposeScript number)
 	)
 	
-	(method (handleEvent pEvent)
-		(pEvent claimed?)
+	(method (handleEvent event)
+		(event claimed?)
 	)
 )
 

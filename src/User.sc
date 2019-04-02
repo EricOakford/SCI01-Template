@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# 996)
-(include sci.sh)
+(include system.sh) (include sci2.sh)
 (use Main)
 (use Intrface)
 (use Sound)
@@ -83,7 +83,7 @@
 			(sortedFeatures add: cast features)
 		)
 		(if TheMenuBar (sortedFeatures addToFront: TheMenuBar))
-		(if approachCode (sortedFeatures addToFront: approachCode))
+		(if firstSaidHandler (sortedFeatures addToFront: firstSaidHandler))
 		(sortedFeatures
 			addToEnd: theGame
 			handleEvent: param1
@@ -95,41 +95,41 @@
 		)
 	)
 	
-	(method (handleEvent pEvent &tmp pEventType temp1)
-		(if (pEvent type?)
-			(= lastEvent pEvent)
-			(= pEventType (pEvent type?))
-			(if mapKeyToDir (MapKeyToDir pEvent))
-			(if TheMenuBar (TheMenuBar handleEvent: pEvent pEventType))
-			(GlobalToLocal pEvent)
-			(if (not (pEvent claimed?))
-				(theGame handleEvent: pEvent pEventType)
+	(method (handleEvent event &tmp eventType temp1)
+		(if (event type?)
+			(= lastEvent event)
+			(= eventType (event type?))
+			(if mapKeyToDir (MapKeyToDir event))
+			(if TheMenuBar (TheMenuBar handleEvent: event eventType))
+			(GlobalToLocal event)
+			(if (not (event claimed?))
+				(theGame handleEvent: event eventType)
 			)
 			(if
 				(and
 					controls
-					(not (pEvent claimed?))
+					(not (event claimed?))
 					(cast contains: alterEgo)
 				)
-				(alterEgo handleEvent: pEvent)
+				(alterEgo handleEvent: event)
 			)
 			(if
 				(and
 					input
-					(not (pEvent claimed?))
-					(== (pEvent type?) evKEYBOARD)
+					(not (event claimed?))
+					(== (event type?) keyDown)
 					(or
-						(== (pEvent message?) echo)
+						(== (event message?) echo)
 						(and
-							(<= KEY_SPACE (pEvent message?))
-							(<= (pEvent message?) 255)
+							(<= KEY_SPACE (event message?))
+							(<= (event message?) 255)
 						)
 					)
-					(self getInput: pEvent)
-					(Parse @inputLine pEvent)
+					(self getInput: event)
+					(Parse @inputLine event)
 				)
-				(pEvent type: 128)
-				(self said: pEvent)
+				(event type: 128)
+				(self said: event)
 			)
 		)
 		(= lastEvent 0)
@@ -217,24 +217,24 @@
 		)
 	)
 	
-	(method (handleEvent pEvent &tmp temp0)
+	(method (handleEvent event &tmp temp0)
 		(asm
 			pToa     script
 			bnt      code_03bc
 			pushi    #handleEvent
 			pushi    1
-			lsp      pEvent
+			lsp      event
 			send     6
 code_03bc:
 			pushi    #claimed
 			pushi    0
-			lap      pEvent
+			lap      event
 			send     4
 			not     
 			bnt      code_0469
 			pushi    #type
 			pushi    0
-			lap      pEvent
+			lap      event
 			send     4
 			push    
 			dup     
@@ -248,7 +248,7 @@ code_03bc:
 			bnt      code_0468
 			pushi    #modifiers
 			pushi    0
-			lap      pEvent
+			lap      event
 			send     4
 			not     
 			bnt      code_0468
@@ -264,12 +264,12 @@ code_03fd:
 			push    
 			pushi    #x
 			pushi    0
-			lap      pEvent
+			lap      event
 			send     4
 			push    
 			pushi    #y
 			pushi    0
-			lap      pEvent
+			lap      event
 			send     4
 			push    
 			self     10
@@ -281,7 +281,7 @@ code_03fd:
 			pushi    #claimed
 			pushi    1
 			pushi    1
-			lap      pEvent
+			lap      event
 			send     6
 			jmp      code_0468
 code_0424:
@@ -291,7 +291,7 @@ code_0424:
 			bnt      code_0468
 			pushi    #message
 			pushi    0
-			lap      pEvent
+			lap      event
 			send     4
 			sat      temp0
 			push    
@@ -320,14 +320,14 @@ code_044e:
 			pushi    #claimed
 			pushi    1
 			pushi    1
-			lap      pEvent
+			lap      event
 			send     6
 code_0468:
 			toss    
 code_0469:
 			pushi    #claimed
 			pushi    0
-			lap      pEvent
+			lap      event
 			send     4
 			ret     
 		)

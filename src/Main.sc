@@ -54,8 +54,8 @@
 	showStyle =  7	;The global style for the transition from one picture to another.  This
      				;may be overridden by the style property of a given room.  See the
      				;DrawPic kernel function for the possible styles.
-	overRun			;The number of timer ticks more than the Game's speed which it took to
-     				;complete the last animation cycle.  A non-zero overRun means that the
+	aniInterval			;The number of timer ticks more than the Game's speed which it took to
+     				;complete the last animation cycle.  A non-zero aniInterval means that the
      				;system is not keeping up.
 	theCursor							;the number of the current cursor
 	normalCursor = 		ARROW_CURSOR	;number of normal cursor form
@@ -91,7 +91,7 @@
 	global47
 	global48
 	global49
-	animationDelay =  10
+	aniThreshold =  10
 	perspective				;player's viewing angle: degrees away from vertical along y axis
 	features				;locations that may respond to events
 	sortedFeatures
@@ -103,7 +103,7 @@
 	overlays =  -1
 	doMotionCue				;a motion cue has occurred - process it
 	systemWindow			;ID of standard system window
-	global60 =  3			;Unused/unknown purpose
+	demoDialogTime =  3
 	defaultPalette
 	modelessPort
 	[sysLogPath 10]			;used for system standard logfile path (uses 10 globals)
@@ -111,8 +111,7 @@
 							;a feature's init
 	doVerbCode				;pointer to code that gets invoked if
 							;no feature claims a user event
-	approachCode			;pointer to code that translates verbs
-							;into bits
+	firstSaidHandler		
 	useObstacles =  FALSE	;will Ego use PolyPath or not? (default is FALSE)
 	;77 to 99 are unused
 	global77

@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# 255)
-(include sci.sh)
+(include system.sh) (include sci2.sh)
 (use Main)
 (use System)
 
@@ -330,7 +330,7 @@
 		(self draw:)
 	)
 	
-	(method (handleEvent event &tmp temp0 pEventType temp2)
+	(method (handleEvent event &tmp temp0 eventType temp2)
 		(if (event claimed?) (return 0))
 		(= temp0 0)
 		(if
@@ -338,14 +338,14 @@
 				(& state $0001)
 				(or
 					(and
-						(== (= pEventType (event type?)) 128)
+						(== (= eventType (event type?)) 128)
 						(Said said)
 					)
 					(and
-						(== pEventType evKEYBOARD)
+						(== eventType keyDown)
 						(== (event message?) key)
 					)
-					(and (== pEventType evMOUSEBUTTON) (self check: event))
+					(and (== eventType mouseDown) (self check: event))
 				)
 			)
 			(event claimed: 1)
@@ -559,7 +559,7 @@
 		)
 		(= temp0 0)
 		(switch (event type?)
-			(evKEYBOARD
+			(keyDown
 				(event claimed: 1)
 				(switch (event message?)
 					(KEY_NUMPAD7 (self retreat: 50))
@@ -575,7 +575,7 @@
 					(else  (event claimed: 0))
 				)
 			)
-			(evMOUSEBUTTON
+			(mouseDown
 				(if (self check: event)
 					(event claimed: 1)
 					(cond 
@@ -874,8 +874,8 @@
 				(event claimed?)
 				(== (event type?) evNULL)
 				(and
-					(!= evMOUSEBUTTON (event type?))
-					(!= evKEYBOARD (event type?))
+					(!= mouseDown (event type?))
+					(!= keyDown (event type?))
 					(!= evJOYSTICK (event type?))
 					(!= evJOYDOWN (event type?))
 				)
@@ -900,7 +900,7 @@
 						(or
 							(== (event type?) evJOYDOWN)
 							(and
-								(== evKEYBOARD (event type?))
+								(== keyDown (event type?))
 								(== KEY_RETURN (event message?))
 							)
 						)
@@ -917,15 +917,15 @@
 							(not (self firstTrue: #checkState 1))
 							(or
 								(and
-									(== evKEYBOARD (event type?))
+									(== keyDown (event type?))
 									(== KEY_RETURN (event message?))
 								)
-								(== evMOUSEBUTTON (event type?))
+								(== mouseDown (event type?))
 								(== evJOYDOWN (event type?))
 							)
 						)
 						(and
-							(== evKEYBOARD (event type?))
+							(== keyDown (event type?))
 							(== KEY_ESCAPE (event message?))
 						)
 					)
@@ -934,7 +934,7 @@
 				)
 				(
 					(and
-						(== evKEYBOARD (event type?))
+						(== keyDown (event type?))
 						(== KEY_TAB (event message?))
 					)
 					(event claimed: 1)
@@ -942,7 +942,7 @@
 				)
 				(
 					(and
-						(== evKEYBOARD (event type?))
+						(== keyDown (event type?))
 						(== KEY_SHIFTTAB (event message?))
 					)
 					(event claimed: 1)
