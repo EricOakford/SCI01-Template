@@ -30,3 +30,6 @@
 ; Sound defines
 (define sQuake 10)
 (define sDeath 11)
+
+;Event flags
+	;Example: fBabaFrog (original Sierra naming)
