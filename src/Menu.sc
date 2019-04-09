@@ -111,7 +111,7 @@ $500 soundM
 ;      (SetMenu teleportI   109 'tp')
    )
 
-   (method (handleEvent event &tmp i newVol [str 300])
+   (method (handleEvent event &tmp i [str 300])
       (switch (super handleEvent: event (User blocks?))
 
          ;**************      SIERRA MENU    **************
@@ -228,24 +228,27 @@ $500 soundM
 			)
 			         ;**************      SOUND MENU     **************
 
-         (volumeI
-				(= newVol (+ 1 (DoSound MasterVol)))
+			(volumeI
 				(if
-				(= newVol (GetNumber {Volume (1 - 16)?} newVol))
-					(DoSound MasterVol (- newVol 1)
-               )
-            )
-            (DoSound ChangeVolume i)
-         )
-            
+					(!=
+						(= i
+							(GetNumber {Volume (1 - 16)?} (+ 1 (DoSound MasterVol)))
+						)
+						-1
+					)
+					(if (< (-- i) 0) (= i 0))
+					(if (> i 15) (= i 15))
+					(DoSound MasterVol i)
+				)
+			)
          (soundI
             (= i (DoSound SoundOn))
-            (if (GetMenu soundI 113)
-					(DoSound SoundOn DISABLED)
-					(SetMenu soundI 113 0 110 {Sound on})
+            (if (GetMenu soundI p_value)
+					(DoSound SoundOn FALSE)
+					(SetMenu soundI p_value FALSE p_text {Sound on})
 				else
-					(DoSound SoundOn ENABLED)
-					(SetMenu soundI 113 1 110 {Sound off})
+					(DoSound SoundOn TRUE)
+					(SetMenu soundI p_value TRUE p_text {Sound off})
             )
             (DoSound SoundOn (not i))
          )

@@ -334,12 +334,13 @@
 	(properties)
 	
 	(method (init)
-		(= debugging ENABLED) ;Set to ENABLED if you want to enable the debug features.
+		(= debugging TRUE) ;Set to TRUE if you want to enable the debug features.
 		(SysWindow color: vBLACK back: vWHITE) ;These colors can be changed to suit your preferences.
 		(= colorCount (Graph GDetect))
 		(= systemWindow SysWindow)
 		(super init:)
-		(= musicChannels (DoSound sndDISPOSE))
+		(= musicChannels (DoSound NumVoices))
+		(= useSortedFeatures FALSE) ;set to TRUE if you want to use sorted features
 		(= ego egoObj)
 		(= doVerbCode VerbCode)
 		(User alterEgo: ego)

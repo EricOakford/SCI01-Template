@@ -6,6 +6,7 @@
 (use Sound)
 (use Motion)
 (use Menu)
+(use SortCopy)
 (use Actor)
 (use System)
 
@@ -78,7 +79,7 @@
 			message: (if verbMessager (verbMessager doit:) else 0)
 		)
 		(if useSortedFeatures
-			(__proc984_0)
+			(SortCopy) ;This was the elusive proc984_0. The script is found in QFG2.
 		else
 			(sortedFeatures add: cast features)
 		)
@@ -362,14 +363,14 @@ code_0469:
 	(method (doit)
 		(return
 			(cond 
-				((Said 'look>') 1)
-				((Said 'open>') 2)
-				((Said 'close>') 3)
-				((Said 'smell>') 4)
-				((Said 'move>') 5)
-				((Said 'eat>') 6)
-				((Said 'get>') 7)
-				((Said 'climb>') 8)
+				((Said 'look>') verbLook)
+				((Said 'open>') verbOpen)
+				((Said 'close>') verbClose)
+				((Said 'smell>') verbSmell)
+				((Said 'move>') verbMove)
+				((Said 'eat>') verbEat)
+				((Said 'get>') verbGet)
+				((Said 'climb>') verbClimb)
 			)
 		)
 	)

@@ -239,7 +239,7 @@
 		(addToPics doit:)
 		(theGame setCursor: normalCursor (HaveMouse))
 		(StatusLine doit:)
-		(DoSound sndNOP)
+		(DoSound RestoreSound)
 		(Sound pause: 0)
 		(while (not quit)
 			(self doit:)

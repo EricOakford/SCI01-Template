@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# 989)
-(include sci.sh)
+(include system.sh) (include sci2.sh)
 (use Main)
 (use System)
 
@@ -30,13 +30,13 @@
 	(method (init)
 		(= prevSignal (= signal 0))
 		(sounds add: self)
-		(DoSound sndSTOP self)
+		(DoSound InitSound self)
 	)
 	
 	(method (dispose param1)
 		(if (and argc (not param1)) (= client 0))
 		(sounds delete: self)
-		(if nodePtr (DoSound sndPAUSE self) (= nodePtr 0))
+		(if nodePtr (DoSound KillSound self) (= nodePtr 0))
 		(super dispose:)
 	)
 	
@@ -44,25 +44,25 @@
 		(self init:)
 		(= client (if argc param1 else 0))
 		(if (not loop) (= loop 1))
-		(DoSound sndRESUME self 0)
+		(DoSound PlaySound self 0)
 	)
 	
 	(method (playBed param1)
 		(self init:)
 		(= client (if argc param1 else 0))
 		(if (not loop) (= loop 1))
-		(DoSound sndRESUME self 1)
+		(DoSound PlaySound self 1)
 	)
 	
 	(method (stop param1)
 		(if (and argc (not param1)) (= client 0))
-		(if nodePtr (DoSound sndVOLUME self))
+		(if nodePtr (DoSound StopSound self))
 	)
 	
 	(method (pause param1)
 		(if (not argc) (= param1 1))
 		(DoSound
-			sndUPDATE
+			PauseSound
 			(if (self isMemberOf: Sound) self else 0)
 			param1
 		)
@@ -70,34 +70,34 @@
 	
 	(method (hold param1)
 		(if (not argc) (= param1 1))
-		(DoSound 14 self param1)
+		(DoSound HoldSound self param1)
 	)
 	
 	(method (release)
-		(DoSound 14 self 0)
+		(DoSound HoldSound self 0)
 	)
 	
 	(method (fade param1 param2 param3 param4 param5)
 		(if (and (> argc 4) param5) (= client 0))
 		(if argc
-			(DoSound sndFADE self param1 param2 param3 param4)
+			(DoSound FadeSound self param1 param2 param3 param4)
 		else
-			(DoSound sndFADE self 0 25 10 1)
+			(DoSound FadeSound self 0 25 10 1)
 		)
 	)
 	
 	(method (send param1 param2 param3)
 		(if (and (<= 1 param1) (<= param1 15))
-			(DoSound sndSTOP_ALL self param1 param2 param3)
+			(DoSound MidiSend self param1 param2 param3)
 		)
 	)
 	
 	(method (changeState)
-		(DoSound sndSET_SOUND self)
+		(DoSound ChangeSndState self)
 	)
 	
 	(method (check)
-		(DoSound sndCHECK_DRIVER self)
+		(DoSound UpdateCues self)
 		(if signal
 			(= prevSignal signal)
 			(= signal 0)

@@ -86,38 +86,72 @@
 ;   (define StopSound		5)  ;sci.sh = sndSTOP
 ;   (define PauseSound		6)  ;sci.sh = sndPAUSE
 ;   (define RestoreSound	7)  ;sci.sh = sndRESUME
-   (define ChangeVolume		8)  ;sci.sh = sndVOLUME
+;   (define ChangeVolume		8)  ;sci.sh = sndVOLUME
 ;   (define ChangeSndState	9)  ;sci.sh = sndUPDATE
 ;   (define FadeSound		10) ;sci.sh = sndFADE
 ;   (define NumVoices		11) ;sci.sh = sndCHECK_DRIVER
 ;   (define (unknown)		12) ;sci.sh = sndSTOP_ALL
 
+;  DoSound in SCI0         kernel   45
+; (includes KQ1SCI)
+;   (define InitSound		0)  ;sci.sh = sndINIT
+;   (define PlaySound		1)  ;sci.sh = sndPLAY
+;   (define NextSound		2)  ;sci.sh = sndNOP
+;   (define KillSound		3)  ;sci.sh = sndDISPOSE
+;   (define SoundOn			4)  ;sci.sh = sndSET_SOUND
+;   (define StopSound		5)  ;sci.sh = sndSTOP
+;   (define PauseSound		6)  ;sci.sh = sndPAUSE
+;   (define RestoreSound	7)  ;sci.sh = sndRESUME
+;   (define ChangeVolume	8)  ;sci.sh = sndVOLUME
+;   (define ChangeSndState	9)  ;sci.sh = sndUPDATE
+;   (define FadeSound		10) ;sci.sh = sndFADE
+;   (define NumVoices		11) ;sci.sh = sndCHECK_DRIVER
+;   (define MidiSend		12) ;sci.sh = sndSTOP_ALL
+
+;  DoSound in SCI1 (early)  kernel   45
+;(includes Seasoned Professional and QFG2)
+   (define MasterVol           0)  ;SCI0 = sndINIT
+   (define SoundOn             1)  ;SCI0 = sndPLAY
+   (define RestoreSound        2)  ;SCI0 = sndNOP
+   (define NumVoices           3)  ;SCI0 = sndDISPOSE
+   (define ChangeSndState      4)  ;SCI0 = sndSET_SOUND
+   (define InitSound           5)  ;SCI0 = sndSTOP
+   (define KillSound           6)  ;SCI0 = sndPAUSE
+   (define PlaySound           7)  ;SCI0 = sndRESUME
+   (define StopSound           8)  ;SCI0 = sndVOLUME
+   (define PauseSound          9)  ;SCI0 = sndUPDATE
+   (define FadeSound           10) ;SCI0 = sndFADE
+   (define UpdateCues          11) ;SCI0 = sndCHECK_DRIVER
+   (define MidiSend            12) ;SCI0 = sndSTOP_ALL
+   (define SetVol              13) 
+   (define HoldSound           14) 
+
 
 ;  DoSound in SCI1.1       kernel   45
-   (define MasterVol    0)  ;sci.sh = sndMASTER_VOLUME           SCI0 = sndINIT
-   (define SoundOn      1)  ;sci.sh = sndSET_SOUND               SCI0 = sndPLAY
-   (define RestoreSound 2)  ;sci.sh = sndRESTORE                 SCI0 = sndNOP
-   (define NumVoices    3)  ;sci.sh = sndGET_POLYPHONY           SCI0 = sndDISPOSE
-   (define NumDACs      4)  ;sci.sh = sndGET_AUDIO_CAPABILITY    SCI0 = sndSET_SOUND
-   (define Suspend      5)  ;sci.sh = sndSUSPEND                 SCI0 = sndSTOP
-   (define InitSound    6)  ;sci.sh = sndINIT                    SCI0 = sndPAUSE
-   (define KillSound    7)  ;sci.sh = sndDISPOSE                 SCI0 = sndRESUME
-   (define PlaySound    8)  ;sci.sh = sndPLAY                    SCI0 = sndVOLUME
-   (define StopSound    9)  ;sci.sh = sndSTOP                    SCI0 = sndUPDATE
-   (define PauseSound   10) ;sci.sh = sndPAUSE                   SCI0 = sndFADE
-   (define FadeSound    11) ;sci.sh = sndFADE                    SCI0 = sndCHECK_DRIVER
-   (define HoldSound    12) ;sci.sh = sndSET_HOLD                SCI0 = sndSTOP_ALL
-   (define MuteSound    13) ;sci.sh = sndDUMMY
-   (define SetVol       14) ;sci.sh = sndSET_VOLUME
-   (define SetPri       15) ;sci.sh = sndSET_PRIORITY
-   (define SetLoop      16) ;sci.sh = sndSET_LOOP
-   (define UpdateCues   17) ;sci.sh = sndUPDATE_CUES
-   (define MidiSend     18) ;sci.sh = sndSEND_MIDI
-   (define SetReverb    19) ;sci.sh = sndGLOBAL_REVERB
+;   (define MasterVol    0)  ;sci.sh = sndMASTER_VOLUME           SCI0 = sndINIT
+;   (define SoundOn      1)  ;sci.sh = sndSET_SOUND               SCI0 = sndPLAY
+;   (define RestoreSound 2)  ;sci.sh = sndRESTORE                 SCI0 = sndNOP
+;   (define NumVoices    3)  ;sci.sh = sndGET_POLYPHONY           SCI0 = sndDISPOSE
+;   (define NumDACs      4)  ;sci.sh = sndGET_AUDIO_CAPABILITY    SCI0 = sndSET_SOUND
+;   (define Suspend      5)  ;sci.sh = sndSUSPEND                 SCI0 = sndSTOP
+;   (define InitSound    6)  ;sci.sh = sndINIT                    SCI0 = sndPAUSE
+;   (define KillSound    7)  ;sci.sh = sndDISPOSE                 SCI0 = sndRESUME
+;   (define PlaySound    8)  ;sci.sh = sndPLAY                    SCI0 = sndVOLUME
+;   (define StopSound    9)  ;sci.sh = sndSTOP                    SCI0 = sndUPDATE
+;   (define PauseSound   10) ;sci.sh = sndPAUSE                   SCI0 = sndFADE
+;   (define FadeSound    11) ;sci.sh = sndFADE                    SCI0 = sndCHECK_DRIVER
+;   (define HoldSound    12) ;sci.sh = sndSET_HOLD                SCI0 = sndSTOP_ALL
+;   (define MuteSound    13) ;sci.sh = sndDUMMY
+;   (define SetVol       14) ;sci.sh = sndSET_VOLUME
+;   (define SetPri       15) ;sci.sh = sndSET_PRIORITY
+;   (define SetLoop      16) ;sci.sh = sndSET_LOOP
+;   (define UpdateCues   17) ;sci.sh = sndUPDATE_CUES
+;   (define MidiSend     18) ;sci.sh = sndSEND_MIDI
+;   (define SetReverb    19) ;sci.sh = sndGLOBAL_REVERB
 
    ; This will be removed after KQ5 cd and
    ; Jones cd are shipped (DO NOT USE)
-   (define ChangeSndState 20) ;sci.sh = sndUPDATE
+;   (define ChangeSndState 20) ;sci.sh = sndUPDATE
 
 
 ;   ;List handling.
