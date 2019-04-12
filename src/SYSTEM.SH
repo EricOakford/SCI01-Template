@@ -212,10 +212,17 @@
 (define  PIXELDISSOLVE  9)
 (define  FADEOUT        10)      ;Defaults to PLAIN in 16 color
 
-(define  SCROLLRIGHT    11)      ;Relative order of these four is important
-(define  SCROLLLEFT     12)      ;  in order for ShowPic to work correctly
-(define  SCROLLUP       13)
-(define  SCROLLDOWN     14)
+;SCI0.1 and SCI1.0 scrolling styles
+(define SCROLLLEFT 40)
+(define SCROLLRIGHT 41)
+(define SCROLLDOWN 42)
+(define SCROLLUP 43)
+
+;SCI1.1 scrolling styles
+;(define  SCROLLRIGHT    11)      ;Relative order of these four is important
+;(define  SCROLLLEFT     12)      ;  in order for ShowPic to work correctly
+;(define  SCROLLUP       13)
+;(define  SCROLLDOWN     14)
 
 (define  PLAIN          100)     ;Draw quickly with no special effects
 

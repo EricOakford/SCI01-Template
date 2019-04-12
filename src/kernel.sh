@@ -297,9 +297,9 @@
          GDetect        ; none                        # of colors available        ;sci.sh = grGET_COLOURS
 
          GSetPalette    ; Palette number
-         GDrawLine      ; x1/y1/x2/y2 mapSet colors...
+         GDrawLine      ; x1/y1/x2/y2 mapSet colors...                             ;sci.sh = grDRAW_LINE
          GFillArea      ; x/y/ mapSet colors...
-         GDrawBrush     ; x/y/ size randomSeed mapSet colors...                    ;sci.sh = grDRAW_LINE
+         GDrawBrush     ; x/y/ size randomSeed mapSet colors...                    
          GSaveBits      ; top/left/bottom/right mapSet            saveID of area   ;sci.sh = grSAVE_BOX
          GRestoreBits   ; saveID from SaveBits                                     ;sci.sh = grRESTORE_BOX
          GEraseRect     ; top/left/bottom/right (draws visual in background color) ;sci.sh = grFILL_BOX_BACKGROUND
