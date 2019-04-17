@@ -256,6 +256,9 @@
 	)
 )
 
+;These verb instances can be customized for additional verbs
+;that are not part of the stock USER.SC. This was used for QFG2.
+
 (instance VerbCode of Code
 	(properties)
 	
@@ -293,6 +296,50 @@
 				(Print (Format @str "Don't bother trying to talk to %s." (description description?)))
 			)
 		)
+	)
+)
+
+(class GameVerbMessager of Code
+	(properties
+		ssLook 0
+		ssOpen 0
+		ssClose 0
+		ssSmell 0
+		ssMove 0
+		ssEat 0
+		ssGet 0
+		ssClimb 0
+		ssTalk 0
+	)
+	
+	(method (doit)
+		(return
+			(cond 
+				((Said ssLook) verbLook)
+				((Said ssOpen) verbOpen)
+				((Said ssClose) verbClose)
+				((Said ssSmell) verbSmell)
+				((Said ssMove) verbMove)
+				((Said ssEat) verbEat)
+				((Said ssGet) verbGet)
+				((Said ssClimb) verbClimb)
+				((Said ssTalk) verbTalk)
+			)
+		)
+	)
+)
+
+(instance verbWords of GameVerbMessager
+	(properties
+		ssLook 'look,examine>'
+		ssOpen 'open,open>'
+		ssClose 'close,shut>'
+		ssSmell 'smell>'
+		ssMove 'move>'
+		ssEat 'eat,chew>'
+		ssGet 'get,acquire,(pick<up)>'
+		ssClimb 'climb,scale>'
+		ssTalk 'talk,chat,chat>'
 	)
 )
 
@@ -342,8 +389,11 @@
 		(= musicChannels (DoSound NumVoices))
 		(= useSortedFeatures FALSE) ;set to TRUE if you want to use sorted features
 		(= ego egoObj)
-		(= doVerbCode VerbCode)
 		(User alterEgo: ego)
+;		(= doVerbCode VerbCode)
+;		(User verbMessager: verbWords)
+		;uncomment the above two if you want to use custom verb words.
+		;Otherwise, the game will use the stock verbs from USER.SC and FEATURE.SC.
 		(= possibleScore 0)	;Set the maximum score here
 		(= showStyle 0)
 		(TheMenuBar init: draw: hide:)
@@ -369,7 +419,13 @@
 	)
 	
 	(method (startRoom roomNum &tmp [temp0 12])
-		(LoadMany FALSE EXTRA QSOUND GROOPER FORCOUNT SIGHT DPATH)
+		(LoadMany FALSE	
+			;These are all disposed when going to another room, to reduce the
+			;chances of "Memory Fragmented" errors.
+			EXTRA QSOUND GROOPER FORCOUNT SIGHT DPATH MOVEFWD JUMP SMOOPER
+			REVERSE CHASE FOLLOW WANDER POLYPATH BLOCK PRINTD
+			APPROACH AVOIDER POLYGON TIMER EGO QSOUND
+		)
 		(ego setCycle: StopWalk vEgoStand)
 		(if debugging
 			(if
@@ -381,6 +437,9 @@
 			)
 			(User canInput: TRUE)
 		)
+;		(User verbMessager: verbWords)
+		;uncomment the above if you want to use custom verb words.
+		;Otherwise, the game will use the stock verbs from USER.SC.
 		(super startRoom: roomNum)
 	)
 	
