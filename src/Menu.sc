@@ -18,7 +18,7 @@
 
 
 (script# MENU)                         ;**   output to script.997
-(include system.sh) (include sci2.sh)
+(include system.sh) (include sci2.sh) (include menu.sh)
 (use Main)
 (use Intrface)
 (use Sound)
@@ -28,41 +28,8 @@
 (public
 	SetInputText 1
 )
-
-;NOTE: SSCI allowed defining multiple "starting" numbers in a single enum, but SCICompanion only allows once
-; so, we have to start multiple enums to define the entirety of the menu system.
-(enum
-$100 sierraM
-	aboutI
-	helpI
-)
-(enum
-$200 fileM
-	saveI
-	restoreI
-		divider201I
-	restartI
-	quitI
-)
-(enum
-$300 actionM
-   pauseI
-   invI
-   repeatI
-)
-(enum
-$400 speedM
-   speedI
-      divider401I
-   fasterI
-   normalI
-   slowerI
-)
-(enum
-$500 soundM
-   volumeI
-   soundI
-)
+;moved enums to MENU.SH, as per "SCI Changes and Updates" document
+;entry 09/05/1988. This will allow other scripts to use the menu defines.
 
 (procedure (SetInputText event)
 	(if (> argc 1) (Format (User inputLineAddr?) &rest))
@@ -80,7 +47,8 @@ $500 soundM
       )
 
       (AddMenu { Action }
-         { Pause Game`^p: Inventory`^I: Retype`#3:}
+         { Pause Game`^p: Inventory`^I: Retype`#3:--!
+         : Colors}
 	  )
 
       (AddMenu { Speed }
@@ -98,6 +66,11 @@ $500 soundM
                { Sound on}
             )
      )
+     (if (< (Graph GDetect) 9)
+			(SetMenu colorI 32 0)
+		else
+			(SetMenu colorI 109 '/color')
+	 )
 
       (SetMenu saveI       109 'save[/game]')
       (SetMenu restoreI    109 'restore[/game]')
@@ -111,13 +84,16 @@ $500 soundM
 ;      (SetMenu teleportI   109 'tp')
    )
 
-   (method (handleEvent event &tmp i [str 300])
+   (method (handleEvent event &tmp i newBackColor newTextColor [str 300])
       (switch (super handleEvent: event (User blocks?))
 
          ;**************      SIERRA MENU    **************
 
          (aboutI
-			(Print "SCI01 Template Game\nBy Eric Oakford"
+			(Print (Format @str
+					"SCI01 Template Game\n
+					By Eric Oakford\n
+					Version %s" version) ;this brings up the version number defined in MAIN.SC.
 			#title "About"
 			)
 		 )
@@ -195,7 +171,28 @@ $500 soundM
 
          (repeatI
          	(SetInputText event)
-         	)
+		 )
+		(colorI
+			(= newTextColor 16)
+			(while (and (u> newTextColor 15) (!= newTextColor -1))
+				(= newTextColor (GetNumber {New Text Color: (0-15)}))
+			)
+			(if (!= newTextColor -1)
+				(= newBackColor 16)
+				(while
+					(and
+						(!= newBackColor -1)
+						(or (u> newBackColor 15) (== newBackColor newTextColor))
+					)
+					(= newBackColor (GetNumber {New Background Color: (0-15)}))
+				)
+				(if (!= newBackColor -1)
+					(= curTextColor newTextColor)
+					(= curBackColor newBackColor)
+				)
+			)
+			(systemWindow color: curTextColor back: curBackColor)
+		)		 
 
          ;**************      SPEED MENU     ************** 
 		(speedI

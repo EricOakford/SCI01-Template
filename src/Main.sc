@@ -150,6 +150,8 @@
 	global109
 	SFX				;sound effect being played
 	[gameFlags 10]	;each global can have 16 flags. 10 globals * 16 flags = 160 flags. If you need more flags, just increase the array!
+	curTextColor ;color of text in message boxes
+	curBackColor ;color of message boxes
 )
 
 (procedure (AnimateCast)
@@ -356,9 +358,7 @@
 		number 10
 	)
 )
-(instance egoSW of StopWalk
-	(properties)
-)
+
 (instance Test_Object of InvItem
 	(properties
 		name {Test Object}
@@ -381,13 +381,19 @@
 	(properties)
 	
 	(method (init)
-		(= debugging TRUE) ;Set to TRUE if you want to enable the debug features.
-		(SysWindow color: vBLACK back: vWHITE) ;These colors can be changed to suit your preferences.
+		(= debugging TRUE) ;Set to TRUE if you want to enable the debug features.	
+		(SysWindow
+			;these colors can be changed to suit your preferences.
+			;They can also be changed in the game's menu, like in LSL3.
+			color: (= curTextColor vBLACK)
+			back: (= curBackColor vWHITE)
+		)
 		(= colorCount (Graph GDetect))
 		(= systemWindow SysWindow)
 		(super init:)
 		(= musicChannels (DoSound NumVoices))
 		(= useSortedFeatures FALSE) ;set to TRUE if you want to use sorted features
+		(= version {x.yyy.zzz}) ;set game version here
 		(= ego egoObj)
 		(User alterEgo: ego)
 ;		(= doVerbCode VerbCode)
