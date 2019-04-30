@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# 968)
-(include sci.sh)
+(script# SMOOPER) ;968
+(include system.sh) (include sci2.sh)
 (use Motion)
 (use System)
 
@@ -8,127 +8,243 @@
 	SmoothLooper 0
 )
 
-(class SmoothLooper of Code
-	(properties
-		nextLoop 0
-		client 0
-		oldCycler 0
-		oldMover 0
-		newMover 0
-		oldCycleSpeed 0
-		inProgress 0
-		vNormal 0
-		vChangeDir 0
-	)
-	
-	(method (doit theClient param2 &tmp clientLoop temp1)
-		(if (& (theClient signal?) $0800) (return))
-		(= temp1 0)
-		(if inProgress
-			(if newMover (newMover dispose:))
-			(= newMover (theClient mover?))
-			(theClient mover: 0)
-			(return)
-		else
-			(if (not vNormal) (= vNormal (theClient view?)))
-			(= client theClient)
-			(= inProgress 1)
-		)
-		(if
-		(and (> (client loop?) 3) (== (client view?) vNormal))
-			(if inProgress
-				(if (IsObject oldMover) (oldMover dispose:))
-			else
-				(client view: vNormal)
-				(DirLoop client param2)
-			)
-		)
-		(switch (= clientLoop (client loop?))
-			(3
-				(cond 
-					((or (<= param2 45) (> param2 315)))
-					((<= param2 135) (= clientLoop 4) (= nextLoop 0) (= temp1 1))
-					((<= param2 225) (= clientLoop 4) (= nextLoop 16) (= temp1 1))
-					((<= param2 315) (= clientLoop 5) (= temp1 (= nextLoop 1)))
-				)
-			)
-			(0
-				(cond 
-					((or (<= param2 45) (> param2 315)) (= clientLoop 6) (= nextLoop 3) (= temp1 1))
-					((<= param2 135))
-					((<= param2 225) (= clientLoop 0) (= nextLoop 2) (= temp1 1))
-					((<= param2 315) (= clientLoop 6) (= nextLoop 21) (= temp1 1))
-				)
-			)
-			(1
-				(cond 
-					((or (<= param2 45) (> param2 315)) (= clientLoop 7) (= nextLoop 3) (= temp1 1))
-					((<= param2 135) (= clientLoop 1) (= nextLoop 18) (= temp1 1))
-					((<= param2 225) (= clientLoop 1) (= nextLoop 2) (= temp1 1))
-					(else (<= param2 315) -17747)
-				)
-			)
-			(2
-				(cond 
-					((or (<= param2 45) (> param2 315)) (= clientLoop 3) (= nextLoop 23) (= temp1 1))
-					((<= param2 135) (= clientLoop 2) (= nextLoop 0) (= temp1 1))
-					((<= param2 225))
-					((<= param2 315) (= clientLoop 3) (= temp1 (= nextLoop 1)))
-				)
-			)
-		)
-		(if temp1
-			(= oldCycler (client cycler?))
-			(= oldMover (client mover?))
-			(= oldCycleSpeed (client cycleSpeed?))
-			(client
-				view: vChangeDir
-				cycleSpeed: 0
-				mover: 0
-				cycler: 0
-				loop: clientLoop
-				cel: 0
-				setCycle: EndLoop self
-			)
-		else
-			(= inProgress 0)
-		)
-	)
-	
-	(method (dispose)
-		(if oldMover (oldMover dispose:))
-		(if newMover (newMover dispose:))
-		(if oldCycler (oldCycler dispose:))
-		(client view: vNormal looper: 0)
-		(DirLoop client (client heading?))
-		(super dispose:)
-	)
-	
-	(method (cue &tmp [temp0 2])
-		(if (< nextLoop 15)
-			(client
-				view: vNormal
-				loop: nextLoop
-				mover: oldMover
-				cycler: oldCycler
-				cycleSpeed: oldCycleSpeed
-			)
-			(= inProgress (= oldCycler (= oldMover 0)))
-			(if newMover
-				(client setMotion: newMover)
-				(= newMover 0)
-			)
-		else
-			(= nextLoop (- nextLoop 16))
-			(client loop: nextLoop cel: 0 setCycle: EndLoop self)
-			(= nextLoop
-				(switch nextLoop
-					(0 2)
-					(5 1)
-					(2 0)
-					(7 3)
-				)
-			)
-		)
-	)
+;;; SmoothLooper Class
+;;; Author J.Mark Hood 3/27/89
+;;; Update 6/26/89 queue's any new setMotion request.
+;;; loops ego smoothly through transition cels ( vChangeDir)
+;;; on a direction change
+;;; Usage : set property vChangeDir to view containing transition loops
+;;; in the order listed in enum below  and set clients looper property
+;;; i.e. 
+;;;   (instance mySmoothLooper of SmoothLooper
+;;;      (properties
+;;;            vChangeDir     myTransitionLoops
+;;;      )
+;;;   )
+;;;   (Actor looper:mySmoothLooper)
+
+
+(enum
+   lEastToSouth   
+   lWestToSouth   
+   lSouthToEast
+   lSouthToWest
+   lNorthToEast   
+   lNorthToWest   
+   lEastToNorth
+   lWestToNorth
 )
+
+(define TwoStep   16)
+
+;Unsupported equation defines
+;;;(define HEADINGNORTH    (or (<= theHeading 45   ) (> theHeading 315)))
+;;;(define HEADINGEAST  (<= theHeading 135   ))
+;;;(define HEADINGSOUTH    (<= theHeading 225   ))
+;;;(define HEADINGWEST  (<= theHeading 315   ))
+
+
+
+(class SmoothLooper of Code
+   (properties
+      nextLoop       0
+      client         0
+      oldCycler      0
+      oldMover       0
+      newMover       0
+      oldCycleSpeed  0
+      cycleSpeed     0
+      inProgress     0
+      vNormal        0
+      vChangeDir     0
+   )
+
+;;;   (methods
+;;;      cue
+;;;   )
+
+   (method (doit cl theHeading &tmp theLoop changedTheLoop)
+;      (if (& (cl signal) fixedLoop) (return))
+      (= changedTheLoop FALSE)
+      (if inProgress
+         (if newMover   (newMover dispose:))
+         (= newMover    (cl mover?))
+         (cl mover:0)
+         (return)
+      else
+         (if (not vNormal)
+            (= vNormal (cl view?))
+         )
+         (= client   cl)
+         (= inProgress  TRUE)
+      )
+      (if (and 
+            (>  (client loop?)   3) 
+            (== (client view?) vNormal)
+         ) ;abnormal loops
+         ;;ie hero's quest cat
+         (if inProgress
+            (if (IsObject oldMover) (oldMover dispose:))
+         else
+            (client 
+               view: vNormal
+            )
+            (DirLoop client theHeading)
+         )
+      )
+      (= theLoop (client loop?))
+		(switch (= theLoop (client loop?)) ; clients Loop
+			(facingNorth
+				(cond 
+					((or (<= theHeading 45) (> theHeading 315))) ;HEADINGNORTH
+					((<= theHeading 135) ;HEADINGEAST
+						(= theLoop lNorthToEast) 
+						(= nextLoop facingEast) 
+						(= changedTheLoop TRUE)
+					) 
+					((<= theHeading 225) ;HEADINGSOUTH
+						(= theLoop lNorthToEast) 
+						(= nextLoop (+ TwoStep lEastToSouth)) 
+						(= changedTheLoop TRUE)
+					) 
+					((<= theHeading 315) ;HEADINGWEST
+						(= theLoop lNorthToWest) 
+						(= nextLoop facingWest) 
+						(= changedTheLoop TRUE)
+					) 
+				)
+			)
+			(facingEast
+				(cond 
+					((or (<= theHeading 45) (> theHeading 315)) ;HEADINGNORTH
+						(= theLoop lEastToNorth) 
+						(= nextLoop facingNorth) 
+						(= changedTheLoop TRUE)
+					) 
+					((<= theHeading 135)) ;HEADINGEAST
+					((<= theHeading 225) ;HEADINGSOUTH
+						(= theLoop lEastToSouth) 
+						(= nextLoop facingSouth) 
+						(= changedTheLoop TRUE)
+					) 
+					((<= theHeading 315) ;HEADINGWEST
+						(= theLoop lEastToNorth) 
+						(= nextLoop (+ TwoStep lNorthToWest)) 
+						(= changedTheLoop TRUE)
+					) 
+				)
+			)
+			(facingWest
+				(cond 
+					((or (<= theHeading 45) (> theHeading 315)) ;HEADINGNORTH
+						(= theLoop lWestToNorth) 
+						(= nextLoop facingNorth) 
+						(= changedTheLoop TRUE)
+					)
+					((<= theHeading 135) ;HEADINGEAST
+						(= theLoop lWestToSouth) 
+						(= nextLoop (+ TwoStep lSouthToEast)) 
+						(= changedTheLoop TRUE)
+					)
+					((<= theHeading 225) ;HEADINGSOUTH
+						(= theLoop lWestToSouth) 
+						(= nextLoop facingSouth) 
+						(= changedTheLoop TRUE)
+					) 
+					;CI: NOTE: When SCICompanion decompiled this, there was a bad branch after the else, signified by $baad (aka -17747).
+					;(else (<= theHeading 315) $baad). Based on leaked source code, there should have been no value present there.
+					(else (<= theHeading 315)) ;HEADINGWEST
+				)
+			)
+			(facingSouth
+				(cond 
+					((or (<= theHeading 45) (> theHeading 315)) ;HEADINGNORTH
+						(= theLoop lSouthToWest) 
+						(= nextLoop (+ TwoStep lWestToNorth)) 
+						(= changedTheLoop TRUE)
+					)
+					((<= theHeading 135) ;HEADINGEAST
+						(= theLoop lSouthToEast) 
+						(= nextLoop facingEast) 
+						(= changedTheLoop TRUE)
+					)
+					((<= theHeading 225)) ;HEADINGSOUTH
+					((<= theHeading 315) ;HEADINGWEST
+						(= theLoop lSouthToWest) 
+						(= nextLoop facingWest) 
+						(= changedTheLoop TRUE)
+					) 
+				)
+			)
+		)
+		(if changedTheLoop
+			(= oldCycler 		(client cycler?))
+			(= oldMover 		(client mover?))
+			(= oldCycleSpeed 	(client cycleSpeed?))
+			(client
+				view: 		vChangeDir
+				cycleSpeed: 0
+				mover: 		0
+				cycler: 	0
+				loop: 		theLoop
+				cel: 		0
+				setCycle: 	EndLoop self
+			)
+		else
+			(= inProgress FALSE)
+		)
+	)
+
+   (method (cue &tmp om oc)
+      (if (< nextLoop 15) ; single step transition
+         (client 
+            view:       vNormal,
+            loop:       nextLoop,
+            mover:      oldMover,         ; setMotion would be recursive
+            cycler:     oldCycler,
+            cycleSpeed: oldCycleSpeed
+         )
+         (= oldMover    0)
+         (= oldCycler   0)
+         (= inProgress FALSE)
+         (if newMover
+            (client setMotion:newMover)
+            (= newMover 0)
+         )
+      else                ; two step transition
+         (-= nextLoop 16)
+         (client
+            loop:       nextLoop,
+            cel:        0,
+            setCycle:   EndLoop self
+         )
+         (= nextLoop
+            (switch nextLoop
+               (lEastToSouth
+                  facingSouth
+               )
+               (lNorthToWest
+                  facingWest
+               )
+               (lSouthToEast
+                  facingEast
+               )
+               (lWestToNorth
+                  facingNorth
+               )
+            )
+         )
+      ); if
+   );cue
+
+   (method (dispose)
+      (if oldMover   (oldMover   dispose:))
+      (if newMover   (newMover   dispose:))
+      (if oldCycler  (oldCycler  dispose:))
+      (= inProgress (= oldMover (= newMover (= oldCycler 0))))
+      (client        view:vNormal, looper:0)
+      (DirLoop client (client heading?))
+      (super         dispose:)
+   ); dispose
+
+); SmoothLooper

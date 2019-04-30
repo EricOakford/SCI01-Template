@@ -66,7 +66,7 @@
 						)
 					)
 					(KEY_QUESTION
-						(Print {Debug Key commands:\n
+						(Print "Debug Key commands:\n
 							ALT-S Show cast\n
 							ALT-M   Show memory\n
 							ALT-T Teleport\n
@@ -76,8 +76,8 @@
 							ALT-I Get InvItem\n
 							ALT-D Internal debugger\n
 							ALT-E   Show ego\n
-c							ALT-O Path Maker
-							} #window SysWindow)
+							ALT-O Path Maker"
+							#window SysWindow)
 					)
 					(KEY_ALT_s
 						(= castFirst (cast first:))

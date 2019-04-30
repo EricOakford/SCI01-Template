@@ -298,7 +298,7 @@
 				(if (CheckSaveGame name temp20 version)
 					(RestoreGame name temp20 version)
 				else
-					(Print {That game was saved under a different interpreter. It cannot be restored.} #font 0 #button {OK} 1)
+					(Print "That game was saved under a different interpreter. It cannot be restored." #font SYSFONT #button {OK} 1)
 					(self setCursor: temp21 (HaveMouse))
 					(= parseLang theParseLang)
 				)
@@ -323,7 +323,7 @@
 				(= parseLang theParseLang)
 				(= temp21 (self setCursor: waitCursor 1))
 				(if (not (SaveGame name temp20 @temp0 version))
-					(Print {Your save game disk is full. You must either use another disk or save over an existing saved game.} #font 0 #button {OK} 1)
+					(Print "Your save game disk is full. You must either use another disk or save over an existing saved game." #font SYSFONT #button {OK} 1)
 				)
 				(self setCursor: temp21 (HaveMouse))
 			)
@@ -401,21 +401,21 @@
 		(if script (script cue:))
 	)
 	
-	(method (wordFail param1 &tmp [temp0 100])
-		(Printf {I don't understand "%s".} param1)
-		(return 0)
+	(method (wordFail word &tmp [str 100])
+		(Printf "I don't understand \"%s\"." word)
+		(return FALSE)
 	)
 	
 	(method (syntaxFail)
-		(Print {That doesn't appear to be a proper sentence.})
+		(Print "That doesn't appear to be a proper sentence.")
 	)
 	
 	(method (semanticFail)
-		(Print {That sentence doesn't make sense.})
+		(Print "That sentence doesn't make sense.")
 	)
 	
 	(method (pragmaFail)
-		(Print {You've left me responseless.})
+		(Print "You've left me responseless.")
 	)
 )
 

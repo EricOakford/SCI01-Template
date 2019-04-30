@@ -77,7 +77,7 @@
 
 
 	(method (at)
-		(Printf {%s needs an 'at:' method.} name)
+		(Printf "%s needs an 'at:' method." name)
 		(return FALSE)
 	)
 )

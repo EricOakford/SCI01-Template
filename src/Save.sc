@@ -136,7 +136,7 @@ code_07bc:
 )
 
 (procedure (NeedDescription)
-	(Print {You must type a description for the game.} #font 0)
+	(Print "You must type a description for the game." #font 0)
 )
 
 (class SysWindow of Object
