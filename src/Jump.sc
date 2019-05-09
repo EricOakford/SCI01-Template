@@ -13,7 +13,7 @@
 
 
 (script# JUMP)
-(include system.sh) (include sci2.sh)
+(include game.sh)
 (use Main)
 (use Motion)
 

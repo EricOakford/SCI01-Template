@@ -17,7 +17,7 @@
 ;;;;  Usage:
 ;;;;     anActor setMotion: MoveFwd 20 whoToCue
 ;;;;
-(include system.sh) (include sci2.sh)
+(include game.sh)
 (use Motion)
 
 

@@ -18,7 +18,7 @@
 
 
 (script# MENU)                         ;**   output to script.997
-(include system.sh) (include sci2.sh) (include menu.sh)
+(include game.sh) (include menu.sh)
 (use Main)
 (use Intrface)
 (use Sound)

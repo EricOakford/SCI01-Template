@@ -33,7 +33,7 @@
 ;;;;     Eval	(not present in SCI01)
 
 (script# SYSTEM) ;SYSTEM = 999
-(include system.sh) (include sci2.sh) (include game.sh)
+(include game.sh)
 (use Main)
 (use Intrface)
 

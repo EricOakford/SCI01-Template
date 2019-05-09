@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# 994)
-(include system.sh) (include sci2.sh)
+(include game.sh)
 (use Main)
 (use Intrface)
 (use Sound)
@@ -231,9 +231,9 @@
 		(if modelessDialog (modelessDialog dispose:))
 		(cast eachElementDo: #perform RestoreUpdate)
 		(theGame setCursor: waitCursor 1)
-		(DrawPic (curRoom curPic?) 100 dpCLEAR defaultPalette)
+		(DrawPic (curRoom curPic?) 100 dpCLEAR currentPalette)
 		(if (!= overlays -1)
-			(DrawPic overlays 100 dpNO_CLEAR defaultPalette)
+			(DrawPic overlays 100 dpNO_CLEAR currentPalette)
 		)
 		(if (curRoom controls?) ((curRoom controls?) draw:))
 		(addToPics doit:)
@@ -602,7 +602,7 @@
 				(else showStyle)
 			)
 			dpCLEAR
-			defaultPalette
+			currentPalette
 		)
 	)
 	
@@ -616,7 +616,7 @@
 				(else showStyle)
 			)
 			dpNO_CLEAR
-			defaultPalette
+			currentPalette
 		)
 	)
 	

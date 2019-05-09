@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# 990)
-(include system.sh) (include sci2.sh)
+(include game.sh)
 (use Main)
 (use Intrface)
 (use System)

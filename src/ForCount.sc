@@ -7,7 +7,7 @@
 ;;; then cueing on completion.
 ;;; Usage : propName setCycle:ForwardCounter numOfCycles whoCares
 
-(include system.sh) (include sci2.sh)
+(include game.sh)
 (use Motion)
 
 

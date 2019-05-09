@@ -1,7 +1,16 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-; * SCI Game Header
-;
+;**************************************************************
+;***
+;***	GAME.SH--
+;***
+;**************************************************************
+
 ; * Put all the defines specific to your game in here
+
+(include system.sh) (include sci2.sh) ;system and kernel functions
+(include pics.sh)   (include views.sh)  ;graphic defines
+
+;Commonly-used header files are nested here, so most scripts only need to include this one.
 
 ; Script defines
 (define MAIN 0)
@@ -11,21 +20,11 @@
 (define DEBUG 800)
 
 ; Inventory items
-;Make sure they are in the same order you put them in the inventory list in MAIN.SC. To avoid name conflicts, prefix the items with the letter "i".
+;Make sure they are in the same order you put them in the inventory list in MAIN.SC.
+;To avoid name conflicts, prefix the items with the letter "i".
 (enum
 	iTestObject
 )
-
-; View defines
-(define vEgoWalk 0)
-(define vEgoStand 1)
-(define vSpeedTest 98)
-(define vTestObject 800)
-(define vEgoDeath 998)
-
-; Pic defines
-(define pTestRoom 2)
-(define pSpeedTest 10)
 
 ; Sound defines
 (define sQuake 10)

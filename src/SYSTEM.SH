@@ -218,12 +218,6 @@
 (define SCROLLDOWN 42)
 (define SCROLLUP 43)
 
-;SCI1.1 scrolling styles
-;(define  SCROLLRIGHT    11)      ;Relative order of these four is important
-;(define  SCROLLLEFT     12)      ;  in order for ShowPic to work correctly
-;(define  SCROLLUP       13)
-;(define  SCROLLDOWN     14)
-
 (define  PLAIN          100)     ;Draw quickly with no special effects
 
 (define  DONTSHOW       $1000)   ;Draw pic, but don't show yet
@@ -559,14 +553,12 @@
 ;บ             บ
 ;ศอออออออออออออผ
 
-;NOTE: Non-integer defines are not yet supported by SCICompanion. Uncomment the ENTER, TAB, and BACKSPACE defines once they are.
 (define  ESC         27)
 (define  SPACEBAR    32)
-;(define  ENTER       `^m)
-;(define  TAB         `^i)
+(define  ENTER       $000d) ;(define  ENTER       `^m) in SSCI
+(define  TAB         $0009) ;(define  TAB         `^i) in SSCI
 (define  SHIFTTAB    $0f00)
-;.(define  BACKSPACE   `^h)
-
+(define  BACKSPACE   $0008) ;(define  BACKSPACE   `^h) in SSCI
 
 ;Numeric key code in scan code order with missing codes added
 (define  HOMEKEY     $4700)
@@ -612,8 +604,8 @@
 (define  delObj         $8000)
 
 ; (define  ADDTOPIC       (| delObj stopUpdOn viewAdded))
-(define ADDTOPIC $8021)        ;NOTE: Macro defines are not yet supported by SCICompanion. Remove this define and uncomment the original ADDTOPIC define
-                               ;when they are.
+(define ADDTOPIC $8021)        ;NOTE: Macro defines are not yet supported by SCICompanion.
+                               ;Remove this define and uncomment the original ADDTOPIC define when they are.
 
 ;scaleSignal bits
 ; SCI1+
@@ -744,7 +736,9 @@
 
 (define  RELVERIFY        $0001)   ;release verify, track mouse
 (define  IMMEDIATE        $0002)   ;do the job now, don't condition events
-(define  ICONBAR_DISABLED $0004)   ;icon or bar not enabled ;NOTE: This was defined by SSCI as DISABLED, but DISABLED is already defined in sci.sh as 1
+(define  ICONBAR_DISABLED $0004)   ;icon or bar not enabled
+                                   ;NOTE: This was defined by SSCI as DISABLED,
+                                   ;but DISABLED is already defined in sci.sh as 1
 (define  TRANSLATOR       $0010)   ;condition event message (used internally)
 (define  IB_ACTIVE        $0020)   ;iconbar is up
 (define  HIDEBAR          $0040)   ;close bar after action
@@ -756,19 +750,6 @@
 (define  UPDATE_CURSOR    $1000)   ;transfer view, loop, & cel to cursor obj
 (define  FORCE            $8000)
 
-
-
-;*******************
-;*                 *
-;* Misc Defines    *
-;* (Added by CI)   *
-;
-(enum
-	DETAIL_LOW
-	DETAIL_MID
-	DETAIL_HIGH
-	DETAIL_ULTRA ;added by EO
-)
 
 ; SCI01 verb defines
 ;(added by EO)

@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# SPEEDTEST)
-(include system.sh) (include sci2.sh) (include game.sh)
+(include game.sh)
 (use Main)
 (use Intrface)
 (use Save)
@@ -24,7 +24,7 @@
 
 (instance speedTest of Room
 	(properties
-		picture pSpeedTest
+		picture pBlack
 		style IRISIN
 	)
 	
@@ -54,9 +54,9 @@
 		(if
 		(and (u< local0 (GetTime)) (not (self script?)))
 			(cond 
-				((<= speedCount 25) (= detailLevel DETAIL_LOW))
-				((<= speedCount 40) (= detailLevel DETAIL_MID))
-				((<= speedCount 60) (= detailLevel DETAIL_HIGH))
+				((<= speedCount 25) (= detailLevel 0))
+				((<= speedCount 40) (= detailLevel 1))
+				((<= speedCount 60) (= detailLevel 2))
 				(else (= detailLevel 3))
 			)
 			(self setScript: speedScript)
@@ -82,7 +82,7 @@
 			(2
 				(if debugging
 					(repeat
-						(= inputRoom 0)
+						(= inputRoom NULL)
 						(= nextRoom
 							(Print "Where to, boss?"
 								#edit @inputRoom 5
@@ -93,8 +93,8 @@
 						(if (> nextRoom 0) (break))
 					)
 				else
-					(= nextRoom 1)
-					(TheMenuBar state: ENABLED)
+					(= nextRoom TITLE)
+					(TheMenuBar state: DISABLED)
 				)
 				(TheMenuBar state: ENABLED)
 				(HandsOn)

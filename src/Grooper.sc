@@ -16,7 +16,7 @@
 
 
 (script# GROOPER)
-(include system.sh) (include sci2.sh)
+(include game.sh)
 (use Main)
 (use Sight)
 (use Motion)

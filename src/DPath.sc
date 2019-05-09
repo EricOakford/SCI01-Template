@@ -14,7 +14,7 @@
 ;;;;
 
 (script# DPATH)
-(include system.sh) (include sci2.sh)
+(include game.sh)
 (use Motion)
 (use System)
 

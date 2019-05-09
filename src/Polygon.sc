@@ -5,7 +5,7 @@
 ;; Other uses are possible however, such as a features onMe check.
 ;; 7/23/90 J.M.H. Avoider librarian.
 
-(include system.sh) (include sci2.sh)
+(include game.sh)
 (use System)
 
 

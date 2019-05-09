@@ -12,7 +12,7 @@
 ;;;;  MS-DOS specific
 
 (script# FILESEL)
-(include system.sh) (include sci2.sh)
+(include game.sh)
 (use Intrface)
 
 

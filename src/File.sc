@@ -20,7 +20,7 @@
 
 (script# FILE)
 
-(include system.sh) (include sci2.sh)
+(include game.sh)
 (use System)
 
 

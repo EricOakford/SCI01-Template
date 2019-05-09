@@ -9,6 +9,7 @@
 (define TRUE		1)
 (define FALSE		0)
 
+
 #ifdef SCI_0
 (define ENABLED		1)
 (define DISABLED	0)

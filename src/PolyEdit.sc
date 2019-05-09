@@ -134,7 +134,7 @@ code_0056:
 			push    
 			pushi    100
 			pushi    1
-			lsg      defaultPalette
+			lsg      currentPalette
 			callk    DrawPic,  8
 			lsg      overlays
 			ldi      65535
@@ -144,7 +144,7 @@ code_0056:
 			lsg      overlays
 			pushi    100
 			pushi    0
-			lsg      defaultPalette
+			lsg      currentPalette
 			callk    DrawPic,  8
 code_00a3:
 			pushi    #doit
@@ -894,7 +894,7 @@ code_0616:
 			push    
 			pushi    100
 			pushi    1
-			lsg      defaultPalette
+			lsg      currentPalette
 			callk    DrawPic,  8
 			lsg      overlays
 			ldi      65535
@@ -904,7 +904,7 @@ code_0616:
 			lsg      overlays
 			pushi    100
 			pushi    0
-			lsg      defaultPalette
+			lsg      currentPalette
 			callk    DrawPic,  8
 code_063d:
 			pushi    #doit
@@ -968,9 +968,9 @@ code_0691:
 		(theGame
 			setCursor: normalCursor (HaveMouse) (& temp5 $03ff) (& temp6 $03ff)
 		)
-		(DrawPic (curRoom curPic?) 100 dpCLEAR defaultPalette)
+		(DrawPic (curRoom curPic?) 100 dpCLEAR currentPalette)
 		(if (!= overlays -1)
-			(DrawPic overlays 100 dpNO_CLEAR defaultPalette)
+			(DrawPic overlays 100 dpNO_CLEAR currentPalette)
 		)
 		(addToPics doit:)
 		(Animate (cast elements?) 0)

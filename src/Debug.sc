@@ -17,7 +17,7 @@
 (instance debugRm of Script
 	(properties)
 	
-	(method (handleEvent event &tmp newEvent temp1 [temp2 2] castFirst [temp5 80] temp85 temp86)
+	(method (handleEvent event &tmp newEvent temp1 [temp2 2] castFirst [str 80] temp85 temp86)
 		(switch (event type?)
 			(mouseDown
 				(cond 
@@ -36,7 +36,7 @@
 						(event claimed: TRUE)
 						(= temp1
 							(Print
-								(Format @temp5 {%d/%d} (event x?) (event y?))
+								(Format @str {%d/%d} (event x?) (event y?))
 								#at
 								(- (event x?) 21)
 								(- (event y?) 17)
@@ -85,7 +85,7 @@
 							(= temp1 (NodeValue castFirst))
 							(Print
 								(Format
-									@temp5
+									@str
 									{view: %d\n
 									(x,y):%d,%d\n
 									STOPUPD=%d\n
@@ -128,7 +128,7 @@
 					(KEY_ALT_m (theGame showMem:))
 					(KEY_ALT_e
 						(Format
-							@temp5
+							@str
 							{ego\n
 							x:%d y:%d\n
 							loop:%d\n
@@ -138,13 +138,15 @@
 							(ego loop?)
 							(ego cel?)
 						)
-						(Print @temp5 #icon (ego view?) 0 0)
+						(Print @str #icon (ego view?) 0 0)
 					)
 					(KEY_ALT_v (Show VMAP))
 					(KEY_ALT_p (Show PMAP))
 					(KEY_ALT_c (Show CMAP))
 					(KEY_ALT_w (CreateObject doit:))
-					(KEY_ALT_d (SetDebug)) ;Added to allow the interpreter's internal debugger to be accessed with a simpler key combo
+					(KEY_ALT_d (SetDebug))
+					;Added to allow the interpreter's internal debugger
+					;to be accessed with a simpler key combo
 					
 					(else  (event claimed: FALSE))
 				)

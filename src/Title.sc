@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# TITLE)
-(include system.sh) (include sci2.sh) (include game.sh)
+(include game.sh)
 (use Main)
 (use Game)
 (use Menu)
@@ -13,7 +13,7 @@
 
 (instance title of Room
 	(properties
-		picture pSpeedTest
+		picture pBlack
 		style DISSOLVE
 	)
 	
@@ -36,9 +36,9 @@
 			(0 
 				(Display
 					"Intro/Opening screen"
-					dsCOORD 90 80
-					dsCOLOR clWHITE
-					dsBACKGROUND clTRANSPARENT
+					p_at 90 80
+					p_color vWHITE
+					p_back clTRANSPARENT
 					)
 			)
 			(1

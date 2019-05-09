@@ -4,7 +4,7 @@
 ;	a number of useful procedures.
 
 (script# MAIN)
-(include system.sh) (include sci2.sh) (include game.sh)
+(include game.sh) (include menu.sh)
 (use Intrface)
 (use LoadMany)
 (use Motion)
@@ -70,33 +70,14 @@
                                         ;WARNING!  Must be set in room 0
                                         ;(usually to {x.yyy    } or {x.yyy.zzz})
 	locales
-	curSaveDir		;address of current save drive/directory string
-	;31-49 are unused
-	global31
-	global32
-	global33
-	global34
-	global35
-	global36
-	global37
-	global38
-	global39
-	global40
-	global41
-	global42
-	global43
-	global44
-	global45
-	global46
-	global47
-	global48
-	global49
+	[curSaveDir 20]			;current save drive/directory string [20 chars long]
 	aniThreshold =  10
 	perspective				;player's viewing angle: degrees away from vertical along y axis
 	features				;locations that may respond to events
-	sortedFeatures
+	sortedFeatures          ;requires SORTCOPY (script 984)
 	useSortedFeatures		;enable cast & feature sorting?
-	isDemoGame				;enabled if this is a game demo, and not a full game.??
+	isDemoGame				;55 enabled if this is a game demo, and not a full game.
+	                        ;CI: This might not be an accurate variable name??
 	egoBlindSpot			;actors behind ego within angle 
 							;from straight behind. 
 							;Default zero is no blind spot
@@ -104,7 +85,7 @@
 	doMotionCue				;a motion cue has occurred - process it
 	systemWindow			;ID of standard system window
 	demoDialogTime =  3
-	defaultPalette
+	currentPalette
 	modelessPort
 	[sysLogPath 10]			;used for system standard logfile path (uses 10 globals)
 	ftrInitializer			;pointer to code that gets called from
@@ -136,7 +117,7 @@
 	global96
 	global97
 	global98
-	global99
+	lastSysGlobal
 	isEgoLocked
 	deathMusic	= sDeath	;default death music
 	musicChannels
@@ -383,7 +364,7 @@
 	(method (init)
 		(= debugging TRUE) ;Set to TRUE if you want to enable the debug features.	
 		(SysWindow
-			;these colors can be changed to suit your preferences.
+			;These colors can be changed to suit your preferences.
 			;They can also be changed in the game's menu, like in LSL3.
 			color: (= curTextColor vBLACK)
 			back: (= curBackColor vWHITE)
@@ -423,6 +404,14 @@
 	(method (doit)
 		(super doit:)
 	)
+	(method (replay)
+		(TheMenuBar draw:)
+		(StatusLine enable:)
+		(SetMenu soundI p_text
+			(if (DoSound SoundOn) {Sound off} else {Sound on})
+		)
+		(super replay:)
+	)	
 	
 	(method (startRoom roomNum &tmp [temp0 12])
 		(LoadMany FALSE	

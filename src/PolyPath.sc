@@ -5,7 +5,7 @@
 ;; defined as Polygons and added to the obstacle list via the
 ;; Rooms setObstacle method. 07/24/90 J.M.H.
 
-(include system.sh) (include sci2.sh)
+(include game.sh)
 (use Main)
 (use Motion)
 

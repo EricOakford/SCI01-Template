@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# TESTROOM)
-(include system.sh) (include sci2.sh) (include game.sh)
+(include game.sh)
 (use Main)
 (use Feature)
 (use Game)
@@ -14,7 +14,7 @@
 
 (instance rm002 of Room
 	(properties
-		picture scriptNumber
+		picture pWhite
 		north 0
 		east 0
 		south 0
