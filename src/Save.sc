@@ -1,13 +1,31 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# 990)
+(script# SAVE)
 (include game.sh)
 (use Main)
 (use Intrface)
 (use System)
 
+(define  GAMESSHOWN 8)     ;the number of games displayed in the selector
+(define  MAXGAMES 20)      ;maximum number of games in a save directory
+(define  COMMENTSIZE 36)   ;size of user's description of the game
+(define  COMMENTBUFF 18) 	;(/ (+ 1 COMMENTSIZE) 2))
+
+(define  DIRECTORYSIZE 29) ;size of the save directory name
+(define  DIRECTORYBUFF 15)	;(/ (+ 1 DIRECTORYSIZE) 2))
+
+(define  BUFFERSIZE 361)	;(+ (* MAXGAMES COMMENTBUFF) 1))
+
+;;;(procedure
+;;;   GetDirectory
+;;;   HaveSpace
+;;;   GetStatus
+;;;   NeedDescription
+;;;)
+
 (public
-	GetDirectory 0
+   GetDirectory   0
 )
+
 
 (local
 	default
@@ -19,18 +37,6 @@
 	[butbuf2 4] = [{Select the game that you would like to restore.} {Type the description of this saved game.} {This directory/disk can hold no more saved games. You must replace one of your saved games or use Change Directory to save on a different directory/disk.} {This directory/disk can hold no more saved games. You must replace one of your saved games or use Change Directory to save on a different directory/disk.}]
 )
 
-(define  GAMESSHOWN 8)     ;the number of games displayed in the selector
-(define  MAXGAMES 20)      ;maximum number of games in a save directory
-(define  COMMENTSIZE 36)   ;size of user's description of the game
-;SCICompanion doesn't support equation defines
-;(define  COMMENTBUFF (/ (+ 1 COMMENTSIZE) 2))
-
-(define  DIRECTORYSIZE 29) ;size of the save directory name
-;(define  DIRECTORYBUFF (/ (+ 1 DIRECTORYSIZE) 2))
-
-;(define  BUFFERSIZE (+ (* MAXGAMES (/ (+ 1 COMMENTSIZE) 2)) 1))
-
-
 (enum
    RESTORE        ;Restore games
    HAVESPACE      ;Save, with space on disk
@@ -38,78 +44,37 @@
    NOREPLACE      ;Save, no space on disk, no games to replace
 )
 
-(procedure (GetDirectory param1 &tmp temp0 [temp1 33] [temp34 40])
-	(asm
-code_075a:
-		pushi    13
-		pushi    990
-		pushi    1
-		pushi    33
-		pushi    0
-		pushi    41
-		pushi    2
-		lea      @temp1
-		push    
-		lsp      param1
-		callk    StrCpy,  4
-		push    
-		pushi    29
-		pushi    81
-		lofsa    {OK}
-		push    
-		pushi    1
-		pushi    81
-		lofsa    {Cancel}
-		push    
-		pushi    0
-		calle    Print,  26
-		sat      temp0
-		not     
-		bnt      code_078d
-		ldi      0
-		ret     
-code_078d:
-		pushi    1
-		lea      @temp1
-		push    
-		callk    StrLen,  2
-		not     
-		bnt      code_07a1
-		pushi    1
-		lea      @temp1
-		push    
-		callk    GetCWD,  2
-code_07a1:
-		pushi    1
-		lea      @temp1
-		push    
-		callk    ValidPath,  2
-		bnt      code_07bc
-		pushi    2
-		lsp      param1
-		lea      @temp1
-		push    
-		callk    StrCpy,  4
-		ldi      1
-		ret     
-		jmp      code_075a
-code_07bc:
-		pushi    3
-		pushi    4
-		lea      @temp34
-		push    
-		pushi    990
-		pushi    2
-		lea      @temp1
-		push    
-		callk    Format,  8
-		push    
-		pushi    33
-		pushi    0
-		calle    Print,  6
-		jmp      code_075a
-		ret     
-	)
+
+(procedure (GetDirectory where &tmp result [newDir 33] [buf1 40])
+   (repeat
+      (= result
+         (Print "New save-game directory:"
+            #font SYSFONT
+            #edit    (StrCpy @newDir where)
+            #back
+            #button {OK} TRUE
+            #button {Cancel} FALSE
+         )
+      )
+      ;Pressed ESC -- return FALSE.
+      (if (not result)
+         (return FALSE)
+      )
+      ;No string defaults to current drive.
+      (if (not (StrLen @newDir))
+         (GetCWD @newDir)
+      )
+      ;If drive is valid, return TRUE, otherwise complain.
+      (if (ValidPath @newDir)
+         (StrCpy where @newDir)
+         (return TRUE)
+      else
+         (Print
+         	(Format @buf1 "%s\nis not a valid directory" @newDir)
+         	#font SYSFONT
+         )		 
+      )
+   )
 )
 
    (procedure (GetStatus)
@@ -180,77 +145,73 @@ code_07bc:
 )
 
 (class SRDialog of Dialog
-	(properties
-		elements 0
-		size 0
-		text 0
-		window 0
-		theItem 0
-		nsTop 0
-		nsLeft 0
-		nsBottom 0
-		nsRight 0
-		time 0
-		busy 0
-		caller 0
-		seconds 0
-		lastSeconds 0
-	)
+   ;;; The SRDialog class implements the user interface for save/restore.
+   ;;; Its subclasses are the specific save and restore game dialogs,
+   ;;; Save and Restore.
 	
-	(method (init param1 param2 param3)
-		(= window SysWindow)
-		(= nsBottom 0)
-		(if
-			(==
-				(= numGames
-					(GetSaveFiles (theGame name?) param2 param3)
-				)
-				-1
-			)
-			(return 0)
-		)
-		(if (== (= theStatus (GetStatus)) 1)
-			(editI
-				text: (StrCpy param1 param2)
-				font: smallFont
-				setSize:
-				moveTo: 4 4
-			)
-			(self add: editI setSize:)
-		)
-		(selectorI
-			text: param2
-			font: smallFont
-			setSize:
-			moveTo: 4 (+ nsBottom 4)
-			state: 2
-		)
-		(= i (+ (selectorI nsRight?) 4))
-		(okI
+	(method (init theComment names nums)
+		
+      ;; Initialize the dialog.
+
+      ; give ourself the system window as our window
+      (= window SysWindow)
+
+      ;Re-init our size, with no elements.
+      (= nsBottom 0)
+
+      ;Get some files for this directory.
+      (= numGames (GetSaveFiles (theGame name?) names nums))
+      (if (== numGames -1)
+         (return FALSE)
+      )
+
+      (= theStatus (GetStatus))
+
+      ;Set up the edit item for saved games.
+      (if (== theStatus HAVESPACE)
+         (editI
+            text: (StrCpy theComment names),
+            font: smallFont,
+            setSize:,
+            moveTo: MARGIN MARGIN
+         )
+         (self add: editI, setSize:)
+      )
+
+      ;Set up the selectorI box.
+      (selectorI
+         text: names,
+         font: smallFont,
+         setSize:,
+         moveTo: MARGIN (+ nsBottom MARGIN),
+         state: dExit
+      )
+      (= i (+ (selectorI nsRight?) MARGIN))
+     	(okI
 			text: [butbuf1 theStatus]
 			setSize:
 			moveTo: i (selectorI nsTop?)
-			state: (if (== theStatus 3) 0 else 3)
+			state: (if (== theStatus NOREPLACE) 0 else (| dActive dExit))
 		)
 		(cancelI
 			setSize:
-			moveTo: i (+ (okI nsBottom?) 4)
-			state: (& (cancelI state?) $fff7)
+			moveTo: i (+ (okI nsBottom?) MARGIN)
+			state: (& (cancelI state?) (~ dSelected))
 		)
 		(changeDirI
 			setSize:
-			moveTo: i (+ (cancelI nsBottom?) 4)
-			state: (& (changeDirI state?) $fff7)
+			moveTo: i (+ (cancelI nsBottom?) MARGIN)
+			state: (& (changeDirI state?) (~ dSelected))
 		)
 		(self add: selectorI okI cancelI changeDirI setSize:)
 		(textI
 			text: [butbuf2 theStatus]
-			setSize: (- (- nsRight nsLeft) 8)
-			moveTo: 4 4
+			setSize: (- (- nsRight nsLeft) (* 2 MARGIN))
+			moveTo: MARGIN MARGIN
 		)
 		(= i (+ (textI nsBottom?) 4))
 		(self eachElementDo: #move 0 i)
-		(self add: textI setSize: center: open: 4 15)
+		(self add: textI setSize: center: open: wTitled 15)
 		(return 1)
 	)
 	
@@ -270,7 +231,7 @@ code_07bc:
             theComment
          )
 
-         (= fd (FileIO fileOpen (Format @str 990 0 (theGame name?))))
+         (= fd (FileIO fileOpen (Format @str "%ssg.dir" (theGame name?))))
          (if (== fd -1)
             ;no directory -> no saved games
             (return)
@@ -391,7 +352,7 @@ code_07bc:
             )
          )
       )
-      (DisposeScript FILE)
+;      (DisposeScript FILE)
       (self dispose:)
 ;      (DisposeScript SAVE)
       (return ret)
@@ -400,94 +361,69 @@ code_07bc:
 
 (class Restore of SRDialog
 	(properties
-		elements 0
-		size 0
 		text {Restore a Game}
-		window 0
-		theItem 0
-		nsTop 0
-		nsLeft 0
-		nsBottom 0
-		nsRight 0
-		time 0
-		busy 0
-		caller 0
-		seconds 0
-		lastSeconds 0
 	)
 )
 
 (class Save of SRDialog
 	(properties
-		elements 0
-		size 0
 		text {Save a Game}
-		window 0
-		theItem 0
-		nsTop 0
-		nsLeft 0
-		nsBottom 0
-		nsRight 0
-		time 0
-		busy 0
-		caller 0
-		seconds 0
-		lastSeconds 0
 	)
 )
 
 (instance GetReplaceName of Dialog
 	(properties)
 	
-	(method (doit param1 &tmp temp0)
-		(= window SysWindow)
-		(text1 setSize: moveTo: 4 4)
+	(method (doit theComment &tmp ret)
+      ; give ourself the system window as our window
+      (= window SysWindow)
+		(text1 setSize: moveTo: MARGIN MARGIN)
 		(self add: text1 setSize:)
 		(oldName
-			text: param1
+			text: theComment
 			font: smallFont
 			setSize:
-			moveTo: 4 nsBottom
+			moveTo: MARGIN nsBottom
 		)
 		(self add: oldName setSize:)
-		(text2 setSize: moveTo: 4 nsBottom)
+		(text2 setSize: moveTo: MARGIN nsBottom)
 		(self add: text2 setSize:)
 		(newName
-			text: param1
+			text: theComment
 			font: smallFont
 			setSize:
-			moveTo: 4 nsBottom
+			moveTo: MARGIN nsBottom
 		)
 		(self add: newName setSize:)
 		(button1 nsLeft: 0 nsTop: 0 setSize:)
 		(button2 nsLeft: 0 nsTop: 0 setSize:)
 		(button2
-			moveTo: (- nsRight (+ (button2 nsRight?) 4)) nsBottom
+			moveTo: (- nsRight (+ (button2 nsRight?) MARGIN)) nsBottom
 		)
 		(button1
-			moveTo: (- (button2 nsLeft?) (+ (button1 nsRight?) 4)) nsBottom
+			moveTo: (- (button2 nsLeft?) (+ (button1 nsRight?) MARGIN)) nsBottom
 		)
-		(self add: button1 button2 setSize: center: open: 0 15)
-		(= temp0 (super doit: newName))
+		(self add: button1 button2 setSize: center: open: stdWindow 15)
+		(= ret (super doit: newName))
 		(self dispose:)
-		(if (not (StrLen param1))
+		(if (not (StrLen theComment))
 			(NeedDescription)
-			(= temp0 0)
+			(= ret 0)
 		)
-		(return (if (== temp0 newName) else (== temp0 button1)))
+		(return (if (== ret newName) else (== ret button1)))
 	)
 )
 
 (instance selectorI of DSelector
 	(properties
-		x 36
-		y 8
+		x COMMENTSIZE
+		y GAMESSHOWN
 	)
 )
 
 (instance editI of DEdit
 	(properties
-		max 35
+		max (- COMMENTSIZE 1)
 	)
 )
 
@@ -509,21 +445,21 @@ code_07bc:
 
 (instance textI of DText
 	(properties
-		font 0
+		font SYSFONT
 	)
 )
 
 (instance text1 of DText
 	(properties
 		text {Replace}
-		font 0
+		font SYSFONT
 	)
 )
 
 (instance text2 of DText
 	(properties
 		text {with:}
-		font 0
+		font SYSFONT
 	)
 )
 
@@ -533,7 +469,7 @@ code_07bc:
 
 (instance newName of DEdit
 	(properties
-		max 35
+		max (- COMMENTSIZE 1)
 	)
 )
 

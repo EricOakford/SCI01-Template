@@ -41,7 +41,7 @@
 	)
 	
 	(method (showSelf)
-		(PrintD (if description else name) view loop cel)
+		(PrintIcon (if description else name) view loop cel)
 	)
 	
 	(method (saidMe)

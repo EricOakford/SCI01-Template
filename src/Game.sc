@@ -12,50 +12,42 @@
 (use System)
 
 
-(procedure (PromptForDiskChange param1 &tmp temp0 [temp1 40] [temp41 40] [temp81 40])
-	(= temp0 1)
-	(DeviceInfo 0 curSaveDir @temp1)
-	(DeviceInfo 1 @temp41)
+(procedure (PromptForDiskChange saveDisk &tmp ret [saveDevice 40] [curDevice 40] [str 40])
+	(= ret TRUE)
+	(DeviceInfo GetDevice curSaveDir @saveDevice)
+	(DeviceInfo CurDevice @curDevice)
 	(if
 		(and
-			(DeviceInfo 2 @temp1 @temp41)
-			(DeviceInfo 3 @temp41)
+			(DeviceInfo SameDevice @saveDevice @curDevice)
+			(DeviceInfo DevRemovable @curDevice)
 		)
 		(Format
-			@temp81
-			{Please insert your %s disk in drive %s.}
-			(if param1 {SAVE GAME} else {GAME})
-			@temp41
+			@str
+			"Please insert your %s disk in drive %s."
+			(if saveDisk {SAVE GAME} else {GAME})
+			@curDevice
 		)
-		(DeviceInfo 4)
+		(DeviceInfo CloseDevice)
 		(if
 			(==
-				(= temp0
-					(if param1
-						(Print
-							@temp81
-							#font
-							0
-							#button
-							{OK}
-							1
-							#button
-							{Cancel}
-							0
-							#button
-							{Change Directory}
-							2
+				(= ret
+					(if saveDisk
+						(Print @str
+							#font SYSFONT
+							#button {OK} TRUE
+							#button {Cancel} FALSE
+							#button {Change Directory} 2
 						)
 					else
-						(Print @temp81 #font 0 #button {OK} 1)
+						(Print @str #font SYSFONT #button {OK} TRUE)
 					)
 				)
 				2
 			)
-			(= temp0 (GetDirectory curSaveDir))
+			(= ret (GetDirectory curSaveDir))
 		)
 	)
-	(return temp0)
+	(return ret)
 )
 
 (instance theCast of EventHandler
@@ -167,8 +159,8 @@
 (class Game of Object
 	(properties
 		script 0
-		parseLang 1
-		printLang 1
+		parseLang ENGLISH
+		printLang ENGLISH
 		subtitleLang 0
 	)
 	
@@ -193,9 +185,9 @@
 		(sounds eachElementDo: #check)
 		(timers eachElementDo: #doit)
 		(if modelessDialog (modelessDialog check:))
-		(Animate (cast elements?) 1)
+		(Animate (cast elements?) TRUE)
 		(if doMotionCue
-			(= doMotionCue 0)
+			(= doMotionCue FALSE)
 			(cast eachElementDo: #motionCue)
 		)
 		(if script (script doit:))
@@ -230,24 +222,24 @@
 		(sortedFeatures release:)
 		(if modelessDialog (modelessDialog dispose:))
 		(cast eachElementDo: #perform RestoreUpdate)
-		(theGame setCursor: waitCursor 1)
-		(DrawPic (curRoom curPic?) 100 dpCLEAR currentPalette)
+		(theGame setCursor: waitCursor TRUE)
+		(DrawPic (curRoom curPic?) PLAIN TRUE currentPalette)
 		(if (!= overlays -1)
-			(DrawPic overlays 100 dpNO_CLEAR currentPalette)
+			(DrawPic overlays PLAIN FALSE currentPalette)
 		)
 		(if (curRoom controls?) ((curRoom controls?) draw:))
 		(addToPics doit:)
 		(theGame setCursor: normalCursor (HaveMouse))
 		(StatusLine doit:)
 		(DoSound RestoreSound)
-		(Sound pause: 0)
+		(Sound pause: FALSE)
 		(while (not quit)
 			(self doit:)
 			(= aniInterval (Wait speed))
 		)
 	)
 	
-	(method (newRoom newRoomNumber &tmp [temp0 4] temp4 temp5)
+	(method (newRoom n &tmp [temp0 4] temp4 evt)
 		(addToPics dispose:)
 		(features eachElementDo: #perform featureDisposeCode release:)
 		(cast eachElementDo: #dispose eachElementDo: #delete)
@@ -256,9 +248,9 @@
 		(locales eachElementDo: #dispose release:)
 		(Animate 0)
 		(= prevRoomNum curRoomNum)
-		(= curRoomNum newRoomNumber)
-		(= newRoomNum newRoomNumber)
-		(FlushResources newRoomNumber)
+		(= curRoomNum n)
+		(= newRoomNum n)
+		(FlushResources n)
 		(= temp4 (self setCursor: waitCursor 1))
 		(self
 			startRoom: curRoomNum
@@ -266,17 +258,17 @@
 			setCursor: temp4 (HaveMouse)
 		)
 		(SetSynonyms regions)
-		(while ((= temp5 (Event new: 3)) type?)
-			(temp5 dispose:)
+		(while ((= evt (Event new: (| mouseDown mouseUp))) type?)
+			(evt dispose:)
 		)
-		(temp5 dispose:)
+		(evt dispose:)
 	)
 	
-	(method (startRoom param1)
+	(method (startRoom roomNum)
 		(if debugOn (SetDebug))
-		(regions addToFront: (= curRoom (ScriptID param1)))
+		(regions addToFront: (= curRoom (ScriptID roomNum)))
 		(curRoom init:)
-		(if isDemoGame (curRoom setRegions: 975))
+		(if isDemoGame (curRoom setRegions: DEMO))
 	)
 	
 	(method (restart)
@@ -284,57 +276,60 @@
 		(RestartGame)
 	)
 	
-	(method (restore &tmp [temp0 20] temp20 temp21 temp22 theParseLang)
+	(method (restore &tmp [comment 20] num oldCur temp22 theParseLang)
 		(= theParseLang parseLang)
-		(= parseLang 1)
-		(Load rsFONT smallFont)
-		(Load rsCURSOR waitCursor)
-		(= temp21 (self setCursor: normalCursor))
-		(= temp22 (Sound pause: 1))
-		(if (PromptForDiskChange 1)
+		(= parseLang ENGLISH)
+		(Load RES_FONT smallFont)
+		(Load RES_CURSOR waitCursor)
+		(= oldCur (self setCursor: normalCursor))
+		(= temp22 (Sound pause: TRUE))
+		(if (PromptForDiskChange TRUE)
 			(if modelessDialog (modelessDialog dispose:))
-			(if (!= (= temp20 (Restore doit: &rest)) -1)
-				(self setCursor: waitCursor 1)
-				(if (CheckSaveGame name temp20 version)
-					(RestoreGame name temp20 version)
+			(if (!= (= num (Restore doit: &rest)) -1)
+				(self setCursor: waitCursor TRUE)
+				(if (CheckSaveGame name num version)
+					(RestoreGame name num version)
 				else
 					(Print "That game was saved under a different interpreter. It cannot be restored." #font SYSFONT #button {OK} 1)
-					(self setCursor: temp21 (HaveMouse))
+					(self setCursor: oldCur (HaveMouse))
 					(= parseLang theParseLang)
 				)
 			else
 				(= parseLang theParseLang)
 			)
-			(PromptForDiskChange 0)
+			(PromptForDiskChange FALSE)
 		)
 		(Sound pause: temp22)
 	)
 	
-	(method (save &tmp [temp0 20] temp20 temp21 temp22 theParseLang)
+	(method (save &tmp [comment 20] num oldCur temp22 theParseLang)
 		(= theParseLang parseLang)
-		(= parseLang 1)
-		(Load rsFONT smallFont)
-		(Load rsCURSOR waitCursor)
-		(= temp21 (self setCursor: normalCursor))
-		(= temp22 (Sound pause: 1))
-		(if (PromptForDiskChange 1)
+		(= parseLang ENGLISH)
+		(Load RES_FONT smallFont)
+		(Load RES_CURSOR waitCursor)
+		(= oldCur (self setCursor: normalCursor))
+		(= temp22 (Sound pause: TRUE))
+		(if (PromptForDiskChange TRUE)
 			(if modelessDialog (modelessDialog dispose:))
-			(if (!= (= temp20 (Save doit: @temp0)) -1)
+			(if (!= (= num (Save doit: @comment)) -1)
 				(= parseLang theParseLang)
-				(= temp21 (self setCursor: waitCursor 1))
-				(if (not (SaveGame name temp20 @temp0 version))
-					(Print "Your save game disk is full. You must either use another disk or save over an existing saved game." #font SYSFONT #button {OK} 1)
+				(= oldCur (self setCursor: waitCursor TRUE))
+				(if (not (SaveGame name num @comment version))
+					(Print "Your save game disk is full. You must either use another disk or save over an existing saved game."
+						#font SYSFONT
+						#button {OK} TRUE
+					)
 				)
-				(self setCursor: temp21 (HaveMouse))
+				(self setCursor: oldCur (HaveMouse))
 			)
-			(PromptForDiskChange 0)
+			(PromptForDiskChange FALSE)
 		)
 		(Sound pause: temp22)
 		(= parseLang theParseLang)
 	)
 	
-	(method (changeScore param1)
-		(= score (+ score param1))
+	(method (changeScore delta)
+		(= score (+ score delta))
 		(StatusLine doit:)
 	)
 	
@@ -370,11 +365,11 @@
 		(return theSpeed)
 	)
 	
-	(method (setCursor cursorNumber &tmp theTheCursor)
-		(= theTheCursor theCursor)
+	(method (setCursor cursorNumber &tmp oldCur)
+		(= oldCur theCursor)
 		(= theCursor cursorNumber)
 		(SetCursor cursorNumber &rest)
-		(return theTheCursor)
+		(return oldCur)
 	)
 	
 	(method (checkAni &tmp temp0)

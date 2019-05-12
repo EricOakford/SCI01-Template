@@ -5,10 +5,10 @@
 (use Intrface)
 
 (public
-	PrintD_940 0
+	PrintD 0
 )
 
-(procedure (PrintD_940 param1 &tmp temp0 newDialog newDText newDTextNsRight temp4 newDTextNsBottom temp6 temp7 temp8 temp9 temp10 temp11 temp12 temp13 temp14 temp15)
+(procedure (PrintD param1 &tmp temp0 newDialog newDText newDTextNsRight temp4 newDTextNsBottom temp6 temp7 temp8 temp9 temp10 temp11 temp12 temp13 temp14 temp15)
 	(= temp11 (= temp12 -1))
 	(= newDTextNsRight
 		(= temp4 (= newDTextNsBottom (= temp6 0)))

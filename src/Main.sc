@@ -408,7 +408,7 @@
 		(TheMenuBar draw:)
 		(StatusLine enable:)
 		(SetMenu soundI p_text
-			(if (DoSound SoundOn) {Sound off} else {Sound on})
+			(if (DoSound SoundOn) { Sound off} else { Sound on})
 		)
 		(super replay:)
 	)	

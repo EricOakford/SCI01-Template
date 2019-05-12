@@ -122,7 +122,7 @@
 					(or
 						(== (event message?) echo)
 						(and
-							(<= KEY_SPACE (event message?))
+							(<= SPACEBAR (event message?))
 							(<= (event message?) 255)
 						)
 					)

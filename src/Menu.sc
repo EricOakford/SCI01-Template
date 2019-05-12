@@ -242,7 +242,7 @@
             (= i (DoSound SoundOn))
             (if (GetMenu soundI p_value)
 					(DoSound SoundOn FALSE)
-					(SetMenu soundI p_value FALSE p_text {Sound on})
+					(SetMenu soundI p_value FALSE p_text { Sound on})
 				else
 					(DoSound SoundOn TRUE)
 					(SetMenu soundI p_value TRUE p_text {Sound off})

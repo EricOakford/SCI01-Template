@@ -1,17 +1,19 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# 255)
-(include game.sh)
+(include system.sh) (include sci2.sh)
 (use Main)
 (use System)
 
 (public
 	Print 0
-	PrintD 1
+	PrintIcon 1
 	GetInput 2
 	GetNumber 3
 	Printf 4
 	MousedOn 5
 )
+
+(define BMOD 16) ; width equalizer for buttons
 
 (procedure (Print param1 &tmp newDialog newDText newDIcon newDEdit temp4 temp5 temp6 temp7 temp8 theModelessDialog temp10 temp11 [newDButton 6] temp18 temp19 temp20 [temp21 1000])
 	(= temp6 (= temp7 -1))
@@ -195,39 +197,41 @@
 	(return temp4)
 )
 
-(procedure (PrintD param1 param2 param3 param4)
-	(Print param1 #icon param2 param3 param4 &rest)
+(procedure (PrintIcon str view loop cel)
+	(Print str #icon view loop cel &rest)
 )
 
-(procedure (GetInput param1 param2 param3 &tmp [temp0 4])
+(procedure (GetInput inputStr maxLen str &tmp [temp0 4])
 	(if
 		(Print
-			(if (>= argc 3) param3 else {})
+			(if (>= argc 3) str else {})
 			#edit
-			param1
-			param2
+			inputStr
+			maxLen
 			&rest
 		)
-		(StrLen param1)
+		(StrLen inputStr)
 	)
 )
 
-(procedure (GetNumber param1 param2 &tmp [temp0 40])
-	(= temp0 0)
-	(if (> argc 1) (Format @temp0 255 0 param2))
+
+(procedure (GetNumber str default &tmp [theLine 40])
+	(= theLine 0)
+	(if (> argc 1) (Format @theLine INTRFACE 0 default))
 	(return
-		(if (GetInput @temp0 5 param1)
-			(ReadNumber @temp0)
+		(if (GetInput @theLine 5 str)
+			(ReadNumber @theLine)
 		else
 			-1
 		)
 	)
 )
 
-(procedure (Printf &tmp [temp0 500])
-	(Format @temp0 &rest)
-	(Print @temp0)
+(procedure (Printf &tmp [str 500])
+	(Format @str &rest)
+	(Print @str)
 )
+
 
 (procedure (MousedOn param1 param2 param3)
 	(cond 
@@ -261,35 +265,39 @@
 	)
 )
 
-(procedure (localproc_0016 &tmp newEvent temp1)
-	(= temp1 (!= ((= newEvent (Event new:)) type?) 2))
-	(newEvent dispose:)
-	(return temp1)
+(procedure (StillDown &tmp evt ret)
+	(= ret (!= ((= evt (Event new:)) type?) mouseUp))
+	(evt dispose:)
+	(return ret)
 )
+
 
 (class MenuBar of Object
 	(properties
-		state $0000
+		name 	NULL
+		state 	$0000
 	)
 	
 	(method (draw)
-		(= state 1)
-		(DrawMenuBar 1)
+		(= state TRUE)
+		(DrawMenuBar TRUE)
 	)
 	
 	(method (hide)
-		(DrawMenuBar 0)
+		(= state FALSE)
+		(DrawMenuBar FALSE)
 	)
 	
-	(method (handleEvent event &tmp temp0 temp1)
-		(= temp0 0)
+	(method (handleEvent event &tmp ret oldJoy)
+		(= ret 0)
 		(if state
-			(= temp1 (Joystick 12 30))
-			(= temp0 (MenuSelect event &rest))
-			(Joystick 12 temp1)
+			(= oldJoy (Joystick 12 30))
+			(= ret (MenuSelect event &rest))
+			(Joystick 12 oldJoy)
 		)
-		(return temp0)
+		(return ret)
 	)
+
 	
 	(method (add)
 		(AddMenu &rest)
@@ -297,233 +305,307 @@
 )
 
 (class DItem of Object
+;;; The superclass of all items of control in the user interface.
+	
 	(properties
-		type $0000
-		state $0000
-		nsTop 0
-		nsLeft 0
-		nsBottom 0
-		nsRight 0
-		key 0
-		said 0
-		value 0
+		name 	 NULL	; don't waste storage on a name string
+		type 	 $0000	; the type of this control
+		state 	 $0000	; defined by each subclass
+		nsTop 	 0		; visible rectangle
+		nsLeft 	 0		; in LOCAL coords
+		nsBottom 0		; used to select
+		nsRight  0		; control via a mouse click
+		key 	 0		; key code associated with control
+		said 	 0		; said spec associated with control
+		value 	 0		; for programmers use
 	)
+
 	
 	(method (doit)
+		;; Default method is to return value.
+		;; Will be superceded by user's instances.
+
 		(return value)
 	)
 	
-	(method (enable param1)
-		(if param1
-			(= state (| state $0001))
+	(method (enable bool)
+		;; Enable/disable this control.
+		
+		(if bool
+			(= state (| state dActive))
 		else
-			(= state (& state $fffe))
+			(= state (& state (~ dActive)))
 		)
 	)
 	
-	(method (select param1)
-		(if param1
-			(= state (| state $0008))
+	(method (select bool)
+		;; Select/deselect this control.
+
+		(if bool
+			(= state (| state dSelected))
 		else
-			(= state (& state $fff7))
+			(= state (& state (~ dSelected)))
 		)
 		(self draw:)
 	)
+
 	
-	(method (handleEvent event &tmp temp0 eventType temp2)
-		(if (event claimed?) (return 0))
-		(= temp0 0)
+	(method (handleEvent event &tmp ret evtType evt)
+		;; Return ID if this event is yours, else 0.
+		
+		(if (event claimed?) (return NULL))
+		
+		; default to not selected
+		(= ret NULL)
 		(if
 			(and
-				(& state $0001)
+				(& state dActive)
 				(or
+					;something was 'said'
 					(and
-						(== (= eventType (event type?)) 128)
+						; assign to evtType variable for a slight speed up effort
+						(== (= evtType (event type?)) saidEvent)
 						(Said said)
 					)
+					; pressed your key
 					(and
-						(== eventType keyDown)
+						(== evtType keyDown)
 						(== (event message?) key)
 					)
-					(and (== eventType mouseDown) (self check: event))
+					; clicked in box
+					(and (== evtType mouseDown) (self check: event))
 				)
 			)
-			(event claimed: 1)
-			(= temp0 (self track: event))
+			
+			; this was us
+			(event claimed: TRUE)
+			(= ret (self track: event))
 		)
-		(return temp0)
+		(return ret)
 	)
+
 	
-	(method (check param1)
+	(method (check event)
+		;; Return true if x/y/ in your rectangle.
+		
 		(return
 			(if
 				(and
-					(>= (param1 x?) nsLeft)
-					(>= (param1 y?) nsTop)
-					(< (param1 x?) nsRight)
+					(>= (event x?) nsLeft)
+					(>= (event y?) nsTop)
+					(< (event x?) nsRight)
 				)
-				(< (param1 y?) nsBottom)
+				(< (event y?) nsBottom)
 			else
 				0
 			)
 		)
 	)
+
 	
-	(method (track param1 &tmp temp0 temp1)
+	(method (track event &tmp in lastIn)
+		;; Track control to confirm selection.
+		;; NOTE: Only a mouseDown requires a mouse track.
+
 		(return
-			(if (== 1 (param1 type?))
-				(= temp1 0)
+			(if (== mouseDown (event type?))
+				(= lastIn 0)
 				(repeat
-					(= param1 (Event new: -32768))
-					(GlobalToLocal param1)
-					(if (!= (= temp0 (self check: param1)) temp1)
+					(= event (Event new: leaveIt))
+					(GlobalToLocal event)
+					(if (!= (= in (self check: event)) lastIn)
 						(HiliteControl self)
-						(= temp1 temp0)
+						(= lastIn in)
 					)
-					(param1 dispose:)
-					(breakif (not (localproc_0016)))
+					(event dispose:)
+					(breakif (not (StillDown)))
 				)
-				(if temp0 (HiliteControl self))
-				(return temp0)
+				(if in (HiliteControl self))
+				(return in)
 			else
 				(return self)
 			)
 		)
 	)
+
 	
 	(method (setSize)
+		;; Set the item's rectangle.  Responsibility of subclasses.
 	)
 	
-	(method (move param1 param2)
-		(= nsRight (+ nsRight param1))
-		(= nsLeft (+ nsLeft param1))
-		(= nsTop (+ nsTop param2))
-		(= nsBottom (+ nsBottom param2))
+	(method (move h v)
+		;; Move item BY h v.
+		
+		(= nsRight (+ nsRight h))
+		(= nsLeft (+ nsLeft h))
+		(= nsTop (+ nsTop v))
+		(= nsBottom (+ nsBottom v))
 	)
 	
-	(method (moveTo param1 param2)
-		(self move: (- param1 nsLeft) (- param2 nsTop))
+	(method (moveTo h v)
+		;; Move item TO h v.
+		
+		(self move: (- h nsLeft) (- v nsTop))
 	)
 	
 	(method (draw)
+		;; Draw self per kernel definition.
+		
 		(DrawControl self)
 	)
+
 	
-	(method (isType param1)
-		(return (== type param1))
+	(method (isType theType)
+		;; Return TRUE if this DItem is of type theType.
+		
+		(return (== type theType))
 	)
 	
-	(method (checkState param1)
-		(return (& state param1))
+	(method (checkState bit)
+		(return (& state bit))
 	)
 	
 	(method (cycle)
+		; do something on each cycle through the dialog's doit
 	)
 )
 
+
 (class DText of DItem
-	(properties
-		type $0002
-		state $0000
-		nsTop 0
-		nsLeft 0
-		nsBottom 0
-		nsRight 0
-		key 0
-		said 0
-		value 0
-		text 0
-		font 1
-		mode 0
-	)
+	;;; A non-editable, generally non-selectable text field.
 	
-	(method (new &tmp temp0)
+	(properties
+		;properties from DItem
+		type 		dText	;value updated for DText
+		state 		$0000
+		nsTop 		0
+		nsLeft 		0
+		nsBottom 	0
+		nsRight 	0
+		key 		0
+		said 		0
+		value 		0
+		;new properties for DText
+		text 		0			;the text in the field
+		font 		USERFONT	;font to use for print text
+		mode 		teJustLeft	;possible alignment of text
+								;  (0) teJustLeft     left justified
+								;  (1) teJustCenter   center each line
+								;  (-1) teJustRight    right justified
+	)
+
+	
+	(method (new &tmp newText)
 		((super new:) font: userFont yourself:)
 	)
 	
-	(method (setSize param1 &tmp [temp0 4])
-		(TextSize @[temp0 0] text font (if argc param1 else 0))
-		(= nsBottom (+ nsTop [temp0 2]))
-		(= nsRight (+ nsLeft [temp0 3]))
+	(method (setSize w &tmp [r 4])
+		;; If w arg is present it is the fixed width of the text rectangle.
+		
+		(TextSize @[r 0] text font (if argc w else 0))
+		(= nsBottom (+ nsTop [r 2]))
+		(= nsRight (+ nsLeft [r 3]))
 	)
 )
 
 (class DIcon of DItem
+	;;; Icons are simply a view/loop/cel combination created by the view
+	;;; editor VE.  They are generally not selectable.
+
 	(properties
-		type $0004
-		state $0000
-		nsTop 0
-		nsLeft 0
-		nsBottom 0
-		nsRight 0
-		key 0
-		said 0
-		value 0
-		view 0
-		loop 0
-		cel 0
+		;properties from DItem
+		type 		dIcon ;value updated for DIcon
+		state 		$0000
+		nsTop 		0
+		nsLeft 		0
+		nsBottom 	0
+		nsRight 	0
+		key 		0
+		said 		0
+		value 		0
+		;new properties for DIcon
+		view 		NULL	; view number
+		loop 		NULL	; loop number
+		cel 		NULL	; cel number
 	)
 	
-	(method (setSize &tmp [temp0 4])
+	(method (setSize &tmp [r 4])
 		(= nsRight (+ nsLeft (CelWide view loop cel)))
 		(= nsBottom (+ nsTop (CelHigh view loop cel)))
 	)
 )
 
+
 (class DButton of DItem
+	;;; Buttons are selectable items which a user clicks in with the mouse
+	;;; or selects with the TAB key and ENTER in order to execute an action.
+
 	(properties
-		type $0001
-		state $0003
-		nsTop 0
-		nsLeft 0
-		nsBottom 0
-		nsRight 0
-		key 0
-		said 0
-		value 0
-		text 0
-		font 0
+		;properties from DIcon
+		type 		dButton ;value updated for DButton
+		state 		(| dActive dExit) ;value updated for DButton
+		nsTop 		0
+		nsLeft 		0
+		nsBottom	0
+		nsRight 	0
+		key 		0
+		said 		0
+		value 		0
+		;new properties for DButton
+		text 		0		;text displayed inside button
+		font 		SYSFONT	;should usally be left as the system font
 	)
 	
-	(method (setSize &tmp [temp0 4])
-		(TextSize @[temp0 0] text font)
-		(= [temp0 2] (+ [temp0 2] 2))
-		(= [temp0 3] (+ [temp0 3] 2))
-		(= nsBottom (+ nsTop [temp0 2]))
-		(= [temp0 3] (* (/ (+ [temp0 3] 15) 16) 16))
-		(= nsRight (+ [temp0 3] nsLeft))
+	(method (setSize &tmp [r 4])
+		(TextSize @[r 0] text font)
+		
+		; a button box is one pixel larger all around
+		(= [r 2] (+ [r 2] 2))
+		(= [r 3] (+ [r 3] 2))
+		(= nsBottom (+ nsTop [r 2]))
+		(= [r 3] (* (/ (+ [r 3] (- BMOD 1)) BMOD) BMOD))
+		(= nsRight (+ [r 3] nsLeft))
 	)
 )
 
 (class DEdit of DItem
+	;;; A text field which is editable by the user.
+	
 	(properties
-		type $0003
-		state $0001
-		nsTop 0
-		nsLeft 0
-		nsBottom 0
-		nsRight 0
-		key 0
-		said 0
-		value 0
-		text 0
-		font 0
-		max 0
-		cursor 0
+		;properties from DItem
+		type 		dEdit 	;value updated for DEdit
+		state 		dActive	;value updated for DEdit
+		nsTop 		0
+		nsLeft 		0
+		nsBottom 	0
+		nsRight 	0
+		key 		0
+		said 		0
+		value 		0
+		;new properties for DEdit
+		text 		0		;default text when the edit item is drawn
+		font 		SYSFONT	;this is often changed to a user font
+		max 		0		;maximum number of characters allowed in field
+		cursor 		0		;cursor position in field
 	)
 	
-	(method (track param1)
-		(EditControl self param1)
-		(return self)
+	(method (track evt)
+		(EditControl self evt)
+		(return self)	;used to return 0, see Corey
 	)
+
 	
-	(method (setSize &tmp [temp0 4])
-		(TextSize @[temp0 0] {M} font)
-		(= nsBottom (+ nsTop [temp0 2]))
-		(= nsRight (+ nsLeft (/ (* [temp0 3] max 3) 4)))
+	(method (setSize &tmp [r 4])
+		;; Size and set cursor position to the end of the text.
+		
+		; box is as sized by max * width of an "M"
+		(TextSize @[r 0] {M} font)
+		(= nsBottom (+ nsTop [r 2]))
+		(= nsRight (+ nsLeft (/ (* [r 3] max 3) 4)))
 		(= cursor (StrLen text))
 	)
 )
+
 
 (class DSelector of DItem
 	(properties
@@ -582,13 +664,13 @@
 						((< (event y?) (+ nsTop 10))
 							(repeat
 								(self retreat: 1)
-								(breakif (not (localproc_0016)))
+								(breakif (not (StillDown)))
 							)
 						)
 						((> (event y?) (- nsBottom 10))
 							(repeat
 								(self advance: 1)
-								(breakif (not (localproc_0016)))
+								(breakif (not (StillDown)))
 							)
 						)
 						(else
@@ -872,12 +954,12 @@
 		(if
 			(or
 				(event claimed?)
-				(== (event type?) evNULL)
+				(== (event type?) nullEvt)
 				(and
 					(!= mouseDown (event type?))
 					(!= keyDown (event type?))
 					(!= evJOYSTICK (event type?))
-					(!= evJOYDOWN (event type?))
+					(!= joyDown (event type?))
 				)
 			)
 			(EditControl theItem event)
@@ -898,7 +980,7 @@
 				(
 					(and
 						(or
-							(== (event type?) evJOYDOWN)
+							(== (event type?) joyDown)
 							(and
 								(== keyDown (event type?))
 								(== ENTER (event message?))
@@ -921,12 +1003,12 @@
 									(== ENTER (event message?))
 								)
 								(== mouseDown (event type?))
-								(== evJOYDOWN (event type?))
+								(== joyDown (event type?))
 							)
 						)
 						(and
 							(== keyDown (event type?))
-							(== KEY_ESCAPE (event message?))
+							(== ESC (event message?))
 						)
 					)
 					(event claimed: 1)
@@ -943,7 +1025,7 @@
 				(
 					(and
 						(== keyDown (event type?))
-						(== KEY_SHIFTTAB (event message?))
+						(== SHIFTTAB (event message?))
 					)
 					(event claimed: 1)
 					(self retreat:)
@@ -968,8 +1050,8 @@
 
 (class Controls of List
 	(properties
-		elements 0
-		size 0
+		elements 	0
+		size 		0
 	)
 	
 	(method (draw)
@@ -977,16 +1059,18 @@
 		(self eachElementDo: #draw)
 	)
 	
-	(method (handleEvent event &tmp temp0)
-		(if (event claimed?) (return 0))
+	(method (handleEvent evt &tmp cont)
+		;; Find and track an active control.
+		
+		(if (evt claimed?) (return NULL))
 		(if
 			(and
-				(= temp0 (self firstTrue: #handleEvent event))
-				(not (temp0 checkState: 2))
+				(= cont (self firstTrue: #handleEvent evt))
+				(not (cont checkState: dExit))
 			)
-			(temp0 doit:)
-			(= temp0 0)
+			(cont doit:)
+			(= cont NULL)
 		)
-		(return temp0)
+		(return cont)
 	)
 )
