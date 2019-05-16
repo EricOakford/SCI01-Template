@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# 998)
-(include sci.sh)
+(include game.sh)
 (use Main)
 (use Intrface)
 (use Feature)
@@ -20,16 +20,16 @@
 		nsBottom 0
 		nsRight 0
 		description 0
-		sightAngle 26505
-		closeRangeDist 26505
-		longRangeDist 26505
-		shiftClick 26505
-		contClick 26505
-		actions 26505
-		control 26505
-		verbChecks1 26505
-		verbChecks2 26505
-		verbChecks3 26505
+		sightAngle ftrDefault
+		closeRangeDist ftrDefault
+		longRangeDist ftrDefault
+		shiftClick ftrDefault
+		contClick ftrDefault
+		actions ftrDefault
+		control ftrDefault
+		verbChecks1 ftrDefault
+		verbChecks2 ftrDefault
+		verbChecks3 ftrDefault
 		lookStr 0
 		view 0
 		loop 0
@@ -71,16 +71,16 @@
 		nsBottom 0
 		nsRight 0
 		description 0
-		sightAngle 26505
-		closeRangeDist 26505
-		longRangeDist 26505
-		shiftClick 26505
-		contClick 26505
-		actions 26505
-		control 26505
-		verbChecks1 26505
-		verbChecks2 26505
-		verbChecks3 26505
+		sightAngle ftrDefault
+		closeRangeDist ftrDefault
+		longRangeDist ftrDefault
+		shiftClick ftrDefault
+		contClick ftrDefault
+		actions ftrDefault
+		control ftrDefault
+		verbChecks1 ftrDefault
+		verbChecks2 ftrDefault
+		verbChecks3 ftrDefault
 		lookStr 0
 		yStep 2
 		view 0
@@ -269,16 +269,16 @@
 		nsBottom 0
 		nsRight 0
 		description 0
-		sightAngle 26505
-		closeRangeDist 26505
-		longRangeDist 26505
-		shiftClick 26505
-		contClick 26505
-		actions 26505
-		control 26505
-		verbChecks1 26505
-		verbChecks2 26505
-		verbChecks3 26505
+		sightAngle ftrDefault
+		closeRangeDist ftrDefault
+		longRangeDist ftrDefault
+		shiftClick ftrDefault
+		contClick ftrDefault
+		actions ftrDefault
+		control ftrDefault
+		verbChecks1 ftrDefault
+		verbChecks2 ftrDefault
+		verbChecks3 ftrDefault
 		lookStr 0
 		yStep 2
 		view 0
@@ -371,16 +371,16 @@
 		nsBottom 0
 		nsRight 0
 		description 0
-		sightAngle 26505
-		closeRangeDist 26505
-		longRangeDist 26505
-		shiftClick 26505
-		contClick 26505
-		actions 26505
-		control 26505
-		verbChecks1 26505
-		verbChecks2 26505
-		verbChecks3 26505
+		sightAngle ftrDefault
+		closeRangeDist ftrDefault
+		longRangeDist ftrDefault
+		shiftClick ftrDefault
+		contClick ftrDefault
+		actions ftrDefault
+		control ftrDefault
+		verbChecks1 ftrDefault
+		verbChecks2 ftrDefault
+		verbChecks3 ftrDefault
 		lookStr 0
 		yStep 2
 		view 0

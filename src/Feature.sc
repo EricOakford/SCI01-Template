@@ -18,16 +18,16 @@
 		nsBottom 0
 		nsRight 0
 		description 0
-		sightAngle 26505
-		closeRangeDist 26505
-		longRangeDist 26505
-		shiftClick 26505
-		contClick 26505
-		actions 26505
-		control 26505
-		verbChecks1 26505
-		verbChecks2 26505
-		verbChecks3 26505
+		sightAngle ftrDefault
+		closeRangeDist ftrDefault
+		longRangeDist ftrDefault
+		shiftClick ftrDefault
+		contClick ftrDefault
+		actions ftrDefault
+		control ftrDefault
+		verbChecks1 ftrDefault
+		verbChecks2 ftrDefault
+		verbChecks3 ftrDefault
 		lookStr 0
 	)
 	
@@ -272,30 +272,30 @@
 	(properties)
 	
 	(method (doit param1)
-		(if (== (param1 sightAngle?) 26505)
+		(if (== (param1 sightAngle?) ftrDefault)
 			(param1 sightAngle: 90)
 		)
-		(if (== (param1 closeRangeDist?) 26505)
+		(if (== (param1 closeRangeDist?) ftrDefault)
 			(param1 closeRangeDist: 50)
 		)
-		(if (== (param1 longRangeDist?) 26505)
+		(if (== (param1 longRangeDist?) ftrDefault)
 			(param1 longRangeDist: 100)
 		)
-		(if (== (param1 shiftClick?) 26505)
+		(if (== (param1 shiftClick?) ftrDefault)
 			(param1 shiftClick: -32767)
 		)
-		(if (== (param1 contClick?) 26505)
+		(if (== (param1 contClick?) ftrDefault)
 			(param1 contClick: 7)
 		)
-		(if (== (param1 actions?) 26505) (param1 actions: 0))
-		(if (== (param1 control?) 26505) (param1 control: 0))
-		(if (== (param1 verbChecks1?) 26505)
+		(if (== (param1 actions?) ftrDefault) (param1 actions: 0))
+		(if (== (param1 control?) ftrDefault) (param1 control: 0))
+		(if (== (param1 verbChecks1?) ftrDefault)
 			(param1 verbChecks1: -17483)
 		)
-		(if (== (param1 verbChecks2?) 26505)
+		(if (== (param1 verbChecks2?) ftrDefault)
 			(param1 verbChecks2: -17477)
 		)
-		(if (== (param1 verbChecks3?) 26505)
+		(if (== (param1 verbChecks3?) ftrDefault)
 			(param1 verbChecks3: -17477)
 		)
 	)
