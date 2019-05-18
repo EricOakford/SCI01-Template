@@ -11,7 +11,8 @@
 ;;;;  Last Updated:
 ;;;;     Brian K. Hughes
 ;;;;     August 19, 1992
-
+;;;;
+;;;; Adapted for SCI0.1 by Eric Oakford
 
 (include kernel.sh)     ;kernel external declarations
 
@@ -22,101 +23,68 @@
 ;บ                บ
 ;ศออออออออออออออออผ
 
-(define SYSTEM 999)
-(define ACTOR 998)
-(define MENU 997)
-(define USER 996)
-(define INVENT 995)
-(define GAME 994)
-(define FILE 993)
-(define MOTION 992)
-(define JUMP 991)
-(define SAVE 990)
-(define MUSIC 989)
-(define EGO 988)              ; ; SCI1
-(define EXTRA 988)            ; ; SCI0
-(define GAUGE 987)
-(define ORBIT 986)
-(define FLAGS 985)            ; ; SCI1
-(define AVOIDER 985)          ; ; SCI0)
-(define REGPATH 984)          ; ; SCI1
-(define SORTCOPY 984)         ; ; SCI0
-(define PATH 983)
-(define SIGHT 982)
-(define WINDOW 981)
-(define TUTORIAL 980)         ; ; SCI1
-(define TEXTRA 980)           ; ; SCI0
-(define UNUSED_4 979)         ; ; SCI1
-(define MOUSER 979)           ; ; SCI0
-(define GCONTROL 978)
-(define GROOPER 977)
-(define CAT 976)
-(define SCALETO 975)          ; ; SCI1
-(define DEMO 975)             ; ; SCI0
-(define NAMEFIND 974)
-(define TIMER 973)
-(define CHASE 972)
-(define FOLLOW 971)
-(define WANDER 970)
-(define REVERSE 969)
-(define SMOOPER 968)
-(define DCICON 967)
-(define SORT 966)
-(define COUNT 965)
-(define DPATH 964)            ; ; will be merged into PATH in SCI1
-(define RELDPATH 963)         ; ; will be merged into PATH in SCI1
-(define UNUSED_7 962)         ; ; SCI1
-(define QSCRIPT 962)          ; ; SCI0
-(define STOPWALK 961)
-(define UNUSED_8 960)         ; ; SCI1
-(define TIMEDCUE 960)         ; ; SCI0
-(define QSOUND 959)
-(define LOADMANY 958)
-(define UNUSED_10 957)        ; ; SCI1
-(define LASTLINK 957)         ; ; SCI0
-(define FORCOUNT 956)
-(define TRACK 955)
-(define DOOR 954)             ; ; SCI1
-(define GOTOSAID 954)         ; ; SCI0
-(define APPROACH 953)
-(define LOGGER 952)
-(define MOVEFWD 951)
-(define FEATURE 950)
-(define BLOCK 949)
-(define WRITEFTR 948)
-(define DLGEDIT 947)          ; ; SCI1
-(define DELAYEVT 947)         ; ; SCI0
-(define POLYGON 946)
-(define POLYPATH 945)
-(define FILESEL 944)
-(define POLYEDIT 943)
-(define MOVECYC 942)
-(define RANDCYC 941)
-(define UNUSED_11 940)        ; ; SCI1
-(define PRINTD 940)           ; ; SCI0
-(define OSC 939)
-(define RANGEOSC 938)         ; ; SCI1
-(define PCYCLE 938)           ; ; SCI0
-(define ICONBAR 937)
-(define BORDWIND 936)
-(define SCALER 935)
-(define SLIDEICON 934)
-(define PMOUSE 933)
-(define PFOLLOW 932)          ; ; SCI1
-(define LANGUAGE 932)         ; ; SCI0
-(define CDACTOR 931)
-(define PCHASE 930)
-(define SYNC 929)
-(define TALKER 928)
-(define PAVOID 927)
-(define FLIPPOLY 926)
-(define CONV 925)
-(define MESSAGER 924)
-(define INSET 923)
-(define DIALOG 922)        ; ;Contains DIcon, DButton, DEdit, DSelector, Controls
-(define PRINT 921)         ; ;Front-end for dialogs
+(define  SYSTEM      999)
+(define  ACTOR       998)
+(define  MENU        997)
+(define  USER        996)
+(define  INVENT      995)
+(define  GAME        994)
+(define  FILE        993)
+(define  MOTION      992)
+(define  JUMP        991)
+(define  SAVE        990)
+(define  MUSIC       989)
+(define  EXTRA       988)
+(define  GAUGE       987)
+(define  ORBIT       986)
+(define  AVOIDER     985)
+(define  SORTCOPY    984)
+(define  PATH        983)
+(define  SIGHT       982)
+(define  WINDOW      981)
+(define  TEXTRA      980)
+(define  MOUSER      979)
+(define  RFEATURE    978)
+(define  GROOPER     977)
+(define  CAT         976)
+(define  DEMO        975)
+(define  NAMEFIND    974)
+(define  TIMER       973)
+(define  CHASE       972)
+(define  FOLLOW      971)
+(define  WANDER      970)
+(define  REVERSE     969)
+(define  SMOOPER     968)
+(define  DCICON      967)
+(define  SORT        966)
+(define  COUNT       965)
+(define  DPATH       964)
+(define  RELDPATH    963)
+(define  QSCRIPT     962)
+(define  STOPWALK    961)
+(define  TIMEDCUE    960)
+(define  QSOUND      959)
+(define  LOADMANY    958)
+(define  LASTLINK    957)
+(define  FORCOUNT    956)
+(define  TRACK       955)
+(define  GOTOSAID    954)
+(define  APPROACH    953)
+(define  LOGGER      952)
+(define  MOVEFWD     951)
+(define  FEATURE     950)
+(define  BLOCK       949)
+(define  WRITEFTR    948)
+(define  DELAYEVT    947)
+(define  POLYGON     946)
+(define  POLYPATH    945)
+(define  FILESEL     944)
+(define  POLYEDIT    943)
+(define  MOVECYC     942)
+(define  RANDCYC     941)
+(define  PRINTD      940)
 
-(define INTRFACE 255)
+(define  INTRFACE    255)
 
 
 
@@ -125,31 +93,29 @@
 ;บ Extern Defines บ
 ;บ                บ
 ;ศออออออออออออออออผ
-
-;NOTE: Externs are not defined in SCICompanion
-;(extern
-;   Prints         PRINT       0
-;   Printf         PRINT       1
-;   GetInput       PRINT       2
-;   FindFormatLen  PRINT       3
-;   StillDown      INTRFACE    0
-;   GetNumber      INTRFACE    1
-;   MousedOn       INTRFACE    2
-;   sign           SYSTEM      0
-;   umod           SYSTEM      1
-;   Min            SYSTEM      2
-;   Max            SYSTEM      3
-;   InRect         SYSTEM      4
-;   OneOf          SYSTEM      5
-;   WordAt         SYSTEM      6
-;   Eval           SYSTEM      7
-;   LoadMany       LOADMANY    0
-;   IsOffScreen    SIGHT       0
-;   CantBeSeen     SIGHT       1
-;   AngleDiff      SIGHT       2
-;   FlipPoly       FLIPPOLY    0
-;   FlipFeature    FLIPPOLY    1
-;)
+;;;NOTE: Externs are not defined in SCICompanion
+;;;(extern
+;;;   Print          INTRFACE    0
+;;;   PrintIcon      INTRFACE    1 ;EO: Just a guess
+;;;   GetInput       INTRFACE    2
+;;;   GetNumber      INTRFACE    3
+;;;   Printf         INTRFACE    4
+;;;   MousedOn       INTRFACE    5
+;;;   sign           SYSTEM      0
+;;;   umod           SYSTEM      1
+;;;   Min            SYSTEM      2
+;;;   Max            SYSTEM      3
+;;;   InRect         SYSTEM      4
+;;;   OneOf          SYSTEM      5
+;;;   WordAt         SYSTEM      6
+;;;   Eval           SYSTEM      7
+;;;   LoadMany       LOADMANY    0
+;;;   IsOffScreen    SIGHT       0
+;;;   CantBeSeen     SIGHT       1
+;;;   AngleDiff      SIGHT       2
+;;;   FlipPoly       FLIPPOLY    0
+;;;   FlipFeature    FLIPPOLY    1
+;;;)
 
 
 
@@ -160,7 +126,6 @@
 ;ศออออออออออออออออออผ
 
 ;Resource types
-; For SCI0
 (define  VIEW     $80)  ;  For backward compatability
 (define  PICTURE  $81)
 (define  SCRIPT   $82)
@@ -169,9 +134,8 @@
 (define  MEMORY   $85)
 (define  VOCAB    $86)
 (define  FONT     $87)
-(define  CURSOR   $88)  ;
+(define  CURSOR   $88)  ;
 
-; For SCI1+
 (define  RES_VIEW       $80)
 (define  RES_PIC        $81)
 (define  RES_SCRIPT     $82)
@@ -187,11 +151,6 @@
 (define  RES_CDAUDIO    $8C)
 (define  RES_AUDIO      $8D)
 (define  RES_SYNC       $8E)
-(define  RES_MESSAGE    $8F)
-(define  RES_MAP        $90)
-(define  RES_HEAP       $91)
-(define  RES_AUDIO36    $92)
-(define  RES_SYNC36     $93)
 
 ;Virtual bitmap ID's
 (define  VMAP     1)
@@ -212,11 +171,10 @@
 (define  PIXELDISSOLVE  9)
 (define  FADEOUT        10)      ;Defaults to PLAIN in 16 color
 
-;SCI0.1 and SCI1.0 scrolling styles
-(define SCROLLLEFT 40)
-(define SCROLLRIGHT 41)
-(define SCROLLDOWN 42)
-(define SCROLLUP 43)
+(define  SCROLLRIGHT    40)      ;Relative order of these four is important
+(define  SCROLLLEFT     41)      ;  in order for ShowPic to work correctly
+(define  SCROLLUP       42)
+(define  SCROLLDOWN     43)
 
 (define  PLAIN          100)     ;Draw quickly with no special effects
 
@@ -249,7 +207,7 @@
 (define  INFINITY    $7fff)   
 
 
-(define  NULL        0)		; NOTE: Already defined in default sci.sh
+(define  NULL        0)
 
 ;Bits in the -info- property.
 (define  CLONED      $0001)
@@ -258,7 +216,9 @@
 (define  CLASS       $8000)
 
 ;For compatability -- bringing stuff in line with SmallTalk syntax.
-;(define  myself      yourself) ;NOTE: Non-integer defines are not yet supported by SCICompanion. Uncomment this define once they are.
+;;;(define  myself      yourself)
+;;;NOTE: Non-integer defines are not yet supported by SCICompanion.
+;;;Uncomment this define once they are.
 
 ;Screen dimensions
 (define  MINTOP      0)
@@ -434,15 +394,6 @@
 (define teJustCenter    1)
 (define teJustRight     -1)
 
-;Message type definitions
-(define  TEXT_MSG       $0001)
-(define  CD_MSG         $0002)
-
-;Defines for messages
-(define  NEXT           -1)
-(define  ALL            0)
-
-
 
 ;ษอออออออออออออออป
 ;บ               บ
@@ -451,25 +402,22 @@
 ;ศอออออออออออออออผ
 
 ;Event types
-(define  nullEvt     $0000) ;sci.sh = evNULL
-(define  mouseDown   $0001) ;sci.sh = evMOUSEBUTTON
-(define  mouseUp     $0002) ;sci.sh = evMOUSERELEASE
-(define  keyDown     $0004) ;sci.sh = evKEYBOARD
-(define  keyUp       $0008) ;sci.sh = evKEYUP
-(define  menuStart   $0010) ;sci.sh = evMENUSTART
-(define  menuHit     $0020) ;sci.sh = evMENUHIT
-(define  direction   $0040) ;sci.sh = evJOYSTICK
-(define  saidEvent   $0080) ;sci.sh = evSAID
-(define  speechEvent $0080)
-(define  joyDown     $0100) ;sci.sh = evJOYDOWN
-(define  joyUp       $0200) ;sci.sh = evJOYUP
+(define  nullEvt     $0000)
+(define  mouseDown   $0001)
+(define  mouseUp     $0002)
+(define  keyDown     $0004)
+(define  keyUp       $0008)
+(define  direction   $0040)
+(define  saidEvent   $0080)
+(define  joyDown     $0100)
+(define  joyUp       $0200)
 (define  walkEvent   $1000)
 (define  helpEvent   $2000)
 (define  userEvent   $4000)
 
 (define  allEvents   $7fff)
 
-(define  leaveIt     $8000) ;sci.sh = evNOJOYSTICK
+(define  leaveIt     $8000)
 
 (define  speechNoun  1)
 (define  speechVerb  0)
@@ -483,8 +431,8 @@
 
 ;Pseudo selectors for SetMenu, Display, and Print (eventually)
 ;  must be duplicated by #define's in KERNEL.H
-; NOTE: these defines *should* all end with : but that is not supported by SCICompanion
-
+;NOTE: these defines *should* all end with : but
+; that is not supported by SCICompanion
 (define p_at        100)
 (define p_mode      101)
 (define p_color     102)
@@ -560,6 +508,8 @@
 (define  SHIFTTAB    $0f00)
 (define  BACKSPACE   $0008) ;(define  BACKSPACE   `^h) in SSCI
 
+
+
 ;Numeric key code in scan code order with missing codes added
 (define  HOMEKEY     $4700)
 (define  UPARROW     $4800)
@@ -587,28 +537,26 @@
 (define  stopUpdOn      $0001)
 (define  startUpdOn     $0002)
 (define  updOn          $0003)
-(define  notUpd         $0004)   ;NOTE: this is originally defined as notUpd, but sci.sh confuses notUpd with stopUpdOn
+(define  notUpd         $0004)
 (define  hideActor      $0008)
-(define  fixPriOn       $0010)   ;NOTE: This is already defined by sci.sh
+(define  fixPriOn       $0010)
 (define  viewAdded      $0020)   ;view will be added to picture
 (define  forceUpdOn     $0040)
 (define  actorHidden    $0080)
 (define  staticView     $0100)
-(define  isExtra        $0200)   ; $0200 was used in SCI0 for determining if an actor was an Extra or not. This is defined as isExtra in sci.sh.
-
 (define  blocked        $0400)   ;tried to move, but couldn't
 (define  fixedLoop      $0800)   ;loop is fixed
-(define  skipCheck      $1000)   ;onMe will check skip ;NOTE: This is already defined by sci.sh
+(define  skipCheck      $1000)   ;onMe will check skip
 (define  ignrHrz        $2000)   ;can ignore horizon
 (define  ignrAct        $4000)   ;can ignore other actors
 (define  delObj         $8000)
 
-; (define  ADDTOPIC       (| delObj stopUpdOn viewAdded))
+;(define  ADDTOPIC       (| delObj stopUpdOn viewAdded))
 (define ADDTOPIC $8021)        ;NOTE: Macro defines are not yet supported by SCICompanion.
-                               ;Remove this define and uncomment the original ADDTOPIC define when they are.
+                               ;Remove this define and uncomment the original ADDTOPIC define
+                               ;when they are.
 
 ;scaleSignal bits
-; SCI1+
 (define  scalable       $0001)   ;scale on user-defined criteria
 (define  autoScale      $0002)   ;scaling as a function of y
 (define  noStepScale    $0004)   ;don't try to change stepSize when scaling
@@ -727,28 +675,12 @@
 )
 
 
-
-;ษอออออออออออออออออป
-;บ                 บ
-;บ Iconbar Defines บ
-;บ                 บ
-;ศอออออออออออออออออผ
-
-(define  RELVERIFY        $0001)   ;release verify, track mouse
-(define  IMMEDIATE        $0002)   ;do the job now, don't condition events
-(define  ICONBAR_DISABLED $0004)   ;icon or bar not enabled
-                                   ;NOTE: This was defined by SSCI as DISABLED,
-                                   ;but DISABLED is already defined in sci.sh as 1
-(define  TRANSLATOR       $0010)   ;condition event message (used internally)
-(define  IB_ACTIVE        $0020)   ;iconbar is up
-(define  HIDEBAR          $0040)   ;close bar after action
-(define  FIXED_POSN       $0080)   ;Item has fixed position in inv window
-(define  VICON            $0100)   ;up and down arrows will advance and retreat
-(define  RELSEND          $0200)   ;for sliders-don't send message until mouseUp
-(define  OPENIFONME       $0400)   ;close if mouse not on bar
-(define  NOCLICKHELP      $0800)
-(define  UPDATE_CURSOR    $1000)   ;transfer view, loop, & cel to cursor obj
-(define  FORCE            $8000)
+;EO: Icon bars aren't really supported in SCI01.
+;The first icon-based game, the floppy disk release of KQ5,
+;used a weirdly-coded custom icon bar in script 997,
+;which is normally for the menu bar.
+;Since there was not yet a standard system script for icon bars,
+;the related defines have been removed.
 
 
 ; SCI01 verb defines
@@ -771,94 +703,70 @@
 ;บ System Globals (0 to 99) บ
 ;บ                          บ
 ;ศออออออออออออออออออออออออออผ
-;NOTE: This represents SCI1.1.
 
-;(global
-;   ego               0                 ;pointer to ego
-;   theGame           1                 ;ID of the Game instance
-;   curRoom           2                 ;ID of current room
-;   unused_1          3
-;   quit              4                 ;when TRUE, quit game
-;   cast              5                 ;collection of actors
-;   regions           6                 ;set of current regions
-;   timers            7                 ;list of timers in the game
-;   sounds            8                 ;set of sounds being played
-;   inventory         9                 ;set of inventory items in game
-;   addToPics         10                ;list of views added to the picture
-;   curRoomNum        11                ;current room number
-;   prevRoomNum       12                ;previous room number
-;   newRoomNum        13                ;number of room to change to
-;   debugOn           14                ;generic debug flag -- set from debug menu
-;   score             15                ;the player's current score
-;   possibleScore     16                ;highest possible score
-;   textCode          17                ;code that handles interactive text
-;   cuees             18                ;list of who-to-cues for next cycle
-;   theCursor         19                ;the number of the current cursor
-;   normalCursor      20 = ARROW_CURSOR ;number of normal cursor form
-;   waitCursor        21 = HAND_CURSOR  ;cursor number of "wait" cursor
-;   userFont          22 = USERFONT     ;font to use for Print
-;   smallFont         23 = 4            ;small font for save/restore, etc.
-;   lastEvent         24                ;the last event (used by save/restore game)
-;   modelessDialog    25                ;the modeless Dialog known to User and Intrface
-;   bigFont           26 = USERFONT     ;large font
-;   version           27 = 0            ;pointer to 'incver' version string
-;                                       ;  WARNING!  Must be set in room 0
-;                                       ;  (usually to {x.yyy    } or {x.yyy.zzz})
-;   unused_3          28
-;   curSaveDir        29                ;address of current save drive/directory string
-;   unused_4          30
-;   perspective       31                ;player's viewing angle: degrees away
-;                                       ;  from vertical along y axis
-;   features          32                ;locations that may respond to events
-;   unused_5          33
-;   useSortedFeatures 34 = FALSE        ;enable cast & feature sorting?
-;   unused_6          35
-;                                       ;actors behind ego within angle 
-;                                       ;from straight behind. 
-;                                       ;Default zero is no blind spot
-;   overlays          36 = -1
-;   doMotionCue       37                ;a motion cue has occurred - process it
-;   systemWindow      38                ;ID of standard system window
-;   unused_7          39
-;   unused_8          40
-;   modelessPort      41
-;   sysLogPath        42                ;-used for system standard logfile path   
-;   endSysLogPath     62                ;/    (uses 40 globals)
-;   gameControls      63                ;pointer to instance of game controls
-;   ftrInitializer    64                ;pointer to code that gets called from
-;                                       ;  a feature's init
-;   doVerbCode        65                ;pointer to code that gets invoked if
-;                                       ;  no feature claims a user event
-;   approachCode      66                ;pointer to code that translates verbs
-;                                       ;  into bits
-;   useObstacles      67 = TRUE         ;will Ego use PolyPath or not?
-;   unused_9          68
-;   theIconBar        69                ;points to TheIconBar or Null 
-;   mouseX            70                ;-last known mouse position
-;   mouseY            71                ;/
-;   keyDownHandler    72                ;-our EventHandlers, get called by game
-;   mouseDownHandler  73                ;/
-;   directionHandler  74                ;/
-;   speechHandler     75                ;a special handler for speech events
-;   lastVolume        76
-;   pMouse            77 = NULL         ;pointer to a Pseudo-Mouse, or NULL
-;   theDoits          78 = NULL         ;list of objects to get doits each cycle
-;   eatMice           79 = 60           ;how many ticks before we can mouse
-;   user              80 = NULL         ;pointer to specific applications User
-;   syncBias          81                ;-globals used by sync.sc
-;   theSync           82                ;/    (will be removed shortly)
-;   unused_10         83                ;
-;   fastCast          84                ;list of talkers on screen
-;   inputFont         85 = SYSFONT      ;font used for user type-in
-;   tickOffset        86                ;used to adjust gameTime after restore
-;   howFast           87                ;measurment of how fast a machine is
-;   gameTime          88                ;ticks since game start
-;   narrator          89                ;pointer to narrator (normally Narrator)
-;   msgType           90 = TEXT_MSG     ;type of messages used
-;   messager          91                ;pointer to messager (normally Messager)
-;   prints            92                ;list of Print's on screen
-;   walkHandler       93                ;list of objects to get walkEvents
-;   textSpeed         94 = 2            ;time text remains on screen
-;   altPolyList       95                ;list of alternate obstacles
-;   lastSysGlobal     99
-;)
+;;;(global
+;;;   ego               0                 ;pointer to ego
+;;;   theGame           1                 ;ID of the Game instance
+;;;   curRoom           2                 ;ID of current room
+;;;   speed             3 = 6             ;The number of ticks between animations. This is set, usually as a menu
+;;;                                       ;	option, to determine the speed of animation. The default is 6.
+;;;   quit              4                 ;when TRUE, quit game
+;;;   cast              5                 ;collection of actors
+;;;   regions           6                 ;set of current regions
+;;;   timers            7                 ;list of timers in the game
+;;;   sounds            8                 ;set of sounds being played
+;;;   inventory         9                 ;set of inventory items in game
+;;;   addToPics         10                ;list of views added to the picture
+;;;   curRoomNum        11                ;current room number
+;;;   prevRoomNum       12                ;previous room number
+;;;   newRoomNum        13                ;number of room to change to
+;;;   debugOn           14                ;generic debug flag -- set from debug menu
+;;;   score             15                ;the player's current score
+;;;   possibleScore     16                ;highest possible score
+;;;   showStyle         17 = IRISOUT      ;The global style for the transition from one picture to another.  This
+;;                                        ;  may be overridden by the style property of a given room.  See the
+;;;                                       ;  DrawPic kernel function for the possible styles.
+;;;   aniInterval       18                ;The number of timer ticks more than the Game's speed which it took to
+;;;                                       ;  complete the last animation cycle.  A non-zero aniInterval means that the
+;;;                                       ;  system is not keeping up.
+;;;   theCursor         19                ;the number of the current cursor
+;;;   normalCursor      20 = ARROW_CURSOR ;number of normal cursor form
+;;;   waitCursor        21 = HAND_CURSOR  ;cursor number of "wait" cursor
+;;;   userFont          22 = USERFONT     ;font to use for Print
+;;;   smallFont         23 = 4            ;small font for save/restore, etc.
+;;;   lastEvent         24                ;the last event (used by save/restore game)
+;;;   modelessDialog    25                ;the modeless Dialog known to User and Intrface
+;;;   bigFont           26 = USERFONT     ;large font
+;;;   volume            27                ;last volume level set (from 0 to 15, 0 being off, 15 being loudest)
+;;;   version           28 = 0            ;pointer to 'incver' version string
+;;;                                       ;  WARNING!  Must be set in room 0
+;;;                                       ;  (usually to {x.yyy    } or {x.yyy.zzz})
+;;;   locales           29                ;list of locales used in the game
+;;;   curSaveDir        30                ;address of current save drive/directory string [20 chars long]
+;;;   aniThreshold      50
+;;;   perspective       51                ;player's viewing angle: degrees away
+;;;                                       ;  from vertical along y axis
+;;;   features          52                ;locations that may respond to events
+;;;   sortedFeatures    53                ;features and cast sorted by "visibility" to ego
+;;;   useSortedFeatures 54 = FALSE        ;enable cast & feature sorting?
+;;;   isDemoGame        55                ;enabled if this is a game demo, and not a full game.
+;;;                                       ;CI: This might not be an accurate variable name??
+;;;   egoBlindSpot      56                ;actors behind ego within angle 
+;;;                                       ;  from straight behind. 
+;;;                                       ;  Default zero is no blind spot
+;;;   overlays          57 = -1
+;;;   doMotionCue       58                ;a motion cue has occurred - process it
+;;;   systemWindow      59                ;ID of standard system window
+;;;   demoDialogTime    60
+;;;   currentPalette    61
+;;;   modelessPort      62
+;;;   sysLogPath        63                ;-used for system standard logfile path   
+;;;   endSysLogPath     72                ;/    (uses 10 globals)
+;;;   ftrInitializer    73                ;pointer to code that gets called from
+;;;                                       ;  a feature's init
+;;;   doVerbCode        74                ;pointer to code that gets invoked if
+;;;                                       ;  no feature claims a user event
+;;;   firstSaidHandler  75
+;;;   useObstacles      76 = TRUE         ;will Ego use PolyPath or not?
+;;;   lastSysGlobal     99
+;;;)

@@ -34,41 +34,42 @@
 )
 
 (local
-	ego				;pointer to ego
-	theGame			;ID of the Game instance
-	curRoom			;ID of current room
-	speed =  6		;current game speed
-	quit			;when TRUE, quit game
-	cast			;collection of actors
-	regions			;set of current regions
-	timers			;list of timers in the game
-	sounds			;set of sounds being played
-	inventory		;set of inventory items in game
-	addToPics		;list of views added to the picture
-	curRoomNum		;current room number
-	prevRoomNum		;previous room number
-	newRoomNum		;number of room to change to
-	debugOn			;generic debug flag -- set from debug menu
-	score			;the player's current score
-	possibleScore	;highest possible score
-	showStyle =  7	;The global style for the transition from one picture to another.  This
-     				;may be overridden by the style property of a given room.  See the
-     				;DrawPic kernel function for the possible styles.
-	aniInterval			;The number of timer ticks more than the Game's speed which it took to
-     				;complete the last animation cycle.  A non-zero aniInterval means that the
-     				;system is not keeping up.
-	theCursor							;the number of the current cursor
-	normalCursor = 		ARROW_CURSOR	;number of normal cursor form
-	waitCursor	 = 		HAND_CURSOR		;cursor number of "wait" cursor
-	userFont	 = 		USERFONT		;font to use for Print
-	smallFont	 = 		4				;small font for save/restore, etc.
-	lastEvent							;the last event (used by save/restore game)
-	modelessDialog						;the modeless Dialog known to User and Intrface
-	bigFont =  USERFONT					;large font
-	volume =  12						;current game volume
-	version								;pointer to 'incver' version string
-                                        ;WARNING!  Must be set in room 0
-                                        ;(usually to {x.yyy    } or {x.yyy.zzz})
+	ego							;pointer to ego
+	theGame						;ID of the Game instance
+	curRoom						;ID of current room
+	speed =  6					;The number of ticks between animations. This is set, usually as a menu
+								;	option, to determine the speed of animation. The default is 6.
+	quit						;when TRUE, quit game
+	cast						;collection of actors
+	regions						;set of current regions
+	timers						;list of timers in the game
+	sounds						;set of sounds being played
+	inventory					;set of inventory items in game
+	addToPics					;list of views added to the picture
+	curRoomNum					;current room number
+	prevRoomNum					;previous room number
+	newRoomNum					;number of room to change to
+	debugOn						;generic debug flag -- set from debug menu
+	score						;the player's current score
+	possibleScore				;highest possible score
+	showStyle =  IRISOUT		;The global style for the transition from one picture to another.  This
+     							;   may be overridden by the style property of a given room.  See the
+     							;   DrawPic kernel function for the possible styles.
+	aniInterval					;The number of timer ticks more than the Game's speed which it took to
+     							;   complete the last animation cycle.  A non-zero aniInterval means that the
+     							;   system is not keeping up.
+	theCursor						;the number of the current cursor
+	normalCursor = ARROW_CURSOR		;number of normal cursor form
+	waitCursor	 = HAND_CURSOR		;cursor number of "wait" cursor
+	userFont	 = USERFONT			;font to use for Print
+	smallFont	 = 4				;small font for save/restore, etc.
+	lastEvent					;the last event (used by save/restore game)
+	modelessDialog				;the modeless Dialog known to User and Intrface
+	bigFont =  USERFONT			;large font
+	volume =  12				;last volume level set (from 0 to 15, 0 being off, 15 being loudest)
+	version						;pointer to 'incver' version string
+                                ;   WARNING!  Must be set in room 0
+                                ;   (usually to {x.yyy    } or {x.yyy.zzz})
 	locales
 	[curSaveDir 20]			;current save drive/directory string [20 chars long]
 	aniThreshold =  10
@@ -76,7 +77,7 @@
 	features				;locations that may respond to events
 	sortedFeatures          ;requires SORTCOPY (script 984)
 	useSortedFeatures		;enable cast & feature sorting?
-	isDemoGame				;55 enabled if this is a game demo, and not a full game.
+	isDemoGame				;?? enabled if this is a game demo, and not a full game.
 	                        ;CI: This might not be an accurate variable name??
 	egoBlindSpot			;actors behind ego within angle 
 							;from straight behind. 
@@ -359,7 +360,12 @@
 )
 
 (instance SCI01 of Game ;Replace "SCI01" with the game's internal name here (up to 6 characters)
-	(properties)
+	(properties
+		;Set your game's language here.
+		;Supported langauges can be found in SYSTEM.SH.		
+		parseLang ENGLISH
+		printLang ENGLISH
+	)
 	
 	(method (init)
 		(= debugging TRUE) ;Set to TRUE if you want to enable the debug features.	
@@ -419,7 +425,7 @@
 			;chances of "Memory Fragmented" errors.
 			EXTRA QSOUND GROOPER FORCOUNT SIGHT DPATH MOVEFWD JUMP SMOOPER
 			REVERSE CHASE FOLLOW WANDER POLYPATH BLOCK PRINTD
-			APPROACH AVOIDER POLYGON TIMER EGO QSOUND
+			APPROACH AVOIDER POLYGON TIMER QSOUND
 		)
 		(ego setCycle: StopWalk vEgoStand)
 		(if debugging
