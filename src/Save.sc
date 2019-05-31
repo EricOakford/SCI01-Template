@@ -44,7 +44,8 @@
    NOREPLACE      ;Save, no space on disk, no games to replace
 )
 
-
+;EO: this is adapted from SCI16's SAVE.SC. It doesn't fully match the commented 
+;assembly code below.
 (procedure (GetDirectory where &tmp result [newDir 33] [buf1 40])
    (repeat
       (= result
@@ -76,6 +77,82 @@
       )
    )
 )
+;EO: the disassembled output below.
+
+;;;(procedure (GetDirectory where &tmp result [newDir 33] [buf 40])
+;;;	(asm
+;;;code_075a:
+;;;		pushi    13
+;;;		pushi    990
+;;;		pushi    1
+;;;		pushi    33
+;;;		pushi    0
+;;;		pushi    41
+;;;		pushi    2
+;;;		lea      @newDir
+;;;		push    
+;;;		lsp      where
+;;;		callk    StrCpy,  4
+;;;		push    
+;;;		pushi    29
+;;;		pushi    #button
+;;;		lofsa    {OK}
+;;;		push    
+;;;		pushi    TRUE
+;;;		pushi    #button
+;;;		lofsa    {Cancel}
+;;;		push    
+;;;		pushi    FALSE
+;;;		calle    Print,  26
+;;;		sat      result
+;;;		not     
+;;;		bnt      code_078d
+;;;		ldi      0
+;;;		ret     
+;;;code_078d:
+;;;		pushi    1
+;;;		lea      @newDir
+;;;		push    
+;;;		callk    StrLen,  2
+;;;		not     
+;;;		bnt      code_07a1
+;;;		pushi    1
+;;;		lea      @newDir
+;;;		push    
+;;;		callk    GetCWD,  2
+;;;code_07a1:
+;;;		pushi    1
+;;;		lea      @newDir
+;;;		push    
+;;;		callk    ValidPath,  2
+;;;		bnt      code_07bc
+;;;		pushi    2
+;;;		lsp      where
+;;;		lea      @newDir
+;;;		push    
+;;;		callk    StrCpy,  4
+;;;		ldi      1
+;;;		ret     
+;;;		jmp      code_075a
+;;;code_07bc:
+;;;		pushi    3
+;;;		pushi    4
+;;;		lea      @buf
+;;;		push    
+;;;		pushi    990
+;;;		pushi    2
+;;;		lea      @newDir
+;;;		push    
+;;;		callk    Format,  8
+;;;		push    
+;;;		pushi    33
+;;;		pushi    0
+;;;		calle    Print,  6
+;;;		jmp      code_075a
+;;;		ret     
+;;;	)
+;;;)
+
 
    (procedure (GetStatus)
       (return
@@ -215,6 +292,9 @@
 		(return 1)
 	)
 	
+;EO: this is adapted from SCI16's SAVE.SC. It doesn't fully match the commented 
+;assembly code below.
+
    (method  (doit theComment
                   &tmp  fd ret offset 
                         [names 361] [nums 21]
@@ -338,8 +418,8 @@
                (break)
             )
 
-            ((or (== i -1) (== i cancelI))
-               (= ret -1)
+            ((or (== i 0) (== i cancelI))	;EO: changed from -1 so that pressing ESC exits the window.
+               (= ret 0)
                (break)
             )
 
@@ -358,6 +438,344 @@
       (return ret)
    )
 )
+;EO: Here is the disassembled doit
+
+;;;	(method (doit theComment &tmp fd printRet offset temp3 [names BUFFERSIZE] [nums 21] [str 40])
+;;;		(asm
+;;;			pushSelf
+;;;			class    Restore
+;;;			eq?     
+;;;			bnt      code_026e
+;;;			lap      argc
+;;;			bnt      code_026e
+;;;			lap      theComment
+;;;			bnt      code_026e
+;;;			pushi    2
+;;;			pushi    0
+;;;			pushi    4
+;;;			lea      @str
+;;;			push    
+;;;			pushi    990
+;;;			pushi    0
+;;;			pushi    #name
+;;;			pushi    0
+;;;			lag      theGame
+;;;			send     4
+;;;			push    
+;;;			callk    Format,  8
+;;;			push    
+;;;			callk    FileIO,  4
+;;;			sat      printRet
+;;;			push    
+;;;			ldi      65535
+;;;			eq?     
+;;;			bnt      code_0267
+;;;			ret     
+;;;code_0267:
+;;;			pushi    2
+;;;			pushi    1
+;;;			lst      printRet
+;;;			callk    FileIO,  4
+;;;code_026e:
+;;;			pushi    #init
+;;;			pushi    3
+;;;			lsp      theComment
+;;;			lea      @names
+;;;			push    
+;;;			lea      @nums
+;;;			push    
+;;;			self     10
+;;;			not     
+;;;			bnt      code_0287
+;;;			ldi      65535
+;;;			ret     
+;;;code_0287:
+;;;			lsl      theStatus
+;;;			dup     
+;;;			ldi      0
+;;;			eq?     
+;;;			bnt      code_02a1
+;;;			lal      numGames
+;;;			bnt      code_02be
+;;;			lofsa    okI
+;;;			jmp      code_02be
+;;;			lofsa    changeDirI
+;;;			jmp      code_02be
+;;;code_02a1:
+;;;			dup     
+;;;			ldi      1
+;;;			eq?     
+;;;			bnt      code_02ae
+;;;			lofsa    editI
+;;;			jmp      code_02be
+;;;code_02ae:
+;;;			dup     
+;;;			ldi      2
+;;;			eq?     
+;;;			bnt      code_02bb
+;;;			lofsa    okI
+;;;			jmp      code_02be
+;;;code_02bb:
+;;;			lofsa    changeDirI
+;;;code_02be:
+;;;			toss    
+;;;			sal      default
+;;;			pushi    #doit
+;;;			pushi    1
+;;;			push    
+;;;			super    Dialog,  6
+;;;			sal      i
+;;;			pushi    #indexOf
+;;;			pushi    1
+;;;			pushi    #cursor
+;;;			pushi    0
+;;;			lofsa    selectorI
+;;;			send     4
+;;;			push    
+;;;			lofsa    selectorI
+;;;			send     6
+;;;			sal      selected
+;;;			push    
+;;;			ldi      18
+;;;			mul     
+;;;			sat      temp3
+;;;			lsl      i
+;;;			lofsa    changeDirI
+;;;			eq?     
+;;;			bnt      code_0389
+;;;			pushi    1
+;;;			lsg      curSaveDir
+;;;			call     GetDirectory,  2
+;;;			bnt      code_0287
+;;;			pushi    3
+;;;			pushi    #name
+;;;			pushi    0
+;;;			lag      theGame
+;;;			send     4
+;;;			push    
+;;;			lea      @names
+;;;			push    
+;;;			lea      @nums
+;;;			push    
+;;;			callk    GetSaveFiles,  6
+;;;			sal      numGames
+;;;			push    
+;;;			ldi      65535
+;;;			eq?     
+;;;			bnt      code_031d
+;;;			ldi      65535
+;;;			sat      offset
+;;;			jmp      code_0499
+;;;code_031d:
+;;;			lal      theStatus
+;;;			sat      fd
+;;;			pushi    0
+;;;			call     GetStatus,  0
+;;;			sal      theStatus
+;;;			push    
+;;;			dup     
+;;;			ldi      0
+;;;			eq?     
+;;;			bnt      code_0333
+;;;			jmp      code_0379
+;;;code_0333:
+;;;			dup     
+;;;			lat      fd
+;;;			eq?     
+;;;			bnt      code_0364
+;;;			pushi    #contains
+;;;			pushi    1
+;;;			lofsa    editI
+;;;			push    
+;;;			self     6
+;;;			bnt      code_0379
+;;;			pushi    #cursor
+;;;			pushi    1
+;;;			pushi    1
+;;;			pushi    2
+;;;			lsp      theComment
+;;;			lea      @names
+;;;			push    
+;;;			callk    StrCpy,  4
+;;;			push    
+;;;			callk    StrLen,  2
+;;;			push    
+;;;			pushi    83
+;;;			pushi    0
+;;;			lofsa    editI
+;;;			send     10
+;;;			jmp      code_0379
+;;;code_0364:
+;;;			pushi    #dispose
+;;;			pushi    0
+;;;			pushi    102
+;;;			pushi    3
+;;;			lsp      theComment
+;;;			lea      @names
+;;;			push    
+;;;			lea      @nums
+;;;			push    
+;;;			self     14
+;;;code_0379:
+;;;			toss    
+;;;			pushi    #setSize
+;;;			pushi    0
+;;;			pushi    83
+;;;			pushi    0
+;;;			lofsa    selectorI
+;;;			send     8
+;;;			jmp      code_0287
+;;;code_0389:
+;;;			lsl      theStatus
+;;;			ldi      2
+;;;			eq?     
+;;;			bnt      code_03bf
+;;;			lsl      i
+;;;			lofsa    okI
+;;;			eq?     
+;;;			bnt      code_03bf
+;;;			pushi    #doit
+;;;			pushi    1
+;;;			pushi    2
+;;;			lsp      theComment
+;;;			lat      temp3
+;;;			leai     @names
+;;;			push    
+;;;			callk    StrCpy,  4
+;;;			push    
+;;;			lofsa    GetReplaceName
+;;;			send     6
+;;;			bnt      code_0287
+;;;			lal      selected
+;;;			lati     nums
+;;;			sat      offset
+;;;			jmp      code_0499
+;;;			jmp      code_0287
+;;;code_03bf:
+;;;			lsl      theStatus
+;;;			ldi      1
+;;;			eq?     
+;;;			bnt      code_0440
+;;;			lsl      i
+;;;			lofsa    okI
+;;;			eq?     
+;;;			bt       code_03d9
+;;;			lsl      i
+;;;			lofsa    editI
+;;;			eq?     
+;;;			bnt      code_0440
+;;;code_03d9:
+;;;			pushi    1
+;;;			lsp      theComment
+;;;			callk    StrLen,  2
+;;;			push    
+;;;			ldi      0
+;;;			eq?     
+;;;			bnt      code_03ee
+;;;			pushi    0
+;;;			call     NeedDescription,  0
+;;;			jmp      code_0287
+;;;code_03ee:
+;;;			ldi      65535
+;;;			sat      offset
+;;;			ldi      0
+;;;			sal      i
+;;;code_03f6:
+;;;			lsl      i
+;;;			lal      numGames
+;;;			lt?     
+;;;			bnt      code_0418
+;;;			pushi    2
+;;;			lsp      theComment
+;;;			lsl      i
+;;;			ldi      18
+;;;			mul     
+;;;			leai     @names
+;;;			push    
+;;;			callk    StrCmp,  4
+;;;			sat      offset
+;;;			not     
+;;;			bnt      code_0413
+;;;code_0413:
+;;;			+al      i
+;;;			jmp      code_03f6
+;;;code_0418:
+;;;			lat      offset
+;;;			not     
+;;;			bnt      code_0426
+;;;			lal      i
+;;;			lati     nums
+;;;			jmp      code_0438
+;;;code_0426:
+;;;			lsl      numGames
+;;;			ldi      20
+;;;			eq?     
+;;;			bnt      code_0436
+;;;			lal      selected
+;;;			lati     nums
+;;;			jmp      code_0438
+;;;code_0436:
+;;;			lal      numGames
+;;;code_0438:
+;;;			sat      offset
+;;;			jmp      code_0499
+;;;			jmp      code_0287
+;;;code_0440:
+;;;			lsl      i
+;;;			lofsa    okI
+;;;			eq?     
+;;;			bnt      code_0456
+;;;			lal      selected
+;;;			lati     nums
+;;;			sat      offset
+;;;			jmp      code_0499
+;;;			jmp      code_0287
+;;;code_0456:
+;;;			lsl      i
+;;;			ldi      0
+;;;			eq?     
+;;;			bt       code_0467
+;;;			lsl      i
+;;;			lofsa    cancelI
+;;;			eq?     
+;;;			bnt      code_0471
+;;;code_0467:
+;;;			ldi      65535
+;;;			sat      offset
+;;;			jmp      code_0499
+;;;			jmp      code_0287
+;;;code_0471:
+;;;			lsl      theStatus
+;;;			ldi      1
+;;;			eq?     
+;;;			bnt      code_0287
+;;;			pushi    #cursor
+;;;			pushi    1
+;;;			pushi    1
+;;;			pushi    2
+;;;			lsp      theComment
+;;;			lat      temp3
+;;;			leai     @names
+;;;			push    
+;;;			callk    StrCpy,  4
+;;;			push    
+;;;			callk    StrLen,  2
+;;;			push    
+;;;			pushi    83
+;;;			pushi    0
+;;;			lofsa    editI
+;;;			send     10
+;;;			jmp      code_0287
+;;;code_0499:
+;;;			pushi    #dispose
+;;;			pushi    0
+;;;			self     4
+;;;			lat      offset
+;;;			ret     
+;;;		)
+;;;	)
+;;;)
+;;;
 
 (class Restore of SRDialog
 	(properties
