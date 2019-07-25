@@ -96,7 +96,7 @@
 ;;;NOTE: Externs are not defined in SCICompanion
 ;;;(extern
 ;;;   Print          INTRFACE    0
-;;;   PrintIcon      INTRFACE    1 ;EO: Just a guess
+;;;   ShowView       INTRFACE    1
 ;;;   GetInput       INTRFACE    2
 ;;;   GetNumber      INTRFACE    3
 ;;;   Printf         INTRFACE    4
@@ -749,8 +749,7 @@
 ;;;   features          52                ;locations that may respond to events
 ;;;   sortedFeatures    53                ;features and cast sorted by "visibility" to ego
 ;;;   useSortedFeatures 54 = FALSE        ;enable cast & feature sorting?
-;;;   isDemoGame        55                ;enabled if this is a game demo, and not a full game.
-;;;                                       ;CI: This might not be an accurate variable name??
+;;;   demoScripts       55                
 ;;;   egoBlindSpot      56                ;actors behind ego within angle 
 ;;;                                       ;  from straight behind. 
 ;;;                                       ;  Default zero is no blind spot

@@ -1,36 +1,42 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-
+;
+;	MAIN.SC
+;
 ;	This is the main game script. It contains the main game class, all the global variables, and
 ;	a number of useful procedures.
+;
+;
 
 (script# MAIN)
 (include game.sh) (include menu.sh)
 (use Intrface)
+(use DCIcon)
 (use LoadMany)
-(use Motion)
 (use StopWalk)
 (use Sound)
 (use Save)
+(use Motion)
 (use Game)
-(use User)
 (use Invent)
+(use User)
 (use Menu)
 (use System)
 
 (public
 	SCI01 0 ;Replace "SCI01" with the game's internal name here (up to 6 characters)
-	AnimateCast 1	
+	AnimateCast 1
 	HandsOn 2
 	HandsOff 3
-	cls 4
-	Btst 5
-	Bset 6
-	Bclr 7
-	SolvePuzzle 8
-	EgoDead	9
-	PrintDontHaveIt 10
-	PrintAlreadyDoneThat 11
-	PrintNotCloseEnough 12
+	NormalEgo 4
+	cls 5
+	Btst 6
+	Bset 7
+	Bclr 8
+	SolvePuzzle 9
+	EgoDead	10
+	PrintDontHaveIt 11
+	PrintAlreadyDoneThat 12
+	PrintNotCloseEnough 13
 )
 
 (local
@@ -77,8 +83,7 @@
 	features				;locations that may respond to events
 	sortedFeatures          ;requires SORTCOPY (script 984)
 	useSortedFeatures		;enable cast & feature sorting?
-	isDemoGame				;?? enabled if this is a game demo, and not a full game.
-	                        ;CI: This might not be an accurate variable name??
+	demoScripts				
 	egoBlindSpot			;actors behind ego within angle 
 							;from straight behind. 
 							;Default zero is no blind spot
@@ -119,18 +124,19 @@
 	global97
 	global98
 	lastSysGlobal
-	isEgoLocked
+	;globals 100 and above are for game use
+	isHandsOff
 	deathMusic	= sDeath	;default death music
 	musicChannels
 	global103
 	debugging	;debug mode enabled
 	detailLevel		;detail level (0 = low, 1 = mid, 2 = high, 3 = ultra)
-	music			;music object, current playing music
+	theMusic			;music object, current playing music
 	colorCount
 	speedCount		;used to test how fast the system is
 					;and used in determining detail level. (used in conjunction with detailLevel)
-	global109
-	SFX				;sound effect being played
+	cIcon
+	soundFx				;sound effect being played
 	[gameFlags 10]	;each global can have 16 flags. 10 globals * 16 flags = 160 flags. If you need more flags, just increase the array!
 	curTextColor ;color of text in message boxes
 	curBackColor ;color of message boxes
@@ -138,26 +144,42 @@
 
 (procedure (AnimateCast)
 	;Used to animate the cast, generally in a room's init() method.
-	(Animate (cast elements?) 0)
+	(Animate (cast elements?) FALSE)
 )
 
 (procedure (HandsOn)
 	;Enable ego control
-	(= isEgoLocked FALSE)
+	(= isHandsOff FALSE)
 	(User canControl: TRUE canInput: TRUE)
 	(theGame setCursor: normalCursor (HaveMouse))
 )
 
 (procedure (HandsOff)
 	;Disable ego control
-	(= isEgoLocked TRUE)
+	(= isHandsOff TRUE)
 	(User canControl: FALSE canInput: FALSE)
 	(theGame setCursor: waitCursor TRUE)
 	(ego setMotion: 0)
 )
 
+(procedure (NormalEgo)
+	;normalizes ego's animation
+	(ego
+		setLoop: -1
+		setPri: -1
+		setMotion: 0
+		setCycle: StopWalk vEgoStand
+		illegalBits: cWHITE
+		cycleSpeed: 0
+		moveSpeed: 0
+		setStep: 3 2
+		ignoreActors: 0
+		looper: 0
+	)
+)
+
 (procedure (cls)
-	;Clear text from the screen
+	;Clear modeless dialog from the screen
 	(if modelessDialog (modelessDialog dispose:))
 )
 
@@ -197,8 +219,8 @@
 	(Wait 100)
 	(= normalCursor ARROW_CURSOR)
 	(theGame setCursor: normalCursor TRUE)
-	(SFX stop:)
-	(music number: deathMusic play:)
+	(soundFx stop:)
+	(theMusic number: deathMusic play:)
 		(repeat
 			(= printRet
 				(Print
@@ -240,7 +262,7 @@
 	)
 )
 
-;These verb instances can be customized for additional verbs
+;VerbCode and GameVerbMessager can be customized for additional verbs
 ;that are not part of the stock USER.SC. This was used for QFG2.
 
 (instance VerbCode of Code
@@ -315,15 +337,15 @@
 
 (instance verbWords of GameVerbMessager
 	(properties
-		ssLook 'look,examine>'
-		ssOpen 'open,open>'
-		ssClose 'close,shut>'
+		ssLook 'look>'
+		ssOpen 'open>'
+		ssClose 'close>'
 		ssSmell 'smell>'
 		ssMove 'move>'
-		ssEat 'eat,chew>'
-		ssGet 'get,acquire,(pick<up)>'
+		ssEat 'eat>'
+		ssGet 'get,(pick<up)>'
 		ssClimb 'climb,scale>'
-		ssTalk 'talk,chat,chat>'
+		ssTalk 'talk>'
 	)
 )
 
@@ -335,31 +357,37 @@
 	)
 )
 
-(instance GlobalMusic of Sound
+(instance music of Sound
 	(properties
 		number 10
 	)
 )
 
-(instance Test_Object of InvItem
-	(properties
-		name {Test Object}
-		description {This is a test object.}
-		owner 0
-		view 800
-		loop 0
-		cel 0
-	)
-)
-
-(instance miscMusic of Sound
+(instance SFX of Sound
 	(properties
 		number 10
 		priority 15
 	)
 )
 
+(instance deathIcon of DCIcon
+	(properties)
+)
+
+
+(instance Test_Object of InvItem
+	(properties
+		name {Test Object}
+		description {This is a test object.}
+		owner 0
+		view vTestObject
+		loop 0
+		cel 0
+	)
+)
+
 (instance SCI01 of Game ;Replace "SCI01" with the game's internal name here (up to 6 characters)
+	; The main game instance. It adds game-specific functionality.
 	(properties
 		;Set your game's language here.
 		;Supported langauges can be found in SYSTEM.SH.		
@@ -368,6 +396,7 @@
 	)
 	
 	(method (init)
+		;set up various aspects of the game
 		(= debugging TRUE) ;Set to TRUE if you want to enable the debug features.	
 		(SysWindow
 			;These colors can be changed to suit your preferences.
@@ -379,16 +408,15 @@
 		(= systemWindow SysWindow)
 		(super init:)
 		(= musicChannels (DoSound NumVoices))
-		(= useSortedFeatures FALSE) ;set to TRUE if you want to use sorted features
-		(= version {x.yyy.zzz}) ;set game version here
+		(= useSortedFeatures FALSE)
+		(= cIcon deathIcon)
 		(= ego egoObj)
-		(User alterEgo: ego)
-;		(= doVerbCode VerbCode)
-;		(User verbMessager: verbWords)
-		;uncomment the above two if you want to use custom verb words.
-		;Otherwise, the game will use the stock verbs from USER.SC and FEATURE.SC.
 		(= possibleScore 0)	;Set the maximum score here
-		(= showStyle 0)
+		(= version {x.yyy.zzz}) ;set game version here
+		(User alterEgo: ego verbMessager: verbWords)
+		(= showStyle IRISIN)
+		(= doVerbCode VerbCode)
+
 		(TheMenuBar init: draw: hide:)
 		(StatusLine code: statusCode disable:) ;hide the status code at startup
 		(StopWalk init:)
@@ -396,20 +424,22 @@
 			(self setCursor: normalCursor (HaveMouse) 300 170)
 		else
 			(HandsOff)
-			(self setCursor: normalCursor 0 350 200)
+			(self setCursor: normalCursor FALSE 350 200)
 		)
-		((= music GlobalMusic) number: 10 owner: self init:)
-		((= SFX miscMusic) number: 10 owner: self init:)
+		((= theMusic music) number: 10 owner: self init:)
+		((= soundFx SFX) number: 10 owner: self init:)
 		(inventory add:
 			;Add your inventory items here. Make sure they are in the same order as the item list in GAME.SH.
 				Test_Object
 		)
+		;and finally, now that the game's been initialized, we can move on to the speed tester.
 		(self newRoom: SPEEDTEST)
 	)
 	
 	(method (doit)
 		(super doit:)
 	)
+
 	(method (replay)
 		(TheMenuBar draw:)
 		(StatusLine enable:)
@@ -419,30 +449,32 @@
 		(super replay:)
 	)	
 	
-	(method (startRoom roomNum &tmp [temp0 12])
+	(method (newRoom)
+		(super newRoom: &rest)
+	)
+	
+	(method (startRoom roomNum)
 		(LoadMany FALSE	
 			;These are all disposed when going to another room, to reduce the
 			;chances of "Memory Fragmented" errors.
-			EXTRA QSOUND GROOPER FORCOUNT SIGHT DPATH MOVEFWD JUMP SMOOPER
-			REVERSE CHASE FOLLOW WANDER POLYPATH BLOCK PRINTD
+			EXTRA FILE QSOUND GROOPER FORCOUNT SIGHT DPATH MOVEFWD JUMP SMOOPER
+			REVERSE CHASE FOLLOW WANDER POLYPATH BLOCK PRINTD EXTRA
 			APPROACH AVOIDER POLYGON TIMER QSOUND
 		)
-		(ego setCycle: StopWalk vEgoStand)
 		(if debugging
 			(if
 				(and
+					;if memory is fragmented and debugging is on, bring up a warning and internal debugger
 					(u> (MemoryInfo FreeHeap) (+ 20 (MemoryInfo LargestPtr)))
-					(Print "Memory fragmented." #button {Debug} 1)
+					(Print "Memory fragmented." #button {Debug} TRUE)
 				)
 				(SetDebug)
 			)
 			(User canInput: TRUE)
 		)
-;		(User verbMessager: verbWords)
-		;uncomment the above if you want to use custom verb words.
-		;Otherwise, the game will use the stock verbs from USER.SC.
+		(NormalEgo)
 		(super startRoom: roomNum)
-	)
+	)	
 	
 	(method (handleEvent event)
 		(if (event claimed?)
@@ -453,7 +485,7 @@
 			;Add global parser commands here.
 			(saidEvent
 				(cond
-					((Said 'die') ;This should be commented out in your game; it is only used to test the EgoDead procedure.
+					((Said 'die') ;this shouldn't be in your game; it's just used to test the EgoDead procedure.
 						(EgoDead "It's all over for now. Please try again." #title {You're dead.})
 					)
 					((Said 'cheat')
@@ -474,10 +506,11 @@
 					(event claimed: TRUE)
 				else
 					(cast eachElementDo: #handleEvent event)
-					(if (event claimed?) (return))
+					(if (event claimed?)
+						(return)
+					)
 				)
 			)
-			(if (event claimed?) (return))
 			(switch (event type?)
 				(keyDown
 					((ScriptID DEBUG) handleEvent: event)
@@ -486,8 +519,6 @@
 					((ScriptID DEBUG) handleEvent: event)
 				)
 			)
-		else
-			(super handleEvent: event)
 		)
 	)
 )

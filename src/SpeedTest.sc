@@ -33,7 +33,7 @@
 		(super init:)
 		(sounds eachElementDo: #stop)
 		(fred
-			view: 98
+			view: vSpeedTest
 			setLoop: 0
 			illegalBits: 0
 			posn: 20 99
@@ -72,31 +72,36 @@
 (instance speedScript of Script
 	(properties)
 	
-	(method (changeState newState &tmp nextRoom [inputRoom 20])
+	(method (changeState newState &tmp nextRoom [str 20])
 		(switch (= state newState)
 			(0 (= cycles 1))
 			(1
 				(theGame setSpeed: 6)
-				(= cycles (if debugging 1 else 30))
+				(= cycles 10)
 			)
 			(2
 				(if debugging
 					(repeat
-						(= inputRoom NULL)
+						(= str NULL)
 						(= nextRoom
 							(Print "Where to, boss?"
-								#edit @inputRoom 5
+								#edit @str 5
 								#window SysWindow
 							)
 						)
-						(if inputRoom (= nextRoom (ReadNumber @inputRoom)))
-						(if (> nextRoom 0) (break))
+						(if str
+							(= nextRoom (ReadNumber @str)
+							)
+						)
+						(if (> nextRoom 0)
+							(break)
+						)
 					)
 				else
 					(= nextRoom TITLE)
-					(TheMenuBar state: DISABLED)
+					(TheMenuBar state: FALSE)
 				)
-				(TheMenuBar state: ENABLED)
+				(TheMenuBar state: TRUE)
 				(HandsOn)
 				(curRoom newRoom: nextRoom)
 			)

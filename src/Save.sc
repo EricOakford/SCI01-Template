@@ -419,7 +419,7 @@
             )
 
             ((or (== i 0) (== i cancelI))	;EO: changed from -1 so that pressing ESC exits the window.
-               (= ret 0)
+               (= ret -1)
                (break)
             )
 
@@ -432,9 +432,7 @@
             )
          )
       )
-;      (DisposeScript FILE)
       (self dispose:)
-;      (DisposeScript SAVE)
       (return ret)
    )
 )

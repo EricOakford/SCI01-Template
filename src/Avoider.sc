@@ -1,229 +1,370 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# 985)
-(include sci.sh)
+(script# AVOIDER)
+(include game.sh)
 (use Sight)
 (use System)
 
 
-(class Avoid of Object
+(define	escapeMax		80)
+(define	escapeMin		40)
+(define	noProgressMax	50)
+
+(class Avoider kindof Object
+	;;; Normally, when an Actor encounters a control line or other object
+	;;; which blocks its normal motion, it simply stops right there.
+	;;; If, however, an Avoider is attached to such an Actor, it will take
+	;;; over and attempt to direct the Actor around whatever obstruction
+	;;; it has encountered.
+	
+;;;	(methods
+;;;		incClientPos
+;;;		pickLoop
+;;;		canBeHere
+;;;	)
+	
 	(properties
-		client 0
-		heading -1000
-		bumpTurn 0
-		lastBumped 0
-		thisTurn 1
-		escaping 0
-		escapes 0
-		escapeTurn 1
-		nearestDist 32000
-		counter 0
-		nonBumps 10
-		targetX 0
-		targetY 0
-		motionInited 0
-		outOfTouch 0
-		offScreenOK 0
+		name				"Avoid"
+		client			0
+		heading			-1000
+		
+		bumpTurn			0
+		lastBumped		0
+		thisTurn			1
+		escaping			FALSE
+		escapes			0
+		escapeTurn		1
+		nearestDist		32000
+		counter			0
+		nonBumps			10
+		targetX			0
+		targetY			0
+		motionInited	FALSE
+		outOfTouch		FALSE
+		offScreenOK		FALSE
 	)
 	
-	(method (init theClient theOffScreenOK)
-		(if (>= argc 1) (= client theClient))
-		(if (>= argc 2) (= offScreenOK theOffScreenOK))
-		(= heading (client heading?))
+	(method (init aClient allowOff)
+		(if (>= argc 1)	(= client aClient))
+		(if (>= argc 2)	(= offScreenOK allowOff))
+		
+		(= heading (client heading?)) 		;in sync with client
 		(= counter 0)
 		(= nonBumps 10)
-		(= escaping 0)
-	)
-	
-	(method (doit &tmp theHeading theNearestDist clientX clientY theTargetX theTargetY clientMover temp7 temp8 clientMoverB_moveCnt temp10 temp11 temp12 temp13 temp14 temp15)
-		(= temp15 (Max 4 (* (/ (NumLoops client) 4) 4)))
-		(if (= clientMover (client mover?))
-			(clientMover setTarget:)
-		)
-		(cond 
-			((not clientMover) (= heading -1000) (return))
-			(
-				(not
-					(if
-						(self
-							canBeHere:
-								(= theTargetX (clientMover x?))
-								(= theTargetY (clientMover y?))
-						)
-					else
-						(clientMover respondsTo: #distance)
-					)
-				)
-				(clientMover doit:)
-				(return)
-			)
-			((clientMover onTarget:)
-				(if motionInited else (InitBresen clientMover))
-				(clientMover doit:)
-				(return)
-			)
-			((== heading -1000) (self init:))
-		)
-		(= temp13 0)
-		(= clientX (client x?))
-		(= clientY (client y?))
-		(= temp7
-			(umod
-				(GetAngle clientX clientY theTargetX theTargetY)
-				360
-			)
-		)
-		(= theNearestDist
-			(GetDistance clientX clientY theTargetX theTargetY)
-		)
-		(= temp14 (/ 180 temp15))
-		(= theHeading
-			(= heading (umod (* temp14 (/ heading temp14)) 360))
-		)
-		(cond 
-			(
-			(not (if escaping else (= temp12 (<= nonBumps 2))))
-				(if (not motionInited)
-					(= motionInited 1)
-					(InitBresen clientMover)
-				)
-				(clientMover doit:)
-				(if
-				(or (!= clientX (client x?)) (!= clientY (client y?)))
-					(self pickLoop: temp7)
-					(++ nonBumps)
-					(return)
-				)
-				(= nonBumps 0)
-				(= temp13 1)
-				(= motionInited 0)
-			)
-			(
-				(<
-					(= clientMoverB_moveCnt (clientMover b-moveCnt?))
-					(client moveSpeed?)
-				)
-				(clientMover b-moveCnt: (++ clientMoverB_moveCnt))
-				(return)
-			)
-			(else (clientMover b-moveCnt: 0))
-		)
-		(cond 
-			(
-				(or
-					(!= targetX (= targetX theTargetX))
-					(!= targetY (= targetY theTargetY))
-					(and
-						escaping
-						(or
-							(<= (-- counter) 0)
-							(and (< theNearestDist nearestDist) (< counter 40))
-						)
-					)
-				)
-				(= motionInited (= escaping 0))
-				(= nearestDist 32000)
-				(= counter 0)
-			)
-			(escaping)
-			((< theNearestDist nearestDist) (= nearestDist theNearestDist) (= counter 0))
-			((= escaping (>= (++ counter) 50))
-				(= counter (Random 40 80))
-				(= escapeTurn (- escapeTurn))
-			)
-		)
-		(= temp11
-			(<=
-				(= temp8 (Abs (= temp7 (AngleDiff temp7 theHeading))))
-				90
-			)
-		)
-		(= thisTurn (if (sign temp7) else escapeTurn))
-		(if (and (> temp8 (/ temp14 2)) (not escaping))
-			(= heading (+ heading (* thisTurn temp14)))
-		)
-		(if escaping (= thisTurn escapeTurn))
-		(self incClientPos:)
-		(if (self canBeHere:)
-			(++ nonBumps)
-			(= bumpTurn 0)
-			(if (not escaping) (return))
-		else
-			(= lastBumped bumpTurn)
-			(= bumpTurn thisTurn)
-			(= nonBumps 0)
-		)
-		(= temp15 (* temp15 2))
-		(if escaping
-			(= theHeading (* temp14 (/ heading temp14)))
-			(= temp10 0)
-			(while (and (< temp10 temp15) (self canBeHere:))
-				(= heading
-					(umod (+ theHeading (* temp14 temp10 escapeTurn)) 360)
-				)
-				(client x: clientX y: clientY)
-				(self incClientPos:)
-				(++ temp10)
-			)
-			(if (== temp10 temp15)
-				(= heading (+ heading (* escapeTurn temp14)))
-			)
-			(= theHeading heading)
-		)
-		(= temp10 (= clientMoverB_moveCnt 1))
-		(while
-			(and
-				(not (self canBeHere:))
-				(< clientMoverB_moveCnt temp15)
-			)
-			(client x: clientX y: clientY)
-			(= heading (- theHeading (* temp14 temp10 thisTurn)))
-			(self incClientPos:)
-			(= temp10
-				(cond 
-					(escaping (++ clientMoverB_moveCnt))
-					((> temp10 0) (- temp10))
-					(else (++ clientMoverB_moveCnt))
-				)
-			)
-		)
-		(self pickLoop: heading)
+		(= escaping FALSE)
+		;(client view:1)
 	)
 	
 	(method (incClientPos)
+		
 		(client
-			x: (+
-				(client x?)
-				(* (sign (SinMult heading 100)) (client xStep?))
-			)
-			y: (-
-				(client y?)
-				(* (sign (CosMult heading 100)) (client yStep?))
-			)
+			x: (+ (client x?) (* (sign (SinMult heading 100)) (client xStep?))),
+			y: (- (client y?) (* (sign (CosMult heading 100)) (client yStep?))),
 			heading: heading
 		)
-	)
+		;(return (self canBeHere:))
+		
+	);incClientPos
 	
-	(method (pickLoop param1)
-		(client heading: param1)
+	(method (pickLoop angle)
+		(client heading: angle)
 		(if (client looper?)
-			((client looper?) doit: client param1 0 1)
+			((client looper?) doit: client angle NULL TRUE) ;just set loop
 		else
-			(DirLoop client param1)
+			(DirLoop client angle)
 		)
 	)
 	
-	(method (canBeHere param1 param2 &tmp clientX clientY temp2)
-		(= clientX (client x?))
-		(= clientY (client y?))
-		(if argc (client x: param1 y: param2))
-		(= temp2
-			(if (client canBeHere:)
-				(if offScreenOK else (not (IsOffScreen client)))
-			else
-				0
+	(method (canBeHere theX theY &tmp oldX oldY result)
+		(= oldX (client x?))
+		(= oldY (client y?))
+		(if argc
+			(client x:theX, y:theY)
+		)
+		(= result
+			(and
+				(client canBeHere:)
+				(or offScreenOK (not (IsOffScreen client)))
 			)
 		)
-		(client x: clientX y: clientY)
-		(return temp2)
+		(client x:oldX, y:oldY)
+		(return result)
 	)
+	
+	(method (doit 
+			&tmp
+			h					;initial heading
+			d					;distance to target
+			cx		cy			;client x/y
+			mx		my			;motion x/y
+			motion			;client's mover
+			ang				;angle to target, then deviation from heading
+			absDiff			;absolute angular diff in -180/+180
+			i	j				;loop variables
+			facing			;is client facing target?
+			bumping			;is client having a hard time?
+			firstBump
+			
+			angleDelta		;45 for 4-loop, 22 for 8-loop
+			numLoops			;usually 4 or 8
+		)
+		
+		(= numLoops (Max 4 (* (/ (NumLoops client) 4) 4)))
+		
+		(if (= motion (client mover?))
+			(motion setTarget:)
+		)
+		
+		(cond
+			((not motion)	;we have no purpose
+				(= heading -1000)
+				(return)
+			)
+			((not 
+					(or
+						(self canBeHere: (= mx (motion x?))(= my (motion y?)))
+						(motion respondsTo: #distance)
+					)
+				)
+				(motion doit:)
+				(return)
+				
+			)
+			((motion onTarget:)						;if finished
+				(or motionInited 
+					(InitBresen motion))
+				(motion doit:)							;let motion do wrap-up
+				(return)
+			)
+			((== heading -1000)						;we must re-initialize
+				(self init:)
+			)
+		)
+		
+		;Init variables
+		;**************
+		
+		(= firstBump FALSE)
+		;;(= bumping (<= nonBumps 3))
+		
+		(= cx (client x?))							;remember where you started
+		(= cy (client y?))
+		
+		(= ang (umod (GetAngle cx cy mx my) 360))	;client-to-target angle
+		(= d (GetDistance cx cy mx my))
+		
+		(= angleDelta (/ 180 numLoops))
+		(= h (= heading (umod (* angleDelta (/ heading angleDelta)) 360)))
+		
+		
+		(cond
+			((not (or escaping (= bumping (<= nonBumps 2))))	;straight shot?
+				
+				;;IF NOT CURRENTLY ESCAPING OR BUMPING...
+				
+				;Try for a straight shot
+				;***********************
+		
+				(if (not motionInited)
+					(= motionInited TRUE)
+					(InitBresen motion)
+				)
+				(motion doit:)
+				
+				
+				(if (or (!= cx (client x?)) (!= cy (client y?)))	;we moved
+					(self pickLoop: ang)
+					(++ nonBumps)
+					(return)
+				)
+				;;else...
+				(= nonBumps 0)
+				(= firstBump TRUE)
+				(= motionInited FALSE)				;since we will take control
+			)
+			
+			((<	(= i (motion b-moveCnt?))	(client moveSpeed?))
+				;Skip a move
+				;***********
+				(motion b-moveCnt: (++ i))
+				(return)
+			)
+			(else
+				;We are about to move so reset moveCnt if we made it this far
+				(motion b-moveCnt: 0)
+			)
+		);cond
+		
+		;ESCAPE-mode toggling & bookkeeping
+		;**********************************
+		
+		(cond
+			(	;;TURN ESCAPE OFF IF TARGET HAS CHANGED
+				;;OR WE'VE "ESCAPED" LONG ENOUGH
+				(or
+					(!= targetX (= targetX mx))	;new target
+					(!= targetY (= targetY my))
+					(and escaping
+						(or
+							(<= (-- counter) 0) 		;end of escape countdown
+							(and
+								(< d nearestDist)			;escaping paid off
+								(< counter escapeMin)
+							)
+						)
+					)
+				)
+				(= escaping FALSE)
+				(= motionInited FALSE)
+				(= nearestDist 32000)
+				;(client view: 1)
+				(= counter 0)
+			)
+			
+			(escaping		;DO NOTHING, KEEP ESCAPING
+			)
+			
+			((< d nearestDist)
+				
+				;;WE GOT CLOSER, not escaping, ZERO THE "NO PROGRESS" COUNTER
+				
+				(= nearestDist d)
+				(= counter 0)
+			)
+			((= escaping (>= (++ counter) noProgressMax))
+				
+				;;WE'VE GONE TOO LONG WITHOUT GETTING ANY CLOSER
+				;;turn escape ON!
+				
+				(=  counter												;how long to escape
+					;escapeMax
+					(Random escapeMin escapeMax)
+				)
+				;(client view: 2)
+				(= escapeTurn (- escapeTurn))						;try opposite turn
+			)
+		);cond
+		
+		
+		
+		(= absDiff (Abs (= ang (AngleDiff ang h))))
+
+		(= facing (<= absDiff 90))						;can we "see" target?
+
+		(= thisTurn 										;how to turn towards target
+			(or 
+				;;(cond
+				;;	(escaping		(sign ang))
+				;;	(facing			(sign ang))	
+				;;	(bumpTurn 		bumpTurn)			;avoid obstacle
+				;;	(lastBumped		lastBumped)			;or towards last obstacle
+				;;	(else				(sign ang))	
+				;;)
+				(sign ang)
+				escapeTurn									;because zero doesn't cut it
+			)
+		)
+		
+		
+		(if (and	(> absDiff (/ angleDelta 2))
+				;(not bumping)
+				;;(or 
+					(not escaping)
+				;;	(== escapeTurn thisTurn)
+				;;)
+			)
+			(+= heading (* thisTurn angleDelta))			;if it helps, turn to target
+		)
+		
+		(if escaping (= thisTurn escapeTurn))	;escape single-mindedly
+		
+		(self incClientPos:)							;try to move
+		
+		;if and which way we bumped
+		(cond
+			((self canBeHere:) 					;no bump
+				(++ nonBumps)
+				(= bumpTurn 0)
+				(if (not escaping) 
+					(return)
+				)
+			)
+			(else	
+				(= lastBumped bumpTurn)			;save one-bump history
+				(= bumpTurn thisTurn)			;we bumped the way we turned
+				(= nonBumps 0)
+			)
+		)
+		
+		
+		
+		;;start using differently, we will try twice as many angles of 
+		;;movement as there are loops
+		(*= numLoops 2)	
+		
+		
+		(cond
+			(escaping
+				;OBSTACLE-HUGGING LOOP
+				;*********************
+				(= h (* angleDelta (/ heading angleDelta)))	;start with current heading
+				(for
+					(	(= j 0)
+					)
+					(and	(< j numLoops)	(self canBeHere:))
+					(	(++ j)
+					)
+					
+					(= heading 
+						(umod (+ h (* angleDelta j escapeTurn))
+							360))									;turn a bit
+					(client x: cx,	y: cy)					;restore client's position
+					(self incClientPos:)						;try to move
+					
+				)
+				(if (== j numLoops)	
+					(+= heading (* escapeTurn angleDelta))		;stay with obstacle
+				)
+				(= h heading)									;keep bum heading
+			)	
+			
+		);cond
+		
+		
+		;HEADING-SEEKING LOOP
+		;********************
+		
+		(for 
+			(	(= j (= i 1))
+			)
+			(and
+				(not (self canBeHere:))				;until a move is possible
+				(< i numLoops)							;no infinite loops please
+			)
+			(	(= j 		
+					(cond
+						(escaping	(++ i))			;non-fanning escape
+						;(firstBump	(- (++ i)))		;non-fanning non-stray
+						((> j 0) 	(- j) )			;fanning iterator j: +1,-1,+2,-2,...
+						(else			(++ i))
+					)
+				)
+			)
+			
+			(client x: cx,	y: cy)								;restore client's position
+			(= heading (- h (* angleDelta j thisTurn)))	;back off angle a bit
+			(self incClientPos:)									;try to move
+		);for
+		
+		
+		
+		;CLEANUP
+		;*******
+		
+		;;(if (not (self canBeHere:))
+		;;	(client findPosn:)
+		;;)
+		(self pickLoop: heading)
+		
+	);doit
+	
 )

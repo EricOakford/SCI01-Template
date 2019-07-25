@@ -2,6 +2,7 @@
 (script# TITLE)
 (include game.sh)
 (use Main)
+(use Intrface)
 (use Game)
 (use Menu)
 (use User)
@@ -18,13 +19,14 @@
 	)
 	
 	(method (init)
-		(super init: &rest)
-		;Prevent the menu bar and status line from appearing in the title
-		(TheMenuBar state: DISABLED)
-		(StatusLine disable:)
-		(User canInput: FALSE canControl: FALSE)
+		(super init:)
 		(self setScript: titleScreen)
 	)
+)
+
+(enum
+	showTitle
+	onWeGo
 )
 
 
@@ -33,32 +35,26 @@
 	
 	(method (changeState newState)
 		(switch (= state newState)
-			(0 
+			(showTitle
 				(Display
 					"Intro/Opening screen"
 					p_at 90 80
 					p_color vWHITE
-					p_back clTRANSPARENT
-					)
+					p_back -1
+				)
 			)
-			(1
+			(onWeGo
 				;When starting the game proper, enable the status line and menu bar.
 				(StatusLine enable:)
-				(TheMenuBar state: ENABLED)
-				(HandsOn)
-				(curRoom newRoom: 2)
+				(TheMenuBar state: TRUE)
+				(curRoom newRoom: TESTROOM)
 			)
 		)
 	)
 	(method (handleEvent event)
 		(super handleEvent: event)
-		(switch (event type?)
-			(keyDown
-				(titleScreen cue:)
-			)
-			(mouseDown
-				(titleScreen cue:)
-			)
+		(if (not (event claimed?))
+			(self changeState: onWeGo)
 		)
 	)
 )

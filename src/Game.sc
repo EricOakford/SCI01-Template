@@ -89,7 +89,7 @@
 	)
 )
 
-(instance sFeatures of EventHandler
+(instance theSortedFeatures of EventHandler
 	(properties
 		name "sortedFeatures"
 	)
@@ -237,7 +237,7 @@
 		;access.  Init the collections with a null add.
 		((= cast theCast) add:)
 		((= features theFeatures) add:)
-		((= sortedFeatures sFeatures) add:)
+		((= sortedFeatures theSortedFeatures) add:)
 		((= sounds theSounds) add:)
 		((= regions theRegions) add:)
 		((= locales theLocales) add:)
@@ -447,7 +447,7 @@
 		; Initialize the new room and add it to the front of the region list
 		(regions addToFront: (= curRoom (ScriptID roomNum)))
 		(curRoom init:)
-		(if isDemoGame (curRoom setRegions: DEMO))
+		(if demoScripts (curRoom setRegions: DEMO))
 	)
 	
 	(method (restart)

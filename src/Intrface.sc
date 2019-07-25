@@ -1,12 +1,12 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# 255)
-(include system.sh) (include sci2.sh)
+(include game.sh)
 (use Main)
 (use System)
 
 (public
 	Print 0
-	PrintIcon 1
+	ShowView 1
 	GetInput 2
 	GetNumber 3
 	Printf 4
@@ -197,7 +197,7 @@
 	(return temp4)
 )
 
-(procedure (PrintIcon str view loop cel)
+(procedure (ShowView str view loop cel)
 	(Print str #icon view loop cel &rest)
 )
 

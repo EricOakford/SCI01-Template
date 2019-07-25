@@ -1,254 +1,158 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# 954)
-(include sci.sh)
+(script# GOTOSAID)
+(include game.sh)
 (use Main)
-(use Intrface)
-(use Sight)
 (use Avoider)
+(use Sight)
+(use Grooper)
+(use Chase)
 (use Motion)
 (use User)
 (use System)
 
+;;;(procedure
+;;;	GoToIfSaid
+;;;	TurnIfSaid
+;;;	CommonInit
+;;;	CommonCue
+;;;)
+
 (public
-	TurnIfSaid 0
-	GoToIfSaid 1
+	GoToIfSaid	0
+	TurnIfSaid	1
 )
 
 (local
-	local0
-	local1
-	local2
-	egoAvoider
-)
-(procedure (TurnIfSaid param1 param2 param3 param4 param5 param6 &tmp temp0 temp1)
-	(asm
-		pushi    102
-		pushi    4
-		lsp      param1
-		lsp      argc
-		ldi      5
-		ge?     
-		bnt      code_0028
-		lap      param5
-		bnt      code_0028
-		lap      param5
-		jmp      code_002b
-code_0028:
-		lofsa    '*/*'
-code_002b:
-		push    
-		pushi    1
-		pushi    0
-		lofsa    ISSc
-		send     12
-		sat      temp1
-		push    
-		dup     
-		ldi      1
-		eq?     
-		bnt      code_0069
-		pushi    252
-		pushi    4
-		pushi    1
-		lsp      param3
-		callk    IsObject,  2
-		bnt      code_0050
-		class    75
-		jmp      code_0052
-code_0050:
-		class    MoveTo
-code_0052:
-		push    
-		lsp      param3
-		lsp      param4
-		lofsa    ISSc
-		push    
-		pushi    253
-		pushi    1
-		class    Avoid
-		push    
-		lag      ego
-		send     18
-		jmp      code_007f
-code_0069:
-		dup     
-		ldi      2
-		eq?     
-		bnt      code_007f
-		lsp      argc
-		ldi      6
-		ge?     
-		bnt      code_007f
-		pushi    0
-		&rest    param6
-		calle    Print,  0
-code_007f:
-		toss    
-		lat      temp1
-		ret     
-	)
+	turnToWhom
+	goToWhom
+	oldLooper
+	oldAvoider
 )
 
-(procedure (GoToIfSaid param1 param2 param3 &tmp temp0)
-	(asm
-		pushi    4
-		dup     
-		pushi    0
-		lag      ego
-		send     4
-		push    
-		pushi    #y
-		pushi    0
-		lag      ego
-		send     4
-		push    
-		pushi    #x
-		pushi    0
-		lap      param1
-		send     4
-		push    
-		pushi    #y
-		pushi    0
-		lap      param1
-		send     4
-		push    
-		callk    GetAngle,  8
-		sat      temp0
-		pushi    1
-		pushi    102
-		pushi    4
-		lsp      param1
-		lsp      argc
-		ldi      3
-		ge?     
-		bnt      code_00bf
-		lap      param3
-		jmp      code_00c2
-code_00bf:
-		lofsa    '*/*'
-code_00c2:
-		push    
-		pushi    3
-		lsp      param1
-		lsg      ego
-		pushi    360
-		pushi    2
-		pushi    4
-		pushi    1
-		lsg      ego
-		callk    NumLoops,  2
-		push    
-		ldi      4
-		div     
-		push    
-		ldi      4
-		mul     
-		push    
-		calle    Max,  4
-		div     
-		push    
-		calle    CantBeSeen,  6
-		push    
-		pushi    1
-		lofsa    ISSc
-		send     12
-		eq?     
-		bnt      code_0140
-		pushi    1
-		lsl      local2
-		callk    IsObject,  2
-		bnt      code_0107
-		pushi    #dispose
-		pushi    0
-		lal      local2
-		send     4
-code_0107:
-		pushi    #looper
-		pushi    0
-		lag      ego
-		send     4
-		sal      local2
-		pushi    #looper
-		pushi    1
-		pushi    0
-		pushi    58
-		pushi    1
-		lst      temp0
-		pushi    252
-		pushi    1
-		pushi    0
-		pushi    241
-		pushi    1
-		class    67
-		push    
-		lag      ego
-		send     24
-		pushi    #doit
-		pushi    3
-		lsg      ego
-		lst      temp0
-		lofsa    ISSc
-		push    
-		pushi    #looper
-		pushi    0
-		lag      ego
-		send     4
-		send     10
-		ldi      1
-code_0140:
-		ret     
-	)
-)
-
-(instance ISSc of Script
-	(properties)
-	
-	(method (init param1 param2 param3 param4)
-		(return
-			(if param3
-				(if
-					(and
-						(not (if param4 local0 else local1))
-						(Said param2)
-					)
-					(if (User canControl:)
-						(if (IsObject egoAvoider) (egoAvoider dispose:))
-						(= egoAvoider (ego avoider?))
-						(ego avoider: 0)
-						(if param4 (= local0 param1) else (= local1 param1))
-						(User canControl: 0 canInput: 0)
-						1
-					else
-						((User curEvent?) claimed: 0)
-						2
-					)
+(procedure (GoToIfSaid obj event theTargetOrX theDistanceOrY optSpec 
+		&tmp motion)
+	;;(Print "GoToIfSaid?")
+	(return
+		(if (CommonInit 
+				obj
+				(if (>= argc 5) optSpec else '*/*') 
+				
+				;;need to move?
+				(or 
+					(not (= motion (ego mover?)))
+					(motion onTarget?)
 				)
-			else
-				0
+				FALSE
 			)
+			;;(Print "GoToIfSaid!")
+			(ego 
+				setAvoider: Avoider,
+				setMotion: 
+				(if (IsObject theTargetOrX) cueingChase else cueingMoveTo)
+				theTargetOrX theDistanceOrY
+			)
+			TRUE
+		;else FALSE
 		)
 	)
+); GoToIfSaid
+
+(procedure (TurnIfSaid obj event optSpec &tmp theAngle)
+	;;(Print "TurnIfSaid?")
+	(= theAngle (GetAngle (ego x?) (ego y?) (obj x?) (obj y?)))
+	(return
+		(if (CommonInit
+				obj 
+				(if (>= argc  3) optSpec else '*/*')
+				;;need to turn?'
+				(CantBeSeen obj ego (/ 360 (Max 4 (* (/ (NumLoops ego) 4) 4))))
+				TRUE
+			)
+			;;(Print "TurnIfSaid!")
+			(if (IsObject oldLooper) (oldLooper dispose:))
+			(= oldLooper (ego looper?))
+			(ego 
+				looper:		NULL,
+				heading:		theAngle,
+				setMotion:	NULL,
+				setLoop:		lookGrooper
+			)
+			(lookGrooper doit:ego theAngle)
+			TRUE
+			;;else FALSE
+		)
+	)
+); TurnIfSaid
+
+(procedure (CommonInit obj spec otherTest turning)
 	
-	(method (cue &tmp newEvent)
-		(User canControl: TRUE canInput: TRUE)
-		((= newEvent (Event new:)) type: 128)
-		(Parse (User inputLineAddr?) newEvent)
-		(ego setAvoider: egoAvoider)
-		(= egoAvoider 0)
-		(if local0
-			((ego looper?) dispose:)
-			(ego looper: local2)
-			(= local2 0)
-			(local0 handleEvent: newEvent)
-			(= local0 0)
-		else
-			(local1 handleEvent: newEvent)
-			(= local1 0)
+	;;(Print "CommonInit")
+	(return
+		(if (and 													;INIT STUFF
+				otherTest	;should not be TRUE in second pass but MIGHT!
+				(not (if turning turnToWhom else goToWhom))
+				(Said spec)
+			)
+			(if (IsObject oldAvoider) (oldAvoider dispose:))
+			(= oldAvoider (ego avoider?))
+			(ego	avoider:		NULL)
+			(if turning 
+				(= turnToWhom obj)
+			else
+				(= goToWhom obj)
+			)
+			(User 
+				canControl:	FALSE,
+				canInput:	FALSE
+			)
+			;;(theGame setCursor: waitCursor TRUE)
+			TRUE
+			;;else FALSE
 		)
-		(if (not (newEvent claimed?))
-			(regions eachElementDo: #handleEvent newEvent 1)
-			(theGame handleEvent: newEvent 1)
-		)
-		(newEvent dispose:)
 	)
 )
+
+(instance lookGrooper of GradualLooper
+	(method (cue)
+		(super cue:)
+		(self dispose:)
+		(CommonCue TRUE)
+	)
+)
+
+(instance cueingChase of Chase
+	(method (motionCue)
+		(super motionCue:)
+		(if completed (CommonCue FALSE))
+	)
+)
+(instance cueingMoveTo of MoveTo
+	(method (motionCue)
+		(super motionCue:)
+		(if completed (CommonCue FALSE))
+	)
+)
+
+(procedure (CommonCue turning &tmp evt)
+	(User 
+		canControl:	TRUE,		;both HAD to be TRUE to pass CommonInit
+		canInput:	TRUE		;so we make them TRUE again
+	)
+	;;(theGame setCursor:normalCursor (HaveMouse))
+	((= evt (Event new:)) type:saidEvent)
+	(Parse (User inputLineAddr?) evt)
+	(ego setAvoider: oldAvoider)
+	(= oldAvoider NULL)
+	(if turning 
+		(ego looper: oldLooper)
+		(= oldLooper NULL)
+		(turnToWhom handleEvent:evt)
+		(= turnToWhom NULL) 
+	else 
+		(goToWhom handleEvent:evt)
+		(= goToWhom NULL)
+	)
+	(evt dispose:)
+)
+
+

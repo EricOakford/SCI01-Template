@@ -44,7 +44,7 @@
 	)
 	
 	(method (doit)
-		(if (== 0 isDemoGame)
+		(if (== 0 demoScripts)
 			(curEvent
 				type: 0
 				message: 0
@@ -79,7 +79,7 @@
 			message: (if verbMessager (verbMessager doit:) else 0)
 		)
 		(if useSortedFeatures
-			(SortCopy) ;This was the elusive proc984_0. The script is found in QFG2.
+			(SortedAdd) ;This was the elusive proc984_0. The script is found in QFG2.
 		else
 			(sortedFeatures add: cast features)
 		)
