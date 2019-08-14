@@ -91,7 +91,7 @@
 
 (instance theSortedFeatures of EventHandler
 	(properties
-		name "sortedFeatures"
+		name "sFeatures"
 	)
 	
 	(method (delete param1)

@@ -2,33 +2,46 @@
 ;**************************************************************
 ;***
 ;***	GAME.SH--
+;***	Put all the defines specific to your game in here
 ;***
 ;**************************************************************
 
-; * Put all the defines specific to your game in here
+; 
 
+(include pics.sh) (include views.sh) ;graphical defines
 (include system.sh) (include sci2.sh) ;system and kernel functions
-(include pics.sh)   (include views.sh)  ;graphic defines
 
-;Commonly-used header files are nested here, so most scripts only need to include this one.
+; Commonly-used header files are nested here, so most scripts only need to include this one.
 
-; Script defines
-(define MAIN 0)
-(define TITLE 1)
-(define TESTROOM 2)
-(define SPEEDTEST 99)
-(define DEBUG 800)
-
-; Inventory items
-;Make sure they are in the same order you put them in the inventory list in MAIN.SC.
-;To avoid name conflicts, prefix the items with the letter "i".
+;Game modules
 (enum
-	iTestObject
+	MAIN			;0
+	SPEEDTEST		;1
+	DEBUG			;2
+	GAME_INV		;3	;unused, as it is more memory-efficient to place inventory items
+						;in MAIN.SC. However, this will remain in case you want to move the
+						;items there.
+	GAME_INIT		;4
+	DISPOSE_CODE	;5
+)
+
+;Actual rooms
+(enum 10
+	TITLE		;10
+	TESTROOM	;11
 )
 
 ; Sound defines
 (define sQuake 10)
 (define sDeath 11)
 
-;Event flags
-	;Example: fBabaFrog (original Sierra naming)
+; Inventory items
+;Make sure they are in the same order you put them in the inventory list in GAMEINV.SC.
+;To avoid name conflicts, prefix the items with the letter "i".
+(enum
+	iTestObject
+)
+
+; Event flags
+;These flags are used by Bset, Btst, and Bclr.
+;Example: fBabaFrog (original Sierra naming)

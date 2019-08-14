@@ -37,6 +37,8 @@
 	PrintDontHaveIt 11
 	PrintAlreadyDoneThat 12
 	PrintNotCloseEnough 13
+	PrintCantDoThat 14
+	PrintCantSeeThat 15
 )
 
 (local
@@ -256,16 +258,71 @@
 	(Print "You're not close enough.")
 )
 
+(procedure (PrintCantDoThat)
+	(Print "You can't do that now.")
+)
+
+(procedure (PrintCantSeeThat)
+	(Print "You see nothing like that here.")
+)
+
 (instance egoObj of Ego
 	(properties
 		name "ego"
 	)
 )
 
-;VerbCode and GameVerbMessager can be customized for additional verbs
-;that are not part of the stock USER.SC. This was used for QFG2.
+(instance statusCode of Code
+	(properties)
+	
+	(method (doit strg)
+		(Format strg "___Template Game__________________Score: %d of %d" score possibleScore)
+	)
+)
 
-(instance VerbCode of Code
+(instance music of Sound
+	(properties
+		number 10
+	)
+)
+
+(instance SFX of Sound
+	(properties
+		number 10
+		priority 15
+	)
+)
+
+(instance deathIcon of DCIcon
+	(properties)
+)
+
+;	GameVerbMessager can be customized for additional verbs
+;	that are not part of the stock USER.SC. This was done in Quest for Glory II.
+
+(class GameVerbMessager of VerbMessager
+	(properties
+		ssTalk 0
+	)
+	
+	(method (doit)
+		(return
+			(cond 
+				((Said 'look>') verbLook)
+				((Said 'open>') verbOpen)
+				((Said 'close>') verbClose)
+				((Said 'smell>') verbSmell)
+				((Said 'move>') verbMove)
+				((Said 'eat>') verbEat)
+				((Said 'get,(pick<up)>') verbGet)
+				((Said 'climb,scale>') verbClimb)
+				((Said 'talk>') verbTalk)
+			)
+		)
+	)
+)
+
+(instance gameVerbCode of Code
 	(properties)
 	
 	(method (doit description theVerb &tmp [str 100])
@@ -305,87 +362,6 @@
 	)
 )
 
-(class GameVerbMessager of Code
-	(properties
-		ssLook 0
-		ssOpen 0
-		ssClose 0
-		ssSmell 0
-		ssMove 0
-		ssEat 0
-		ssGet 0
-		ssClimb 0
-		ssTalk 0
-	)
-	
-	(method (doit)
-		(return
-			(cond 
-				((Said ssLook) verbLook)
-				((Said ssOpen) verbOpen)
-				((Said ssClose) verbClose)
-				((Said ssSmell) verbSmell)
-				((Said ssMove) verbMove)
-				((Said ssEat) verbEat)
-				((Said ssGet) verbGet)
-				((Said ssClimb) verbClimb)
-				((Said ssTalk) verbTalk)
-			)
-		)
-	)
-)
-
-(instance verbWords of GameVerbMessager
-	(properties
-		ssLook 'look>'
-		ssOpen 'open>'
-		ssClose 'close>'
-		ssSmell 'smell>'
-		ssMove 'move>'
-		ssEat 'eat>'
-		ssGet 'get,(pick<up)>'
-		ssClimb 'climb,scale>'
-		ssTalk 'talk>'
-	)
-)
-
-(instance statusCode of Code
-	(properties)
-	
-	(method (doit strg)
-		(Format strg "___Template Game__________________Score: %d of %d" score possibleScore)
-	)
-)
-
-(instance music of Sound
-	(properties
-		number 10
-	)
-)
-
-(instance SFX of Sound
-	(properties
-		number 10
-		priority 15
-	)
-)
-
-(instance deathIcon of DCIcon
-	(properties)
-)
-
-
-(instance Test_Object of InvItem
-	(properties
-		name {Test Object}
-		description {This is a test object.}
-		owner 0
-		view vTestObject
-		loop 0
-		cel 0
-	)
-)
-
 (instance SCI01 of Game ;Replace "SCI01" with the game's internal name here (up to 6 characters)
 	; The main game instance. It adds game-specific functionality.
 	(properties
@@ -397,26 +373,12 @@
 	
 	(method (init)
 		;set up various aspects of the game
-		(= debugging TRUE) ;Set to TRUE if you want to enable the debug features.	
-		(SysWindow
-			;These colors can be changed to suit your preferences.
-			;They can also be changed in the game's menu, like in LSL3.
-			color: (= curTextColor vBLACK)
-			back: (= curBackColor vWHITE)
-		)
-		(= colorCount (Graph GDetect))
-		(= systemWindow SysWindow)
 		(super init:)
-		(= musicChannels (DoSound NumVoices))
-		(= useSortedFeatures FALSE)
 		(= cIcon deathIcon)
 		(= ego egoObj)
-		(= possibleScore 0)	;Set the maximum score here
 		(= version {x.yyy.zzz}) ;set game version here
-		(User alterEgo: ego verbMessager: verbWords)
-		(= showStyle IRISIN)
-		(= doVerbCode VerbCode)
-
+		(= doVerbCode gameVerbCode)
+		(User alterEgo: ego verbMessager: GameVerbMessager)
 		(TheMenuBar init: draw: hide:)
 		(StatusLine code: statusCode disable:) ;hide the status code at startup
 		(StopWalk init:)
@@ -430,8 +392,10 @@
 		((= soundFx SFX) number: 10 owner: self init:)
 		(inventory add:
 			;Add your inventory items here. Make sure they are in the same order as the item list in GAME.SH.
-				Test_Object
+			Test_Object
 		)
+		;moved any code not requiring any objects in this script into its own script
+		((ScriptID GAME_INIT 0) init:)
 		;and finally, now that the game's been initialized, we can move on to the speed tester.
 		(self newRoom: SPEEDTEST)
 	)
@@ -444,7 +408,7 @@
 		(TheMenuBar draw:)
 		(StatusLine enable:)
 		(SetMenu soundI p_text
-			(if (DoSound SoundOn) { Sound off} else { Sound on})
+			(if (DoSound SoundOn) {Sound off} else {Sound on})
 		)
 		(super replay:)
 	)	
@@ -454,13 +418,7 @@
 	)
 	
 	(method (startRoom roomNum)
-		(LoadMany FALSE	
-			;These are all disposed when going to another room, to reduce the
-			;chances of "Memory Fragmented" errors.
-			EXTRA FILE QSOUND GROOPER FORCOUNT SIGHT DPATH MOVEFWD JUMP SMOOPER
-			REVERSE CHASE FOLLOW WANDER POLYPATH BLOCK PRINTD EXTRA
-			APPROACH AVOIDER POLYGON TIMER QSOUND
-		)
+		((ScriptID DISPOSE_CODE 0) doit:)
 		(if debugging
 			(if
 				(and
@@ -476,7 +434,7 @@
 		(super startRoom: roomNum)
 	)	
 	
-	(method (handleEvent event)
+	(method (handleEvent event &tmp item)
 		(if (event claimed?)
 			(return)
 		)
@@ -493,6 +451,34 @@
 						(Print "(Game over.)" #at -1 152)
 						(= quit TRUE)
 					)
+					;interactions with inventory items, which are present in GAMEINV.SC.
+					(
+						(and
+							(Said '/*>')
+							(= item (inventory saidMe:))
+						)
+						(event claimed: FALSE)
+						(cond 
+							((item ownedBy: ego)
+								(cond 
+									((Said 'look[<at]')
+										(item showSelf:)
+									)
+								)
+							)
+							((item ownedBy: curRoomNum)
+								(if (Said 'get')
+									(PrintCantDoThat)
+								else
+									(PrintDontHaveIt)
+								)
+							)
+							(else
+								(PrintCantSeeThat)
+							)
+						)
+						(event claimed: TRUE)
+					)					
 				)
 			)
 		)
@@ -520,5 +506,17 @@
 				)
 			)
 		)
+	)
+)
+
+(instance Test_Object of InvItem
+	(properties
+		name {Test Object}
+		description {This is a test object.}
+		said '/object'
+		owner 0
+		view vTestObject
+		loop 0
+		cel 0
 	)
 )

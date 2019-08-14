@@ -6,13 +6,14 @@
 (use Game)
 (use Intrface)
 (use Main)
+(use Actor)
 (use System)
 
 (public
-	rm002 0
+	rm011 0
 )
 
-(instance rm002 of Room
+(instance rm011 of Room
 	(properties
 		picture pWhite
 		north 0
