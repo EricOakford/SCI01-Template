@@ -56,7 +56,7 @@
 			(keyDown
 				(event claimed: TRUE)
 				(switch (event message?)
-					(KEY_ALT_t
+					(`@t
 						(if
 							(and
 								(> 105 (= temp85 (GetNumber {Which room number?})))
@@ -65,7 +65,7 @@
 							(curRoom newRoom: temp85)
 						)
 					)
-					(KEY_QUESTION
+					(`?
 						(Print "Debug Key commands:\n
 							ALT-S Show cast\n
 							ALT-M   Show memory\n
@@ -79,7 +79,7 @@
 							ALT-O Path Maker"
 							#window SysWindow)
 					)
-					(KEY_ALT_s
+					(`@s
 						(= castFirst (cast first:))
 						(while castFirst
 							(= temp1 (NodeValue castFirst))
@@ -118,15 +118,15 @@
 							(= castFirst (cast next: castFirst))
 						)
 					)
-					(KEY_ALT_i
+					(`@i
 						(= castFirst (GetNumber {ID number of the object?}))
 						(ego get: castFirst)
 					)
-					(KEY_ALT_o
+					(`@o
 						(MakePath doit:)
 					)
-					(KEY_ALT_m (theGame showMem:))
-					(KEY_ALT_e
+					(`@m (theGame showMem:))
+					(`@e
 						(Format
 							@str
 							{ego\n
@@ -140,11 +140,11 @@
 						)
 						(Print @str #icon (ego view?) 0 0)
 					)
-					(KEY_ALT_v (Show VMAP))
-					(KEY_ALT_p (Show PMAP))
-					(KEY_ALT_c (Show CMAP))
-					(KEY_ALT_w (CreateObject doit:))
-					(KEY_ALT_d (SetDebug))
+					(`@v (Show VMAP))
+					(`@p (Show PMAP))
+					(`@c (Show CMAP))
+					(`@w (CreateObject doit:))
+					(`@d (SetDebug))
 					;Added to allow the interpreter's internal debugger
 					;to be accessed with a simpler key combo
 					
