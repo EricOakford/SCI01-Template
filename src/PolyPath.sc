@@ -4,25 +4,12 @@
 (use Main)
 (use Motion)
 
-;;;(public
-;;;	proc945_0 0
-;;;)
-
 ;; Path around an arbitrary set of obstacles, all of which are
 ;; defined as Polygons and added to the obstacle list via the
 ;; Rooms setObstacle method. 07/24/90 J.M.H.
 
 
-;EO: This procedure is not in the POLYPATH script in SCI16.
-;It probably isn't needed.
-;;;(procedure (proc945_0 param1 param2)
-;;;	(return
-;;;		(|
-;;;			(StrAt param1 (* 2 param2))
-;;;			(<< (StrAt param1 (+ 1 (* 2 param2))) $0008)
-;;;		)
-;;;	)
-;;;)
+
 
 (class PolyPath of Motion
 	(properties

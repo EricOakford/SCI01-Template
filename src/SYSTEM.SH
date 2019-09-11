@@ -116,6 +116,15 @@
 
 (define	maxFileName	13)	;MS-DOS maximum
 
+;Enums for polygon types for the polygon based avoider
+;(added for SCI01 by EO)
+(enum
+	PTotalAccess
+	PNearestAccess
+	PBarredAccess
+	PContainedAccess
+)
+
 ;Language defines (added for SCI01 by EO)
 (define	ENGLISH		1)
 (define	FRENCH		33)

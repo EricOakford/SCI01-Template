@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# POLYGON)
-
+(include game.sh)
 ;; Polygon class, originally for use by the polygon based avoider.
 ;; Other uses are possible however, such as a features onMe check.
 ;; 7/23/90 J.M.H. Avoider librarian.
