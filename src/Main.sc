@@ -39,6 +39,8 @@
 	PrintNotCloseEnough 13
 	PrintCantDoThat 14
 	PrintCantSeeThat 15
+	AddManyToPics 16
+	AddManyFeatures 17
 )
 
 (local
@@ -135,7 +137,7 @@
 	detailLevel		;detail level (0 = low, 1 = mid, 2 = high, 3 = ultra)
 	theMusic			;music object, current playing music
 	colorCount
-	speedCount		;used to test how fast the system is
+	howFast			;used to test how fast the system is
 					;and used in determining detail level. (used in conjunction with detailLevel)
 	cIcon
 	soundFx				;sound effect being played
@@ -266,6 +268,17 @@
 	(Print "You see nothing like that here.")
 )
 
+;These two procedures allow for adding multiple features and addToPics at a time.
+;They were used in QFG2, which uses sorted features.
+(procedure (AddManyToPics)
+	(addToPics add: &rest eachElementDo: #init doit:)
+)
+
+(procedure (AddManyFeatures)
+	(features add: &rest eachElementDo: #init doit:)
+)
+
+
 (instance egoObj of Ego
 	(properties
 		name "ego"
@@ -276,19 +289,19 @@
 	(properties)
 	
 	(method (doit strg)
-		(Format strg "___Template Game__________________Score: %d of %d" score possibleScore)
+		(Format strg "___Template Game_______________Score: %d of %d" score possibleScore)
 	)
 )
 
 (instance music of Sound
 	(properties
-		number 10
+		number sDeath
 	)
 )
 
 (instance SFX of Sound
 	(properties
-		number 10
+		number sDeath
 		priority 15
 	)
 )
@@ -315,7 +328,7 @@
 				((Said 'move>') verbMove)
 				((Said 'eat>') verbEat)
 				((Said 'get,(pick<up)>') verbGet)
-				((Said 'climb,scale>') verbClimb)
+				((Said 'climb>') verbClimb)
 				((Said 'talk>') verbTalk)
 			)
 		)
@@ -379,7 +392,7 @@
 		(= version {x.yyy.zzz}) ;set game version here
 		(= doVerbCode gameVerbCode)
 		(User alterEgo: ego verbMessager: GameVerbMessager)
-		(TheMenuBar init: draw: hide:)
+		(TheMenuBar init: draw: hide: state: FALSE)
 		(StatusLine code: statusCode disable:) ;hide the status code at startup
 		(StopWalk init:)
 		(if debugging
@@ -388,8 +401,8 @@
 			(HandsOff)
 			(self setCursor: normalCursor FALSE 350 200)
 		)
-		((= theMusic music) number: 10 owner: self init:)
-		((= soundFx SFX) number: 10 owner: self init:)
+		((= theMusic music) number: sDeath owner: self init:)
+		((= soundFx SFX) number: sDeath owner: self init:)
 		(inventory add:
 			;Add your inventory items here. Make sure they are in the same order as the item list in GAME.SH.
 			Test_Object
@@ -399,7 +412,7 @@
 		;and finally, now that the game's been initialized, we can move on to the speed tester.
 		(self newRoom: SPEEDTEST)
 	)
-	
+
 	(method (doit)
 		(super doit:)
 	)
@@ -413,18 +426,18 @@
 		(super replay:)
 	)	
 	
-	(method (newRoom)
-		(super newRoom: &rest)
-	)
-	
 	(method (startRoom roomNum)
 		((ScriptID DISPOSE_CODE 0) doit:)
+		(cls)
 		(if debugging
 			(if
 				(and
-					;if memory is fragmented and debugging is on, bring up a warning and internal debugger
+					;if memory is fragmented and debugging is on, bring up a warning and the internal debugger
 					(u> (MemoryInfo FreeHeap) (+ 20 (MemoryInfo LargestPtr)))
-					(Print "Memory fragmented." #button {Debug} TRUE)
+					(Print
+						"Memory fragmented."
+						#button {Debug} TRUE
+					)
 				)
 				(SetDebug)
 			)
@@ -432,26 +445,55 @@
 		)
 		(NormalEgo)
 		(super startRoom: roomNum)
-	)	
+	)
 	
 	(method (handleEvent event &tmp item)
-		(if (event claimed?)
-			(return)
+		(if debugging
+			(if
+				(and
+					(== (event type?) mouseDown)
+					(& (event modifiers?) shiftDown)
+				)
+				(if (not (User canInput:))
+					(event claimed: TRUE)
+				else
+					(cast eachElementDo: #handleEvent event)
+					(if (event claimed?)
+						(return)
+					)
+				)
+			)
+			(super handleEvent: event)
+			(if (event claimed?)
+				(return)
+			)
+			(switch (event type?)
+				(keyDown
+					((ScriptID DEBUG) handleEvent: event)
+				)
+				(mouseDown
+					((ScriptID DEBUG) handleEvent: event)
+				)
+			)
+		else
+			(super handleEvent: event)
 		)
-		(super handleEvent: event)
 		(switch (event type?)
-			;Add global parser commands here.
+		;Add global parser commands here.
 			(saidEvent
 				(cond
 					((Said 'die') ;this shouldn't be in your game; it's just used to test the EgoDead procedure.
-						(EgoDead "It's all over for now. Please try again." #title {You're dead.})
+						(EgoDead "It's all over for now. Please try again."
+							#title {You're dead.}
+							#icon vEgoDeath
+						)
 					)
 					((Said 'cheat')
 						(Print "Okay, you win.")
 						(Print "(Game over.)" #at -1 152)
 						(= quit TRUE)
 					)
-					;interactions with inventory items, which are present in GAMEINV.SC.
+					;interactions with inventory items
 					(
 						(and
 							(Said '/*>')
@@ -478,36 +520,14 @@
 							)
 						)
 						(event claimed: TRUE)
-					)					
-				)
-			)
-		)
-		(if debugging
-			(if
-				(and
-					(== (event type?) mouseDown)
-					(& (event modifiers?) shiftDown)
-				)
-				(if (not (User canInput:))
-					(event claimed: TRUE)
-				else
-					(cast eachElementDo: #handleEvent event)
-					(if (event claimed?)
-						(return)
 					)
-				)
-			)
-			(switch (event type?)
-				(keyDown
-					((ScriptID DEBUG) handleEvent: event)
-				)
-				(mouseDown
-					((ScriptID DEBUG) handleEvent: event)
 				)
 			)
 		)
 	)
 )
+
+;add inventory items here
 
 (instance Test_Object of InvItem
 	(properties

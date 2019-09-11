@@ -1,690 +1,131 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-;;;;
-;;;;  SYSTEM.SH
-;;;;
-;;;;  (c) Sierra On-Line, Inc, 1992
-;;;;
-;;;;  Author: Unknown
-;;;;
-;;;;  This is the header file for the SCI system
-;;;;
-;;;;  Last Updated:
-;;;;     Brian K. Hughes
-;;;;     August 19, 1992
-;;;;
-;;;; Adapted for SCI0.1 by Eric Oakford
+;SYSTEM - Header file
 
-(include kernel.sh)     ;kernel external declarations
-
-
-;ษออออออออออออออออป
-;บ                บ
-;บ Module Defines บ
-;บ                บ
-;ศออออออออออออออออผ
-
-(define  SYSTEM      999)
-(define  ACTOR       998)
-(define  MENU        997)
-(define  USER        996)
-(define  INVENT      995)
-(define  GAME        994)
-(define  FILE        993)
-(define  MOTION      992)
-(define  JUMP        991)
-(define  SAVE        990)
-(define  MUSIC       989)
-(define  EXTRA       988)
-(define  GAUGE       987)
-(define  ORBIT       986)
-(define  AVOIDER     985)
-(define  SORTCOPY    984)
-(define  PATH        983)
-(define  SIGHT       982)
-(define  WINDOW      981)
-(define  TEXTRA      980)
-(define  MOUSER      979)
-(define  RFEATURE    978)
-(define  GROOPER     977)
-(define  CAT         976)
-(define  DEMO        975)
-(define  NAMEFIND    974)
-(define  TIMER       973)
-(define  CHASE       972)
-(define  FOLLOW      971)
-(define  WANDER      970)
-(define  REVERSE     969)
-(define  SMOOPER     968)
-(define  DCICON      967)
-(define  SORT        966)
-(define  COUNT       965)
-(define  DPATH       964)
-(define  RELDPATH    963)
-(define  QSCRIPT     962)
-(define  STOPWALK    961)
-(define  TIMEDCUE    960)
-(define  QSOUND      959)
-(define  LOADMANY    958)
-(define  LASTLINK    957)
-(define  FORCOUNT    956)
-(define  TRACK       955)
-(define  GOTOSAID    954)
-(define  APPROACH    953)
-(define  LOGGER      952)
-(define  MOVEFWD     951)
-(define  FEATURE     950)
-(define  BLOCK       949)
-(define  WRITEFTR    948)
-(define  DELAYEVT    947)
-(define  POLYGON     946)
-(define  POLYPATH    945)
-(define  FILESEL     944)
-(define  POLYEDIT    943)
-(define  MOVECYC     942)
-(define  RANDCYC     941)
-(define  PRINTD      940)
-
-(define  INTRFACE    255)
+;Adapted for SCI01 by Eric Oakford
 
 
 
-;ษออออออออออออออออป
-;บ                บ
-;บ Extern Defines บ
-;บ                บ
-;ศออออออออออออออออผ
-;;;NOTE: Externs are not defined in SCICompanion
-;;;(extern
-;;;   Print          INTRFACE    0
-;;;   ShowView       INTRFACE    1
-;;;   GetInput       INTRFACE    2
-;;;   GetNumber      INTRFACE    3
-;;;   Printf         INTRFACE    4
-;;;   MousedOn       INTRFACE    5
-;;;   sign           SYSTEM      0
-;;;   umod           SYSTEM      1
-;;;   Min            SYSTEM      2
-;;;   Max            SYSTEM      3
-;;;   InRect         SYSTEM      4
-;;;   OneOf          SYSTEM      5
-;;;   WordAt         SYSTEM      6
-;;;   Eval           SYSTEM      7
-;;;   LoadMany       LOADMANY    0
-;;;   IsOffScreen    SIGHT       0
-;;;   CantBeSeen     SIGHT       1
-;;;   AngleDiff      SIGHT       2
-;;;   FlipPoly       FLIPPOLY    0
-;;;   FlipFeature    FLIPPOLY    1
-;;;)
+;System file name / script numbers
+;
+(define	SYSTEM		999)
+(define	ACTOR			998)
+(define	MENU			997)
+(define	USER			996)
+(define	INVENT		995)
+(define	GAME			994)
+(define	FILE			993)
+(define	MOTION		992)
+(define	JUMP			991)
+(define	SAVE			990)
+(define	MUSIC			989)
+(define	EXTRA			988)
+(define	GAUGE			987)
+(define	ORBIT			986)
+(define	AVOIDER		985)
+(define	SORTCOPY		984)
+(define	PATH			983)
+(define	SIGHT			982)
+(define	WINDOW		981)
+(define	TEXTRA		980)
+(define	MOUSER		979)
+(define	RFEATURE		978)
+(define	GROOPER		977)
+(define	CAT			976)
+(define	DEMO			975)
+(define	NAMEFIND		974)
+(define	TIMER			973)
+(define	CHASE			972)
+(define	FOLLOW		971)
+(define	WANDER		970)
+(define	REVERSE		969)
+(define	SMOOPER		968)
+(define	DCICON		967)
+(define	SORT			966)
+(define	COUNT			965)
+(define	DPATH			964)
+(define	RELDPATH		963)
+(define	QSCRIPT		962)
+(define	STOPWALK		961)
+(define	TIMEDCUE		960)
+(define	QSOUND		959)
+(define	LOADMANY		958)	;load/unload many modules
+(define	LASTLINK		957)	;follow a specified link to the bitter end
+(define	FORCOUNT		956)	;forward-loop a specified number of times
+(define	TRACK			955)	;motion to track an actor at an x/y offset.
+(define	GOTOSAID		954)	;turn to or approach "said" object.
+(define	APPROACH		953)
+(define	LOGGER			952)
+(define	MOVEFWD			951)
+(define	FEATURE			950)
+(define	BLOCK			949)
+(define	WRITEFTR		948)
+(define	DELAYEVT		947)
+(define	POLYGON			946)
+(define	POLYPATH		945)
+(define	FILESEL			944)
+(define	POLYEDIT		943)
+(define	MOVECYC			942)
+(define	RANDCYC			941)
+(define	PRINTD			940)
+(define	OSC				939)
 
 
 
-;ษออออออออออออออออออป
-;บ                  บ
-;บ Resource Defines บ
-;บ                  บ
-;ศออออออออออออออออออผ
-
-;Resource types
-(define  VIEW     $80)  ;  For backward compatability
-(define  PICTURE  $81)
-(define  SCRIPT   $82)
-(define  TEXT     $83)
-(define  SOUND    $84)
-(define  MEMORY   $85)
-(define  VOCAB    $86)
-(define  FONT     $87)
-(define  CURSOR   $88)  ;
-
-(define  RES_VIEW       $80)
-(define  RES_PIC        $81)
-(define  RES_SCRIPT     $82)
-(define  RES_TEXT       $83)
-(define  RES_SOUND      $84)
-(define  RES_MEMORY     $85)
-(define  RES_VOCAB      $86)
-(define  RES_FONT       $87)
-(define  RES_CURSOR     $88)
-(define  RES_PATCH      $89)
-(define  RES_BITMAP     $8A)
-(define  RES_PALETTE    $8B)
-(define  RES_CDAUDIO    $8C)
-(define  RES_AUDIO      $8D)
-(define  RES_SYNC       $8E)
-
-;Virtual bitmap ID's
-(define  VMAP     1)
-(define  PMAP     2)
-(define  CMAP     4)
-
-;Picture change style constants
-(define  HWIPE          0)
-(define  HSHUTTER       0)
-(define  VSHUTTER       1)
-(define  WIPELEFT       2)
-(define  WIPERIGHT      3)
-(define  WIPEUP         4)
-(define  WIPEDOWN       5)
-(define  IRISIN         6)
-(define  IRISOUT        7)
-(define  DISSOLVE       8)
-(define  PIXELDISSOLVE  9)
-(define  FADEOUT        10)      ;Defaults to PLAIN in 16 color
-
-(define  SCROLLRIGHT    40)      ;Relative order of these four is important
-(define  SCROLLLEFT     41)      ;  in order for ShowPic to work correctly
-(define  SCROLLUP       42)
-(define  SCROLLDOWN     43)
-
-(define  PLAIN          100)     ;Draw quickly with no special effects
-
-(define  DONTSHOW       $1000)   ;Draw pic, but don't show yet
-(define  VMIRROR        $2000)   ;Mirror pic vertically
-(define  HMIRROR        $4000)   ;Mirror pic horizontally
-(define  BLACKOUT       $8000)   ;"or" with other style to blacken screen first
+(define	INTRFACE		255)
 
 
 
-;ษออออออออออออออออป
-;บ                บ
-;บ Cursor Defines บ
-;บ                บ
-;ศออออออออออออออออผ
+(define	INFINITY $7fff)	
 
-(define  ARROW_CURSOR   999)
-(define  SNAIL_CURSOR   998)
-(define  HAND_CURSOR    997)
-(define  INVIS_CURSOR   996)
+(define	NODIRECTION $7fff)		;Arbitrary value for an undefined heading
 
 
-
-;ษออออออออออออออออออออออออออป
-;บ                          บ
-;บ Numeric Constant Defines บ
-;บ                          บ
-;ศออออออออออออออออออออออออออผ
-
-(define  INFINITY    $7fff)   
-
-
-(define  NULL        0)
-
-;Bits in the -info- property.
-(define  CLONED      $0001)
-(define  NODISPOSE   $0002)
-(define  NODISPLAY   $0004)
-(define  CLASS       $8000)
-
-;For compatability -- bringing stuff in line with SmallTalk syntax.
-;;;(define  myself      yourself)
-;;;NOTE: Non-integer defines are not yet supported by SCICompanion.
-;;;Uncomment this define once they are.
-
-;Screen dimensions
-(define  MINTOP      0)
-(define  MINLEFT     0)
-(define  MAXRIGHT    320)
-(define  MAXBOTTOM   200)
-
-;Screen edges for edgeHit
-(enum 1
-   NORTH
-   EAST
-   SOUTH
-   WEST
-)
-
-;Values for above
-(define  northEdge   40)
-(define  southEdge   189)
-(define  eastEdge    319)
-(define  westEdge    0)
-
-;Screen dimensions
-(define  SCRNWIDE    320)
-(define  SCRNHIGH    200)
-
-;Values returned by (GameIsRestarting)
-(enum 1
-   RESTARTING
-   RESTORING
-)
-
-(define  PATHEND     $8000)   ;Indicates end of path array
-(define  ENDPOLY     $8000)   ;Indicates end of polygon array
-(define  SAMEVIEW    -1)      ;Indicates stop cels are in same view as walks
-(define  END_CONV    0)       ;Indicates end of Conversation array
-(define  MARGIN      4)       ;Standard intrface item/edge spacing
-
-;System font should not be screwed with
-(define  SYSFONT     0)
-(define  USERFONT    1)
-
-;Used to specify the origin of an Actor in certain methods.
-(define  origin      1)
-
-
-;File opening parameters
-(define  fAppend     0)       ;appends to end of file
-(define  fRead       1)       ;positions at start of file
-(define  fTrunc      2)       ;truncates file on open
-
-;File seek parameters (limited to offset of +/- 32767)
-(enum
-   fileSeekBeg    ; seek from beginning of file (positive offset)
-   fileSeekCur    ; seek from current position of file (positively/negatively)
-   fileSeekEnd    ; seek from end of file (negative offset)
-)
-
-
-;Define for features shiftClick and contClick properties
-;  that say don't do proximity checks if clicked on.
-(define NOCHECKMOUSE $8000)
-
-
-;Enums for Extra class
-(enum
-   ExtraForward         ;0=default
-   ExtraEndLoop         ;1
-   ExtraEndAndBeginLoop ;2
-)
-
-(enum -2
-   ExtraLastCel         ;-1
-   ExtraRandomCel       ;-2
-)
-
-; Feature defines
-(define  ftrDefault  $6789)
-(define  ftrControl  $0001)
-(define  ftrPolygon  $0002)
-
-(define  FACINGME    $0001)   
-(define  NEARCHECK   $0002)
-(define  FARCHECK    $0004)
-(define  ISNOTHIDDEN $0008)
-(define  SKIPCHECK   $1000)
-
-
-(define maxFileName  13)      ;MS-DOS maximum
-
-
-;Enums for polygon types for the polygon based avoider
-(enum
-   PTotalAccess
-   PNearestAccess
-   PBarredAccess
-   PContainedAccess
-)
-
-
-;(define NODIRECTION $7fff);Arbitrary value for an undefined heading
-;(define goToSaid    $8000);or with longRangeDist to indicate goToSaid desired 
-;(define turnIfSaid  $8000);or with sightAngle to indicate turnIfSaid desired
+;Some selector aliases
+;NOTE: Macro defines not supported by SCICompanion
+;(define	nowSeen	nsTop)
+;(define	lastSeen	lsTop)
+;(define	baseRect	brTop)
 
 ;Defines for the system view
-(define  SYSVIEW        999)
-;(define STOPSIGN       SYSVIEW 0 0)
-;(define QUESTIONMARK   SYSVIEW 0 1)
-;(define EXCLAMATION    SYSVIEW 0 2)
+(define	SYSVIEW			999)
+;NOTE: Macro defines not supported by SCICompanion
+;;;(define	STOPSIGN			SYSVIEW 0 0)
+;;;(define	QUESTIONMARK	SYSVIEW 0 1)
+;;;(define	EXCLAMATION		SYSVIEW 0 2)
+
+; Standard cursor IDs
+(define	ARROW_CURSOR	999)
+(define	SNAIL_CURSOR	998)
+(define	HAND_CURSOR		997)
 
 ;Text rendering
-;(define TPLAIN   0)
-;(define TDIMMED  1)
+(define	TPLAIN	0)
+(define	TDIMMED	1)
 
-;Door defines
-(enum
-   doorClosed
-   doorOpening
-   doorOpen
-   doorClosing
-)
+;Feature defines (added for SCI01 by EO)
+(define	ftrDefault	$6789)
+(define	ftrControl	$0001)
+(define	ftrPolygon	$0002)
 
-(enum
-   doorWalkEgo    ; ->:    ego will walk in through the door
-                  ; <-:    ego will walk out the door to new room
-   doorPlaceEgo   ; ->:    ego will appear in front of the door
-                  ; <-:    ego will walk out the door & door will close
-   doorLeaveEgo   ; both:  the door does not affect ego
-)
+(define	FACINGME		$0001)   
+(define	NEARCHECK		$0002)
+(define	FARCHECK		$0004)
+(define	ISNOTHIDDEN		$0008)
+(define	SKIPCHECK		$1000)
 
 
-; Language defines
+(define	maxFileName	13)	;MS-DOS maximum
 
-(define  ENGLISH     1)
-(define  FRENCH      33)
-(define  SPANISH     34)
-(define  ITALIAN     39)
-(define  GERMAN      49)
-(define  JAPANESE    81)
-(define  PORTUGUESE  351)
+;Language defines (added for SCI01 by EO)
+(define	ENGLISH		1)
+(define	FRENCH		33)
+(define	SPANISH		34)
+(define	ITALIAN		39)
+(define	GERMAN		49)
+(define	JAPANESE	81)
+(define	PORTUGUESE	351)
 
-
-
-;ษออออออออออออออออป
-;บ                บ
-;บ Dialog Defines บ
-;บ                บ
-;ศออออออออออออออออผ
-
-;Dialog item types
-(define  dButton        1)
-(define  dText          2)
-(define  dEdit          3)
-(define  dIcon          4)
-(define  dMenu          5)          ; the title portion
-(define  dSelector      6)
-
-;Dialog item states
-(define  dActive        $0001)
-(define  dExit          $0002)
-(define  dBold          $0004)
-(define  dSelected      $0008)
-(define  dIconTop       $0010)
-
-;Window manager defines
-(define  stdWindow      $0000)
-(define  wNoSave        $0001)
-(define  wNoBorder      $0002)
-(define  wTitled        $0004)
-(define  wCustom        $0080)
-
-;Text justification for DItem mode
-(define teJustLeft      0)
-(define teJustCenter    1)
-(define teJustRight     -1)
-
-
-;ษอออออออออออออออป
-;บ               บ
-;บ Event Defines บ
-;บ               บ
-;ศอออออออออออออออผ
-
-;Event types
-(define  nullEvt     $0000)
-(define  mouseDown   $0001)
-(define  mouseUp     $0002)
-(define  keyDown     $0004)
-(define  keyUp       $0008)
-(define  direction   $0040)
-(define  saidEvent   $0080)
-(define  joyDown     $0100)
-(define  joyUp       $0200)
-(define  walkEvent   $1000)
-(define  helpEvent   $2000)
-(define  userEvent   $4000)
-
-(define  allEvents   $7fff)
-
-(define  leaveIt     $8000)
-
-(define  speechNoun  1)
-(define  speechVerb  0)
-
-;Event modifiers (in who property)
-(define  shiftRight  1)    ; right shift key pressed
-(define  shiftLeft   2)    ; left shift key pressed
-(define  shiftDown   3)    ; either shift key pressed
-(define  ctrlDown    4)    ; control key pressed
-(define  altDown     8)    ; alt key down pressed
-
-;Pseudo selectors for SetMenu, Display, and Print (eventually)
-;  must be duplicated by #define's in KERNEL.H
-;NOTE: these defines *should* all end with : but
-; that is not supported by SCICompanion
-(define p_at        100)
-(define p_mode      101)
-(define p_color     102)
-(define p_back      103)
-(define p_style     104)
-(define p_font      105)
-(define p_width     106)
-(define p_save      107)
-(define p_restore   108)
-(define p_said      109)
-(define p_text      110)
-(define p_key       111)
-(define p_state     112)
-(define p_value     113)
-(define p_dispose   114)
-(define p_time      115)
-(define p_title     116)
-(define p_draw      117)
-(define p_edit      118)
-(define p_button    119)
-(define p_icon      120)
-(define p_noshow    121)
-
-;Direction event messages.
-(enum
-   dirStop
-   dirN
-   dirNE
-   dirE
-   dirSE
-   dirS
-   dirSW
-   dirW
-   dirNW
-)
-
-;Standard loop order for actors
-(enum
-   loopE
-   loopW
-   loopS
-   loopN
-   
-   loopSE
-   loopSW
-   loopNE
-   loopNW
-)
-
-(enum
-   facingEast
-   facingWest
-   facingSouth
-   facingNorth
-   facingSE
-   facingSW
-   facingNE
-   facingNW
-)
-
-
-
-;ษอออออออออออออป
-;บ             บ
-;บ Key Defines บ
-;บ             บ
-;ศอออออออออออออผ
-
-(define  ESC         27)
-(define  SPACEBAR    32)
-(define  ENTER       $000d) ;(define  ENTER       `^m) in SSCI
-(define  TAB         $0009) ;(define  TAB         `^i) in SSCI
-(define  SHIFTTAB    $0f00)
-(define  BACKSPACE   $0008) ;(define  BACKSPACE   `^h) in SSCI
-
-
-
-;Numeric key code in scan code order with missing codes added
-(define  HOMEKEY     $4700)
-(define  UPARROW     $4800)
-(define  PAGEUP      $4900)
-
-(define  LEFTARROW   $4b00)
-(define  CENTERKEY   $4c00)
-(define  RIGHTARROW  $4d00)
-
-(define  ENDKEY      $4f00)
-(define  DOWNARROW   $5000)
-(define  PAGEDOWN    $5100)
-
-(define  INSERT      $5200)
-(define  DELETE      $5300)
-
-
-
-;ษออออออออออออออออออออป
-;บ                    บ
-;บ Signal Bit Defines บ
-;บ                    บ
-;ศออออออออออออออออออออผ
-
-(define  stopUpdOn      $0001)
-(define  startUpdOn     $0002)
-(define  updOn          $0003)
-(define  notUpd         $0004)
-(define  hideActor      $0008)
-(define  fixPriOn       $0010)
-(define  viewAdded      $0020)   ;view will be added to picture
-(define  forceUpdOn     $0040)
-(define  actorHidden    $0080)
-(define  staticView     $0100)
-(define  blocked        $0400)   ;tried to move, but couldn't
-(define  fixedLoop      $0800)   ;loop is fixed
-(define  skipCheck      $1000)   ;onMe will check skip
-(define  ignrHrz        $2000)   ;can ignore horizon
-(define  ignrAct        $4000)   ;can ignore other actors
-(define  delObj         $8000)
-
-;(define  ADDTOPIC       (| delObj stopUpdOn viewAdded))
-(define ADDTOPIC $8021)        ;NOTE: Macro defines are not yet supported by SCICompanion.
-                               ;Remove this define and uncomment the original ADDTOPIC define
-                               ;when they are.
-
-;scaleSignal bits
-(define  scalable       $0001)   ;scale on user-defined criteria
-(define  autoScale      $0002)   ;scaling as a function of y
-(define  noStepScale    $0004)   ;don't try to change stepSize when scaling
-(define  scaleBase      128)     ;represents 100%
-(define  scaleShift     7)
-
-(define  MATCH          -1)
-
-
-
-;ษอออออออออออออออออออป
-;บ                   บ
-;บ State Bit Defines บ
-;บ                   บ
-;ศอออออออออออออออออออผ
-
-(define  dynamicName    $0001)   ;name of object is dynamically allocated
-(define  approachObj    $0002)   ;ego will try to approach objects
-(define  onMeIsControl  $0004)   ;onMeCheck is bit-mapped control colors
-
-
-;ษอออออออออออออออป
-;บ               บ
-;บ Sound Defines บ
-;บ               บ
-;ศอออออออออออออออผ
-
-(define  SND_DONE       -1)   ;sound finished playing
-
-;MIDI commands
-(define  mNOTEOFF       $80)
-(define  mNOTEON        $90)
-(define  mPOLYAFTER     $a0)
-(define  mCONTROLLER    $b0)
-(define  mPROGRAMCHANGE $c0)
-(define  mCHNLAFTER     $d0)
-(define  mPITCHBEND     $e0)
-
-;MIDI controller #'s
-(define  mMODULATION    1)
-(define  mVOLUME        7)
-(define  mPAN           10)
-(define  mMUTE          78)
-
-;Flags bits
-(define mNOPAUSE        $0001)
-(define mFIXEDPRI       $0002)
-
-
-
-;ษอออออออออออออออป
-;บ               บ
-;บ Color Defines บ
-;บ               บ
-;ศอออออออออออออออผ
-
-;Screen colors
-(define  BLACK          0)
-
-;CONTROL colors
-(define  cBLACK         $0001)   ;  0
-(define  cBLUE          $0002)   ;  1
-(define  cGREEN         $0004)   ;  2
-(define  cCYAN          $0008)   ;  3
-(define  cRED           $0010)   ;  4
-(define  cMAGENTA       $0020)   ;  5
-(define  cBROWN         $0040)   ;  6
-(define  cLGREY         $0080)   ;  7
-(define  cGREY          $0100)   ;  8
-(define  cLBLUE         $0200)   ;  9
-(define  cLGREEN        $0400)   ;  10
-(define  cLCYAN         $0800)   ;  11
-(define  cLRED          $1000)   ;  12
-(define  cLMAGENTA      $2000)   ;  13
-(define  cYELLOW        $4000)   ;  14
-(define  cWHITE         $8000)   ;  15
-
-;VISUAL colors
-(enum
-   vBLACK      ;  0
-   vBLUE       ;  1
-   vGREEN      ;  2
-   vCYAN       ;  3
-   vRED        ;  4
-   vMAGENTA    ;  5
-   vBROWN      ;  6
-   vLGREY      ;  7
-   vGREY       ;  8
-   vLBLUE      ;  9
-   vLGREEN     ;  10
-   vLCYAN      ;  11
-   vLRED       ;  12
-   vLMAGENTA   ;  13
-   vYELLOW     ;  14
-   vWHITE      ;  15
-)
-
-;PRIORITY colors
-(enum
-   pBLACK      ;  0
-   pBLUE       ;  1
-   pGREEN      ;  2
-   pCYAN       ;  3
-   pRED        ;  4
-   pMAGENTA    ;  5
-   pBROWN      ;  6
-   pLGREY      ;  7
-   pGREY       ;  8
-   pLBLUE      ;  9
-   pLGREEN     ;  10
-   pLCYAN      ;  11
-   pLRED       ;  12
-   pLMAGENTA   ;  13
-   pYELLOW     ;  14
-   pWHITE      ;  15
-)
-
-
-;EO: Icon bars aren't really supported in SCI01.
-;The first icon-based game, the floppy disk release of KQ5,
-;used a weirdly-coded custom icon bar in script 997,
-;which is normally for the menu bar.
-;Since there was not yet a standard system script for icon bars,
-;the related defines have been removed.
-
-
-; SCI01 verb defines
-;(added by EO)
+;Verb defines (added for SCI01 by EO)
 (enum 1
 	verbLook
 	verbOpen
@@ -697,75 +138,454 @@
 	verbTalk
 )
 
+;Dialog item types
+(define	dButton	1)
+(define	dText	2)
+(define	dEdit	3)
+(define	dIcon	4)
+(define	dMenu	5)				; the title portion
+(define	dSelector	6)
 
-;ษออออออออออออออออออออออออออป
-;บ                          บ
-;บ System Globals (0 to 99) บ
-;บ                          บ
-;ศออออออออออออออออออออออออออผ
+;Dialog item states
+(define	dActive		1)
+(define	dExit			2)
+(define	dBold			4)
+(define	dSelected	8)
+
+; Window manager defines
+(define 	stdWindow	0)
+(define	wTitled		4)
+
+
+;Text justification for DItem mode
+(define teJustLeft	0)
+(define teJustCenter 1)
+(define teJustRight -1)
+
+
+;Event types
+(define	nullEvt		$0000)
+(define	mouseDown	$0001)
+(define	mouseUp		$0002)
+(define	keyDown		$0004)
+(define	keyUp			$0008)
+(define	menuStart	$0010)
+(define	menuHit		$0020)
+(define	direction	$0040)
+(define	saidEvent	$0080)
+(define	joyDown		$0100)
+(define	joyUp			$0200)
+
+(define	allEvents	$7fff)
+
+(define	leaveIt		$8000)
+
+; event modifiers (in who property)
+(define	shiftDown	3)		; either shift key pressed
+(define	ctrlDown		4)		; control key pressed
+(define	altDown		8)		; alt key down pressed
+
+; pseudo selectors for SetMenu, Display, and Print (eventually)
+; must be duplicated by #define's in KERNEL.H
+;NOTE: these defines *should* all end with : but
+; that is not supported by SCICompanion
+
+(define p_at		100)
+(define p_mode		101)
+(define p_color		102)
+(define p_back		103)
+(define p_style		104)
+(define p_font		105)
+(define p_width		106)
+(define p_save		107)
+(define p_restore	108)
+(define p_said		109)
+(define p_text		110)
+(define p_key		111)
+(define p_state		112)
+(define p_value		113)
+(define p_dispose	114)
+(define p_time		115)
+(define p_title		116)
+(define p_draw		117)
+(define p_edit		118)
+(define p_button	119)
+(define p_icon		120)
+
+;Direction event messages.
+(enum
+	dirStop
+	dirN
+	dirNE
+	dirE
+	dirSE
+	dirS
+	dirSW
+	dirW
+	dirNW
+)
+
+;Standard loop order for actors
+(enum
+	loopE
+	loopW
+	loopS
+	loopN
+	
+	loopSE
+	loopSW
+	loopNE
+	loopNW
+)
+
+; some keycode definitions
+(define	ESC			27)
+(define	SPACEBAR		32)
+(define	ENTER       $000d)		;(define ENTER	`^m) in SSCI
+(define	TAB         $0009)		;(define TAB	`^i) in SSCI
+(define	SHIFTTAB		$0f00)
+(define	BACKSPACE	$0008)		;(define	BACKSPACE	`^h)
+
+
+; Numeric key code in scan code order with missing codes added
+(define	HOMEKEY		$4700)
+(define	UPARROW		$4800)
+(define	PAGEUP		$4900)
+
+(define	LEFTARROW	$4b00)
+(define	CENTERKEY	$4c00)
+(define	RIGHTARROW	$4d00)
+
+(define	ENDKEY		$4f00)
+(define	DOWNARROW	$5000)
+(define	PAGEDOWN	$5100)
+
+(define	DELETE		$5300)
+
+
+
+;Screen colors
+(define	BLACK			0)
+
+;Screen dimensions
+(define	MINTOP		0)
+(define	MINLEFT		0)
+(define	MAXRIGHT		320)
+(define	MAXBOTTOM	200)
+
+
+
+;Resource types
+(define	VIEW		$80)
+(define	PICTURE	$81)
+(define	SCRIPT	$82)
+(define	TEXT		$83)
+(define	SOUND		$84)
+(define	MEMORY	$85)
+(define	VOCAB		$86)
+(define	FONT		$87)
+(define	CURSOR	$88)
+
+
+;Virtual bitmap ID's
+(define	VMAP		1)
+(define	PMAP		2)
+(define	CMAP		4)
+
+
+;Picture change style constants
+(define	HWIPE			0)
+(define	HSHUTTER		0)
+(define	VSHUTTER		1)
+(define	WIPELEFT		2)
+(define	WIPERIGHT	3)
+(define	WIPEUP		4)
+(define	WIPEDOWN		5)
+(define	IRISIN		6)
+(define	IRISOUT		7)
+(define	DISSOLVE		8)
+(define	PLAIN			100)		; Draw quickly with no special effects
+; adding the following constant to any of the styles
+; will blacken the screen in the converse manner before showing
+(define	BLACKOUT		9)
+
+(define	FADEOUT			30)		;Defaults to PLAIN in 16 color
+
+(define	SCROLLRIGHT		40)		;Relative order of these four is important
+(define	SCROLLLEFT		41)		;  in order for ShowPic to work correctly
+(define	SCROLLUP		42)
+(define	SCROLLDOWN		43)
+
+(define	NULL			0)
+
+;Bits in the -info- property.
+(define	CLONED		$0001)
+(define	NODISPOSE	$0002)
+(define	NODISPLAY	$0004)
+(define	CLASS			$8000)
+
+;For compatability -- bringing stuff in line with SmallTalk syntax.
+;NOTE: Macro define
+;(define	myself		yourself)
+
+
+;Bitmap for the 'signal' property of Props
+; MSB xxxxxxxx/xxxPKxUU LSB
+; x = don't touch
+; P = priority
+; K = kill actor
+; U = update control
+
+(define	stopUpdOn		$0001)
+(define	startUpdOn		$0002)
+(define	updOn				$0003)
+(define	notUpd			$0004)
+(define	hideActor		$0008)
+(define	fixPriOn			$0010)
+(define	viewAdded		$0020)	;view will be added to picture
+(define	forceUpdOn		$0040)
+(define	actorHidden		$0080)
+(define	staticView		$0100)
+(define	anExtra			$0200)	;can be added to pic if animation speed bad
+(define	blocked			$0400)	;tried to move, but couldn't
+(define	fixedLoop		$0800)	;loop is fixed
+(define	fixedCel			$1000)	;cel fixed
+(define	ignrHrz			$2000)	;can ignore horizon
+(define	ignrAct			$4000)	;can ignore other actors
+(define	delObj			$8000)
+
+	;(define	ADDTOPIC			(| delObj stopUpdOn viewAdded))
+(define	ADDTOPIC		$8021)	;NOTE: Macro defines are not yet supported by SCICompanion.
+								;Remove this define and uncomment the original ADDTOPIC define
+								;when they are.
+
+
+; Screen edges for edgeHit
+(enum	1
+	NORTH
+	EAST
+	SOUTH
+	WEST
+)
+
+; values for above
+(define	northEdge	40)
+(define	southEdge	189)
+(define	eastEdge		319)
+(define	westEdge		0)
+
+; screen dimensions
+(define	SCRNWIDE	320)
+(define	SCRNHIGH	200)
+
+
+;Values returned by (GameIsRestarting)
+(enum 1
+	RESTARTING
+	RESTORING
+)
+
+;Marker for end of path array.
+(define	PATHEND	$8000)
+
+; system font should not be screwed with
+(define	SYSFONT	0)
+(define	USERFONT	1)
+
+; this is standard inter item / edge spacing
+(define	MARGIN	4)
+
+;Used to specify the origin of an Actor in certain methods.
+(define	origin	1)
+
+;File opening parameters
+(define	fAppend	0)				;appends to end of file
+(define	fRead		1)				;positions at start of file
+(define	fTrunc	2)				;truncates file on open
+
+;File seek parameters (limited to offset of +/- 32767)
+(enum
+	fileSeekBeg		; seek from beginning of file (positive offset)
+	fileSeekCur		; seek from current position of file (positively/negatively)
+	fileSeekEnd		; seek from end of file (negative offset)
+)
+
+;Definitions for sound.
+(define	SND_DONE			-1)	;sound finished playing
+
+(define	SND_NOTREADY	0)
+(define	SND_READY		1)
+(define	SND_BLOCKED		2)
+(define	SND_ACTIVE		3)
+(define	SND_DELETE		4)
+
+
+;**************************************************
+;***
+;***				COLORS
+;***
+;**************************************************
+
+; ******* CONTROL colors
+;         --------------						;	color#
+;         											;	------
+(define	cBLACK				1		)			;	0
+(define	cBLUE					2		)			;	1
+(define	cGREEN				4		)			;	2
+(define	cCYAN					8		)			;	3
+(define	cRED					16		)			;	4
+(define	cMAGENTA				32		)			;	5
+(define	cBROWN				64		)			;	6
+(define	cLGREY				128	)			;	7
+(define	cGREY					256	)			;	8
+(define	cLBLUE				512	)			;	9
+(define	cLGREEN				1024	)			;	10
+(define	cLCYAN				2048	)			;	11
+(define	cLRED					4096	)			;	12
+(define	cLMAGENTA			8192	)			;	13
+(define	cYELLOW				16384	)			;	14
+(define	cWHITE				32768	)			;	15
+
+; ******** VISUAL colors
+(enum						;	color#
+							;	------
+	vBLACK				;	0
+	vBLUE					;	1
+	vGREEN				;	2
+	vCYAN					;	3
+	vRED					;	4
+	vMAGENTA				;	5
+	vBROWN				;	6
+	vLGREY				;	7
+	vGREY					;	8
+	vLBLUE				;	9
+	vLGREEN				;	10
+	vLCYAN				;	11
+	vLRED					;	12
+	vLMAGENTA			;	13
+	vYELLOW				;	14
+	vWHITE				;	15
+)
+
+; ******** PRIORITY colors
+(enum						;	color#
+							;	------
+	pBLACK				;	0
+	pBLUE					;	1
+	pGREEN				;	2
+	pCYAN					;	3
+	pRED					;	4
+	pMAGENTA				;	5
+	pBROWN				;	6
+	pLGREY				;	7
+	pGREY					;	8
+	pLBLUE				;	9
+	pLGREEN				;	10
+	pLCYAN				;	11
+	pLRED					;	12
+	pLMAGENTA			;	13
+	pYELLOW				;	14
+	pWHITE				;	15
+)
+
+;**************************************************
+;***
+;***		SYSTEM GLOBALS (0 TO 99)
+;***
+;**************************************************
 
 ;;;(global
-;;;   ego               0                 ;pointer to ego
-;;;   theGame           1                 ;ID of the Game instance
-;;;   curRoom           2                 ;ID of current room
-;;;   speed             3 = 6             ;The number of ticks between animations. This is set, usually as a menu
-;;;                                       ;	option, to determine the speed of animation. The default is 6.
-;;;   quit              4                 ;when TRUE, quit game
-;;;   cast              5                 ;collection of actors
-;;;   regions           6                 ;set of current regions
-;;;   timers            7                 ;list of timers in the game
-;;;   sounds            8                 ;set of sounds being played
-;;;   inventory         9                 ;set of inventory items in game
-;;;   addToPics         10                ;list of views added to the picture
-;;;   curRoomNum        11                ;current room number
-;;;   prevRoomNum       12                ;previous room number
-;;;   newRoomNum        13                ;number of room to change to
-;;;   debugOn           14                ;generic debug flag -- set from debug menu
-;;;   score             15                ;the player's current score
-;;;   possibleScore     16                ;highest possible score
-;;;   showStyle         17 = IRISOUT      ;The global style for the transition from one picture to another.  This
-;;                                        ;  may be overridden by the style property of a given room.  See the
-;;;                                       ;  DrawPic kernel function for the possible styles.
-;;;   aniInterval       18                ;The number of timer ticks more than the Game's speed which it took to
-;;;                                       ;  complete the last animation cycle.  A non-zero aniInterval means that the
-;;;                                       ;  system is not keeping up.
-;;;   theCursor         19                ;the number of the current cursor
-;;;   normalCursor      20 = ARROW_CURSOR ;number of normal cursor form
-;;;   waitCursor        21 = HAND_CURSOR  ;cursor number of "wait" cursor
-;;;   userFont          22 = USERFONT     ;font to use for Print
-;;;   smallFont         23 = 4            ;small font for save/restore, etc.
-;;;   lastEvent         24                ;the last event (used by save/restore game)
-;;;   modelessDialog    25                ;the modeless Dialog known to User and Intrface
-;;;   bigFont           26 = USERFONT     ;large font
-;;;   volume            27                ;last volume level set (from 0 to 15, 0 being off, 15 being loudest)
-;;;   version           28 = 0            ;pointer to 'incver' version string
-;;;                                       ;  WARNING!  Must be set in room 0
-;;;                                       ;  (usually to {x.yyy    } or {x.yyy.zzz})
-;;;   locales           29                ;list of locales used in the game
-;;;   curSaveDir        30                ;address of current save drive/directory string [20 chars long]
-;;;   aniThreshold      50
-;;;   perspective       51                ;player's viewing angle: degrees away
-;;;                                       ;  from vertical along y axis
-;;;   features          52                ;locations that may respond to events
-;;;   sortedFeatures    53                ;features and cast sorted by "visibility" to ego
-;;;   useSortedFeatures 54 = FALSE        ;enable cast & feature sorting?
-;;;   demoScripts       55                
-;;;   egoBlindSpot      56                ;actors behind ego within angle 
-;;;                                       ;  from straight behind. 
-;;;                                       ;  Default zero is no blind spot
-;;;   overlays          57 = -1
-;;;   doMotionCue       58                ;a motion cue has occurred - process it
-;;;   systemWindow      59                ;ID of standard system window
-;;;   demoDialogTime    60
-;;;   currentPalette    61
-;;;   modelessPort      62
-;;;   sysLogPath        63                ;-used for system standard logfile path   
-;;;   endSysLogPath     72                ;/    (uses 10 globals)
-;;;   ftrInitializer    73                ;pointer to code that gets called from
-;;;                                       ;  a feature's init
-;;;   doVerbCode        74                ;pointer to code that gets invoked if
-;;;                                       ;  no feature claims a user event
-;;;   firstSaidHandler  75
-;;;   useObstacles      76 = TRUE         ;will Ego use PolyPath or not?
-;;;   lastSysGlobal     99
+;;;	ego					0							;pointer to ego
+;;;	theGame				1							;ID of the Game instance
+;;;	curRoom				2							;ID of current room
+;;;	speed					3 = 6						;number of ticks between animations
+;;;	quit					4							;when TRUE, quit game
+;;;	cast					5							;collection of actors
+;;;	regions				6							;set of current regions
+;;;	timers				7							;list of timers in the game
+;;;	sounds				8							;set of sounds being played
+;;;	inventory			9							;set of inventory items in game
+;;;	addToPics			10							;list of views added to the picture
+;;;	curRoomNum			11							;current room number
+;;;	prevRoomNum			12							;previous room number
+;;;	newRoomNum			13							;number of room to change to
+;;;	debugOn				14							;generic debug flag -- set from debug menu
+;;;	score					15							;the player's current score
+;;;	possibleScore		16							;highest possible score
+;;;	showStyle			17 = IRISOUT			;style of picture showing
+;;;	aniInterval			18							;# of ticks it took to do the last animation cycle
+;;;	theCursor			19							;the number of the current cursor
+;;;	normalCursor		20	= ARROW_CURSOR		;number of normal cursor form
+;;;	waitCursor			21	= HAND_CURSOR		;cursor number of "wait" cursor
+;;;	userFont				22	= USERFONT			;font to use for Print
+;;;	smallFont			23	= 4 					;small font for save/restore, etc.
+;;;	lastEvent			24							;the last event (used by save/restore game)
+;;;	modelessDialog		25							;the modeless Dialog known to User and Intrface
+;;;	bigFont				26 = USERFONT		 	;large font
+;;;	volume				27	= 12					;sound volume
+;;;	version				28	= {x.yyy.zzz}		;pointer to 'incver' version string
+;;;	locales				29							;set of current locales
+;;;	curSaveDir			30							;address of current save drive/directory string
+;;;	aniThreshold		50 = 10
+;;;	perspective			51							;player's viewing angle:
+;;;														;	 degrees away from vertical along y axis
+;;;	features				52							;locations that may respond to events
+;;;	sortedFeatures		53							;above+cast sorted by "visibility" to ego
+;;;	useSortedFeatures	54	= FALSE				;enable cast & feature sorting?
+;;;	demoScripts			55			;add to curRoomNum to find room demo script
+;;;	egoBlindSpot		56 = 0	;used by sortCopy to exclude 
+;;;										;actors behind ego within angle 
+;;;										;from straight behind. 
+;;;										;Default zero is no blind spot
+;;;	overlays				57 = -1
+;;;	doMotionCue			58			;a motion cue has occurred - process it
+;;;	systemWindow		59			; ID of standard system window
+;;;	demoDialogTime		60	= 3	;how long Prints stay up in demo mode
+;;;	currentPalette		61			;
+;;;	modelessPort		62
+;;;	sysLogPath			63				;-used for system standard logfile path   
+;;;	endSysLogPath		72				;/    (uses 10 globals)
+;;;	ftrInitializer		73				;pointer to code that gets called from
+;;;										;  a feature's init
+;;;	doVerbCode			74				;pointer to code that gets invoked if
+;;;										;  no feature claims a user event
+;;;	firstSaidHandler	75
+;;;	useObstacles		76 = TRUE		;will Ego use PolyPath or not?
+;;;	lastSysGlobal		99
 ;;;)
+
+
+
+
+
+
+(include	kernel.sh)	; kernel external declarations
+
+;NOTE: Externs are not defined in SCICompanion, so much of the header files
+;are unnecessary and have been omitted.
+
+(include extra.sh)		;externs and defines needed to use extras
+;(include sight.sh)		;externs needed to use CantBeSeen & Co.
+;(include sortcopy.sh)	;extern needed to use SortedAdd
+;(include intrface.sh)
+(include cat.sh)			;for mouse-tracking cat objects
+;(include demo.sh)			;demo demon for self-running demos
+;(include	namefind.sh)
+;(include	sort.sh)
+;(include	count.sh)
+;(include	qscript.sh)
+;(include	loadmany.sh)
+;(include	lastlink.sh)
+;(include	gotosaid.sh)	
+
+
+;;;(extern
+;;;	sign			SYSTEM	0
+;;;	umod			SYSTEM	1
+;;;	Min			SYSTEM	2
+;;;	Max			SYSTEM	3
+;;;	InRect		SYSTEM	4
+;;;	OneOf			SYSTEM	5
+;;;)
+
+

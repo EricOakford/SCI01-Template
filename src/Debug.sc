@@ -3,10 +3,9 @@
 (include game.sh)
 (use Main)
 (use Intrface)
-(use PolyEdit)
-(use WriteFtr)
 (use Save)
 (use User)
+(use Game)
 (use Actor)
 (use System)
 
@@ -14,7 +13,7 @@
 	debugRm 0
 )
 
-(instance debugRm of Script
+(instance debugRm of Locale
 	(properties)
 	
 	(method (handleEvent event &tmp newEvent temp1 [temp2 2] castFirst [str 80] temp85 temp86)
@@ -75,8 +74,7 @@
 							ALT-C   Control\n
 							ALT-I Get InvItem\n
 							ALT-D Internal debugger\n
-							ALT-E   Show ego\n
-							ALT-O Path Maker"
+							ALT-E   Show ego\n"
 							#window SysWindow)
 					)
 					(`@s
@@ -122,9 +120,6 @@
 						(= castFirst (GetNumber {ID number of the object?}))
 						(ego get: castFirst)
 					)
-					(`@o
-						(MakePath doit:)
-					)
 					(`@m (theGame showMem:))
 					(`@e
 						(Format
@@ -143,7 +138,6 @@
 					(`@v (Show VMAP))
 					(`@p (Show PMAP))
 					(`@c (Show CMAP))
-					(`@w (CreateObject doit:))
 					(`@d (SetDebug))
 					;Added to allow the interpreter's internal debugger
 					;to be accessed with a simpler key combo

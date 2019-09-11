@@ -4,16 +4,16 @@
 (use Main)
 (use Intrface)
 (use Sound)
+(use SortCopy)
 (use Motion)
 (use Menu)
-(use SortCopy)
 (use Actor)
 (use System)
 
 
 (local
 	[inputLine 23]
-	userAngle
+	inputLen
 )
 (instance uEvt of Event
 	(properties)
@@ -38,7 +38,7 @@
 	
 	(method (init param1 param2)
 		(= inputLineAddr (if argc param1 else @inputLine))
-		(= userAngle (if (== argc 2) param2 else 45))
+		(= inputLen (if (== argc 2) param2 else 45))
 		(= curEvent uEvt)
 		(if (not verbMessager) (= verbMessager VerbMessager))
 	)
@@ -53,7 +53,7 @@
 				x: 0
 				claimed: 0
 			)
-			(GetEvent 32767 curEvent)
+			(GetEvent allEvents curEvent)
 			(self handleEvent: curEvent)
 		)
 	)
@@ -69,7 +69,7 @@
 			(Format @inputLine "%c" (param1 message?))
 		)
 		(= temp0 (Sound pause: blocks))
-		(= temp1 (GetInput @inputLine userAngle prompt 67 x y))
+		(= temp1 (GetInput @inputLine inputLen prompt 67 x y))
 		(Sound pause: temp0)
 		(return temp1)
 	)
@@ -79,19 +79,21 @@
 			message: (if verbMessager (verbMessager doit:) else 0)
 		)
 		(if useSortedFeatures
-			(SortedAdd) ;This was the elusive proc984_0. The script is found in QFG2.
+			(SortedAdd)
 		else
 			(sortedFeatures add: cast features)
 		)
 		(if TheMenuBar (sortedFeatures addToFront: TheMenuBar))
-		(if firstSaidHandler (sortedFeatures addToFront: firstSaidHandler))
+		(if firstSaidHandler
+			(sortedFeatures addToFront: firstSaidHandler)
+		)
 		(sortedFeatures
 			addToEnd: theGame
 			handleEvent: param1
 			release:
 		)
 		(if
-		(and (== (param1 type?) 128) (not (param1 claimed?)))
+		(and (== (param1 type?) saidEvent) (not (param1 claimed?)))
 			(theGame pragmaFail: @inputLine)
 		)
 	)
@@ -129,7 +131,7 @@
 					(self getInput: event)
 					(Parse @inputLine event)
 				)
-				(event type: 128)
+				(event type: saidEvent)
 				(self said: event)
 			)
 		)
@@ -144,59 +146,7 @@
 
 (class Ego of Actor
 	(properties
-		x 0
-		y 0
-		z 0
-		heading 0
-		noun 0
-		nsTop 0
-		nsLeft 0
-		nsBottom 0
-		nsRight 0
-		description 0
-		sightAngle 26505
-		closeRangeDist 26505
-		longRangeDist 26505
-		shiftClick 26505
-		contClick 26505
-		actions 26505
-		control 26505
-		verbChecks1 26505
-		verbChecks2 26505
-		verbChecks3 26505
-		lookStr 0
-		yStep 2
-		view 0
-		loop 0
-		cel 0
-		priority 0
-		underBits 0
-		signal $2000
-		lsTop 0
-		lsLeft 0
-		lsBottom 0
-		lsRight 0
-		brTop 0
-		brLeft 0
-		brBottom 0
-		brRight 0
-		palette 0
-		cycleSpeed 0
-		script 0
-		cycler 0
-		timer 0
-		illegalBits $8000
-		xLast 0
-		yLast 0
-		xStep 3
-		moveSpeed 0
-		blocks 0
-		baseSetter 0
-		mover 0
-		looper 0
-		viewer 0
-		avoider 0
-		code 0
+		signal ignrHrz
 		edgeHit 0
 	)
 	
@@ -334,26 +284,31 @@ code_0469:
 		)
 	)
 	
-	(method (get param1 &tmp temp0)
-		(= temp0 0)
-		(while (< temp0 argc)
-			((inventory at: [param1 temp0]) moveTo: self)
-			(++ temp0)
+	(method (get what &tmp i)
+		;; Put a number of items into Ego's inventory.
+		
+		(for	((= i 0))
+			(< i argc)
+			((++ i))
+			
+			((inventory at:[what i]) moveTo:self)
 		)
 	)
 	
-	(method (put param1 param2)
-		(if (self has: param1)
-			((inventory at: param1)
-				moveTo: (if (== argc 1) -1 else param2)
-			)
+	(method (put what recipient)
+		;; Put an item of Ego's inventory into the inventory of 'recipient'.
+		;; If recipient is not present, put item into limbo (-1 owner).
+		
+		(if (self has:what)
+			((inventory at:what) moveTo:(if (== argc 1) -1 else recipient))
 		)
 	)
 	
-	(method (has param1 &tmp temp0)
-		(if (= temp0 (inventory at: param1))
-			(temp0 ownedBy: self)
-		)
+	(method (has what &tmp theItem)
+		;; Return TRUE if Ego has 'what' in inventory.
+		
+		(= theItem (inventory at:what))
+		(return (and theItem (theItem ownedBy:self)))
 	)
 )
 

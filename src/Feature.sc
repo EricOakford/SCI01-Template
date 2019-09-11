@@ -31,8 +31,8 @@
 		lookStr 0
 	)
 	
-	(procedure (localproc_0004 theVerb)
-		(switch theVerb
+	(procedure (localproc_0004 param1)
+		(switch param1
 			(verbLook
 				(if lookStr
 					(Print lookStr)
@@ -72,11 +72,11 @@
 	
 	(method (handleEvent event &tmp temp0 temp1)
 		(cond 
-			((event claimed?) (return TRUE))
-			((not description) (return FALSE))
+			((event claimed?) (return 1))
+			((not description) (return 0))
 		)
 		(switch (event type?)
-			(evSAID
+			(saidEvent
 				(cond 
 					((not (Said noun)))
 					((not (= temp1 (event message?))) (event claimed: 0))
@@ -96,7 +96,7 @@
 							)
 							(self doVerb: (& $7fff shiftClick))
 						)
-						(event claimed: TRUE)
+						(event claimed: 1)
 					)
 					((& temp0 $0004)
 						(if
@@ -185,10 +185,10 @@
 					(GetDistance (temp0 x?) (temp0 y?) x y)
 					closeRangeDist
 				)
-				(return 1)
+				(return TRUE)
 			else
 				(self notInNear:)
-				(return 0)
+				(return FALSE)
 			)
 		)
 	)
@@ -201,16 +201,16 @@
 					(GetDistance (temp0 x?) (temp0 y?) x y)
 					longRangeDist
 				)
-				(return TRUE)
+				(return 1)
 			else
 				(self notInFar:)
-				(return FALSE)
+				(return 0)
 			)
 		)
 	)
 	
 	(method (isNotHidden)
-		(return TRUE)
+		(return 1)
 	)
 	
 	(method (onMe param1 param2 &tmp temp0 temp1)

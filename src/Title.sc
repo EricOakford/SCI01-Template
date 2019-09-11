@@ -20,6 +20,7 @@
 	
 	(method (init)
 		(super init:)
+		(TheMenuBar state: FALSE)
 		(self setScript: titleScreen)
 	)
 )
@@ -28,7 +29,6 @@
 	showTitle
 	onWeGo
 )
-
 
 (instance titleScreen of Script
 	(properties)

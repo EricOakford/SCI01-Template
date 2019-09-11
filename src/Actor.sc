@@ -10,27 +10,6 @@
 
 (class PicView of Feature
 	(properties
-		x 0
-		y 0
-		z 0
-		heading 0
-		noun 0
-		nsTop 0
-		nsLeft 0
-		nsBottom 0
-		nsRight 0
-		description 0
-		sightAngle ftrDefault
-		closeRangeDist ftrDefault
-		longRangeDist ftrDefault
-		shiftClick ftrDefault
-		contClick ftrDefault
-		actions ftrDefault
-		control ftrDefault
-		verbChecks1 ftrDefault
-		verbChecks2 ftrDefault
-		verbChecks3 ftrDefault
-		lookStr 0
 		view 0
 		loop 0
 		cel 0
@@ -61,27 +40,6 @@
 
 (class View of Feature
 	(properties
-		x 0
-		y 0
-		z 0
-		heading 0
-		noun 0
-		nsTop 0
-		nsLeft 0
-		nsBottom 0
-		nsRight 0
-		description 0
-		sightAngle ftrDefault
-		closeRangeDist ftrDefault
-		longRangeDist ftrDefault
-		shiftClick ftrDefault
-		contClick ftrDefault
-		actions ftrDefault
-		control ftrDefault
-		verbChecks1 ftrDefault
-		verbChecks2 ftrDefault
-		verbChecks3 ftrDefault
-		lookStr 0
 		yStep 2
 		view 0
 		loop 0
@@ -259,33 +217,6 @@
 
 (class Prop of View
 	(properties
-		x 0
-		y 0
-		z 0
-		heading 0
-		noun 0
-		nsTop 0
-		nsLeft 0
-		nsBottom 0
-		nsRight 0
-		description 0
-		sightAngle ftrDefault
-		closeRangeDist ftrDefault
-		longRangeDist ftrDefault
-		shiftClick ftrDefault
-		contClick ftrDefault
-		actions ftrDefault
-		control ftrDefault
-		verbChecks1 ftrDefault
-		verbChecks2 ftrDefault
-		verbChecks3 ftrDefault
-		lookStr 0
-		yStep 2
-		view 0
-		loop 0
-		cel 0
-		priority 0
-		underBits 0
 		signal $0000
 		lsTop 0
 		lsLeft 0
@@ -361,47 +292,6 @@
 
 (class Actor of Prop
 	(properties
-		x 0
-		y 0
-		z 0
-		heading 0
-		noun 0
-		nsTop 0
-		nsLeft 0
-		nsBottom 0
-		nsRight 0
-		description 0
-		sightAngle ftrDefault
-		closeRangeDist ftrDefault
-		longRangeDist ftrDefault
-		shiftClick ftrDefault
-		contClick ftrDefault
-		actions ftrDefault
-		control ftrDefault
-		verbChecks1 ftrDefault
-		verbChecks2 ftrDefault
-		verbChecks3 ftrDefault
-		lookStr 0
-		yStep 2
-		view 0
-		loop 0
-		cel 0
-		priority 0
-		underBits 0
-		signal $0000
-		lsTop 0
-		lsLeft 0
-		lsBottom 0
-		lsRight 0
-		brTop 0
-		brLeft 0
-		brBottom 0
-		brRight 0
-		palette 0
-		cycleSpeed 0
-		script 0
-		cycler 0
-		timer 0
 		illegalBits $8000
 		xLast 0
 		yLast 0

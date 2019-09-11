@@ -33,9 +33,9 @@
 		(= colorCount (Graph GDetect))
 		(= systemWindow SysWindow)
 		(= musicChannels (DoSound NumVoices))
-		(= useSortedFeatures FALSE)	;sorted features are not yet supported
+		(= useSortedFeatures TRUE)
 		(= possibleScore 0)	;Set the maximum score here
-		(= showStyle IRISIN)
+		(= showStyle HSHUTTER)
 		(DisposeScript GAME_INIT)	;and finally, trash this script from memory
 	)
 )

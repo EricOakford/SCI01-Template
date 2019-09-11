@@ -35,7 +35,7 @@
 		(ego init:)
 		(ego get: iTestObject)
 	)
-	
+
 	(method (handleEvent event)
 		(super handleEvent: event)
 		(switch (event type?)
