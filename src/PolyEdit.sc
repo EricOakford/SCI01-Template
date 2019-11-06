@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# 943)
-(include sci.sh)
+(include game.sh)
 (use Main)
 (use Intrface)
 (use Polygon)
@@ -1047,7 +1047,7 @@ code_0691:
 								(Graph grSAVE_BOX local654 local653 local656 local655 4)
 							)
 							(Graph
-								grDRAW_LINE
+								GDrawLine
 								local6
 								local5
 								(& temp6 $03ff)
@@ -1092,7 +1092,7 @@ code_0691:
 												(= local1 0)
 											)
 											(Graph
-												grDRAW_LINE
+												GDrawLine
 												local6
 												local5
 												(& temp6 $03ff)
@@ -1142,7 +1142,7 @@ code_0691:
 											(Graph grSAVE_BOX local654 local653 local656 local655 4)
 										)
 										(Graph
-											grDRAW_LINE
+											GDrawLine
 											(& temp6 $03ff)
 											(& temp5 $03ff)
 											(& [local73 (+ temp4 1)] $03ff)
@@ -1204,7 +1204,7 @@ code_0691:
 							(if (& [local73 temp4] $c800)
 								(if (and local1 (> temp4 4))
 									(Graph
-										grDRAW_LINE
+										GDrawLine
 										(& [local73 (- temp4 3)] $03ff)
 										(& [local73 (- temp4 4)] $03ff)
 										(& [local73 (- temp4 1)] $03ff)
@@ -1260,7 +1260,7 @@ code_0691:
 									(Graph grSAVE_BOX local654 local653 local656 local655 4)
 								)
 								(Graph
-									grDRAW_LINE
+									GDrawLine
 									local6
 									local5
 									(& temp6 $03ff)
@@ -1304,7 +1304,7 @@ code_0691:
 									(= local1 0)
 								)
 								(Graph
-									grDRAW_LINE
+									GDrawLine
 									local6
 									local5
 									(& temp6 $03ff)
@@ -1379,7 +1379,7 @@ code_0691:
 						(Graph grSAVE_BOX local654 local653 local656 local655 4)
 					)
 					(Graph
-						grDRAW_LINE
+						GDrawLine
 						(ego y?)
 						(ego x?)
 						local6
@@ -1603,7 +1603,7 @@ code_0691:
 						(& [local73 temp0] $03ff)
 					)
 					(Graph
-						grDRAW_LINE
+						GDrawLine
 						(& [local73 (- temp0 1)] $03ff)
 						(& [local73 (- temp0 2)] $03ff)
 						(& [local73 (+ temp0 1)] $03ff)

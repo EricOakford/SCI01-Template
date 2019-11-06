@@ -84,7 +84,7 @@
 
 
 	(method (at n &tmp [buffer 20])
-		(Printf "%s needs an 'at:' method." name)
+		(Printf PATH 0 name)
 		(return 0)
 	)
 )

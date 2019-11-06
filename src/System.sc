@@ -289,7 +289,7 @@
 	
 	
 	(method (showStr where)
-		(return (Format where "%s\n[Collection of size %d]" name size))
+		(return (Format where SYSTEM 0 name size))
 	)
 	
 	
@@ -452,7 +452,7 @@
 	
 	
 	(method (showStr where)
-		(return (Format where "%s\n[List of size %d]" name size))
+		(return (Format where SYSTEM 1 name size))
 	)
 	
 	
@@ -555,7 +555,7 @@
 ;;; collections (the cast, etc.) are Sets.
 	
 	(method (showStr where)
-		(return (Format where "%s\n[Set of size %d]" name size))
+		(return (Format where SYSTEM 2 name size))
 	)
 	
 	

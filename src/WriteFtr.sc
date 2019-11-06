@@ -52,7 +52,7 @@
 	)
 	(if local591
 		(Graph
-			grDRAW_LINE
+			GDrawLine
 			newEventY
 			newEventX
 			newEventY
@@ -61,7 +61,7 @@
 			15
 		)
 		(Graph
-			grDRAW_LINE
+			GDrawLine
 			newEventY_2
 			newEventX
 			newEventY_2
@@ -70,7 +70,7 @@
 			15
 		)
 		(Graph
-			grDRAW_LINE
+			GDrawLine
 			newEventY
 			newEventX
 			newEventY_2
@@ -79,7 +79,7 @@
 			15
 		)
 		(Graph
-			grDRAW_LINE
+			GDrawLine
 			newEventY
 			newEventX_2
 			newEventY_2

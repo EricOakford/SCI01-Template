@@ -34,7 +34,9 @@
 	selected
 	theStatus
 	[butbuf1 4] = [{Restore} {__Save__} {Replace} {Replace}]
-	[butbuf2 4] = [{Select the game that you would like to restore.} {Type the description of this saved game.} {This directory/disk can hold no more saved games. You must replace one of your saved games or use Change Directory to save on a different directory/disk.} {This directory/disk can hold no more saved games. You must replace one of your saved games or use Change Directory to save on a different directory/disk.}]
+	[butbuf2 4] = [{Select the game that you would like to restore.} {Type the description of this saved game.}
+	{This directory/disk can hold no more saved games. You must replace one of your saved games or use Change Directory to save on a different directory/disk.}
+	{This directory/disk can hold no more saved games. You must replace one of your saved games or use Change Directory to save on a different directory/disk.}]
 )
 
 (enum
@@ -42,143 +44,6 @@
    HAVESPACE      ;Save, with space on disk
    NOSPACE        ;Save, no space on disk but games to replace
    NOREPLACE      ;Save, no space on disk, no games to replace
-)
-
-;EO: this is adapted from SCI16's SAVE.SC. It doesn't fully match the commented 
-;assembly code below.
-(procedure (GetDirectory where &tmp result [newDir 33] [buf1 40])
-   (repeat
-      (= result
-         (Print "New save-game directory:"
-            #font SYSFONT
-            #edit    (StrCpy @newDir where)
-            #back
-            #button {OK} TRUE
-            #button {Cancel} FALSE
-         )
-      )
-      ;Pressed ESC -- return FALSE.
-      (if (not result)
-         (return FALSE)
-      )
-      ;No string defaults to current drive.
-      (if (not (StrLen @newDir))
-         (GetCWD @newDir)
-      )
-      ;If drive is valid, return TRUE, otherwise complain.
-      (if (ValidPath @newDir)
-         (StrCpy where @newDir)
-         (return TRUE)
-      else
-         (Print
-         	(Format @buf1 "%s\nis not a valid directory" @newDir)
-         	#font SYSFONT
-         )		 
-      )
-   )
-)
-;EO: the disassembled output below.
-
-;;;(procedure (GetDirectory where &tmp result [newDir 33] [buf 40])
-;;;	(asm
-;;;code_075a:
-;;;		pushi    13
-;;;		pushi    990
-;;;		pushi    1
-;;;		pushi    33
-;;;		pushi    0
-;;;		pushi    41
-;;;		pushi    2
-;;;		lea      @newDir
-;;;		push    
-;;;		lsp      where
-;;;		callk    StrCpy,  4
-;;;		push    
-;;;		pushi    29
-;;;		pushi    #button
-;;;		lofsa    {OK}
-;;;		push    
-;;;		pushi    TRUE
-;;;		pushi    #button
-;;;		lofsa    {Cancel}
-;;;		push    
-;;;		pushi    FALSE
-;;;		calle    Print,  26
-;;;		sat      result
-;;;		not     
-;;;		bnt      code_078d
-;;;		ldi      0
-;;;		ret     
-;;;code_078d:
-;;;		pushi    1
-;;;		lea      @newDir
-;;;		push    
-;;;		callk    StrLen,  2
-;;;		not     
-;;;		bnt      code_07a1
-;;;		pushi    1
-;;;		lea      @newDir
-;;;		push    
-;;;		callk    GetCWD,  2
-;;;code_07a1:
-;;;		pushi    1
-;;;		lea      @newDir
-;;;		push    
-;;;		callk    ValidPath,  2
-;;;		bnt      code_07bc
-;;;		pushi    2
-;;;		lsp      where
-;;;		lea      @newDir
-;;;		push    
-;;;		callk    StrCpy,  4
-;;;		ldi      1
-;;;		ret     
-;;;		jmp      code_075a
-;;;code_07bc:
-;;;		pushi    3
-;;;		pushi    4
-;;;		lea      @buf
-;;;		push    
-;;;		pushi    990
-;;;		pushi    2
-;;;		lea      @newDir
-;;;		push    
-;;;		callk    Format,  8
-;;;		push    
-;;;		pushi    33
-;;;		pushi    0
-;;;		calle    Print,  6
-;;;		jmp      code_075a
-;;;		ret     
-;;;	)
-;;;)
-
-
-   (procedure (GetStatus)
-      (return
-         (cond
-            ((== self Restore)
-               RESTORE
-            )
-            ((HaveSpace)
-               HAVESPACE
-            )
-            (numGames
-               NOSPACE
-            )
-            (else
-               NOREPLACE
-            )
-         )
-	  )
-  )
-
-(procedure (HaveSpace)
-	(if (< numGames MAXGAMES) (CheckFreeSpace curSaveDir))
-)
-
-(procedure (NeedDescription)
-	(Print "You must type a description for the game." #font 0)
 )
 
 (class SysWindow of Object
@@ -311,7 +176,7 @@
             theComment
          )
 
-         (= fd (FileIO fileOpen (Format @str "%ssg.dir" (theGame name?))))
+         (= fd (FileIO fileOpen (Format @str SAVE 0 (theGame name?))))
          (if (== fd -1)
             ;no directory -> no saved games
             (return)
@@ -899,4 +764,141 @@
 	(properties
 		text {Cancel}
 	)
+)
+
+;EO: this is adapted from SCI16's SAVE.SC. It doesn't fully match the commented 
+;assembly code below.
+(procedure (GetDirectory where &tmp result [newDir 33] [buf1 40])
+   (repeat
+      (= result
+         (Print SAVE 1
+            #font SYSFONT
+            #edit    (StrCpy @newDir where)
+            #back
+            #button {OK} TRUE
+            #button {Cancel} FALSE
+         )
+      )
+      ;Pressed ESC -- return FALSE.
+      (if (not result)
+         (return FALSE)
+      )
+      ;No string defaults to current drive.
+      (if (not (StrLen @newDir))
+         (GetCWD @newDir)
+      )
+      ;If drive is valid, return TRUE, otherwise complain.
+      (if (ValidPath @newDir)
+         (StrCpy where @newDir)
+         (return TRUE)
+      else
+         (Print
+         	(Format @buf1 SAVE 2 @newDir)
+         	#font SYSFONT
+         )		 
+      )
+   )
+)
+;EO: the disassembled output below.
+
+;;;(procedure (GetDirectory where &tmp result [newDir 33] [buf 40])
+;;;	(asm
+;;;code_075a:
+;;;		pushi    13
+;;;		pushi    990
+;;;		pushi    1
+;;;		pushi    33
+;;;		pushi    0
+;;;		pushi    41
+;;;		pushi    2
+;;;		lea      @newDir
+;;;		push    
+;;;		lsp      where
+;;;		callk    StrCpy,  4
+;;;		push    
+;;;		pushi    29
+;;;		pushi    #button
+;;;		lofsa    {OK}
+;;;		push    
+;;;		pushi    TRUE
+;;;		pushi    #button
+;;;		lofsa    {Cancel}
+;;;		push    
+;;;		pushi    FALSE
+;;;		calle    Print,  26
+;;;		sat      result
+;;;		not     
+;;;		bnt      code_078d
+;;;		ldi      0
+;;;		ret     
+;;;code_078d:
+;;;		pushi    1
+;;;		lea      @newDir
+;;;		push    
+;;;		callk    StrLen,  2
+;;;		not     
+;;;		bnt      code_07a1
+;;;		pushi    1
+;;;		lea      @newDir
+;;;		push    
+;;;		callk    GetCWD,  2
+;;;code_07a1:
+;;;		pushi    1
+;;;		lea      @newDir
+;;;		push    
+;;;		callk    ValidPath,  2
+;;;		bnt      code_07bc
+;;;		pushi    2
+;;;		lsp      where
+;;;		lea      @newDir
+;;;		push    
+;;;		callk    StrCpy,  4
+;;;		ldi      1
+;;;		ret     
+;;;		jmp      code_075a
+;;;code_07bc:
+;;;		pushi    3
+;;;		pushi    4
+;;;		lea      @buf
+;;;		push    
+;;;		pushi    990
+;;;		pushi    2
+;;;		lea      @newDir
+;;;		push    
+;;;		callk    Format,  8
+;;;		push    
+;;;		pushi    33
+;;;		pushi    0
+;;;		calle    Print,  6
+;;;		jmp      code_075a
+;;;		ret     
+;;;	)
+;;;)
+
+
+   (procedure (GetStatus)
+      (return
+         (cond
+            ((== self Restore)
+               RESTORE
+            )
+            ((HaveSpace)
+               HAVESPACE
+            )
+            (numGames
+               NOSPACE
+            )
+            (else
+               NOREPLACE
+            )
+         )
+	  )
+  )
+
+(procedure (HaveSpace)
+	(if (< numGames MAXGAMES) (CheckFreeSpace curSaveDir))
+)
+
+(procedure (NeedDescription)
+	(Print SAVE 3 #font 0)
 )

@@ -37,17 +37,17 @@
 				(if lookStr
 					(Print lookStr)
 				else
-					(Printf "The %s looks like any other %s." description description)
+					(Printf TEXT 0 description description)
 				)
 			)
-			(verbOpen (Printf "You cannot open the %s." description))
-			(verbClose (Printf "You cannot close the %s." description))
-			(verbSmell (Printf "The %s has no smell." description))
-			(verbMove (Printf "You cannot move the %s." description))
-			(verbEat (Printf "You wouldn't want to eat the %s." description))
-			(verbGet (Printf "You cannot get the %s." description))
-			(verbClimb (Printf "You can't climb the %s." description))
-			(verbTalk (Printf "The %s has nothing to say." description))
+			(verbOpen (Printf FEATURE 1 description))
+			(verbClose (Printf FEATURE 2 description))
+			(verbSmell (Printf FEATURE 3 description))
+			(verbMove (Printf FEATURE 4 description))
+			(verbEat (Printf FEATURE 5 description))
+			(verbGet (Printf FEATURE 6 description))
+			(verbClimb (Printf FEATURE 7 description))
+			(verbTalk (Printf FEATURE 8 description))
 		)
 	)
 	
@@ -140,15 +140,15 @@
 	)
 	
 	(method (notInFar)
-		(Printf "You don't see the %s." description)
+		(Printf FEATURE 9 description)
 	)
 	
 	(method (notInNear)
-		(Printf "You're not close enough." description)
+		(Printf FEATURE 10 description)
 	)
 	
 	(method (notFacing &tmp temp0)
-		(Printf "You're not facing the %s." description)
+		(Printf FEATURE 11 description)
 	)
 	
 	(method (facingMe param1 &tmp temp0 temp1)

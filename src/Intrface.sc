@@ -214,7 +214,7 @@
 
 (procedure (GetNumber param1 param2 &tmp [temp0 40])
 	(= temp0 0)
-	(if (> argc 1) (Format @temp0 "%d" param2))
+	(if (> argc 1) (Format @temp0 INTRFACE 0 param2))
 	(return
 		(if (GetInput @temp0 5 param1)
 			(ReadNumber @temp0)

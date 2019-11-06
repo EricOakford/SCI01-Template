@@ -66,7 +66,7 @@
 	(method (getInput param1 &tmp temp0 temp1)
 		(if (!= (param1 type?) 4) (= inputLine 0))
 		(if (!= (param1 message?) echo)
-			(Format @inputLine "%c" (param1 message?))
+			(Format @inputLine USER 0 (param1 message?))
 		)
 		(= temp0 (Sound pause: blocks))
 		(= temp1 (GetInput @inputLine inputLen prompt 67 x y))

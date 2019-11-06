@@ -11,52 +11,6 @@
 (use System)
 
 
-(procedure (PromptForDiskChange param1 &tmp temp0 [temp1 40] [temp41 40] [temp81 40])
-	(= temp0 1)
-	(DeviceInfo 0 curSaveDir @temp1)
-	(DeviceInfo 1 @temp41)
-	(if
-		(and
-			(DeviceInfo 2 @temp1 @temp41)
-			(DeviceInfo 3 @temp41)
-		)
-		(Format
-			@temp81
-			"Please insert your %s disk in drive %s."
-			(if param1 {SAVE GAME} else {GAME})
-			@temp41
-		)
-		(DeviceInfo 4)
-		(if
-			(==
-				(= temp0
-					(if param1
-						(Print
-							@temp81
-							#font
-							0
-							#button
-							{OK}
-							1
-							#button
-							{Cancel}
-							0
-							#button
-							{Change Directory}
-							2
-						)
-					else
-						(Print @temp81 #font 0 #button {OK} 1)
-					)
-				)
-				2
-			)
-			(= temp0 (GetDirectory curSaveDir))
-		)
-	)
-	(return temp0)
-)
-
 (instance theCast of EventHandler
 	(properties
 		name "cast"
@@ -389,8 +343,32 @@ code_0226:
 		(RestartGame)
 	)
 	
-	(method (restore &tmp [temp0 20] temp20 temp21 temp22 theParseLang)
-		(= theParseLang parseLang)
+	(method (save &tmp [temp0 20] temp20 temp21 temp22 oldLang)
+		(= oldLang parseLang)
+		(= parseLang 1)
+		(Load FONT smallFont)
+		(Load CURSOR waitCursor)
+		(= temp21 (self setCursor: normalCursor))
+		(= temp22 (Sound pause: 1))
+		(if (PromptForDiskChange 1)
+			(if modelessDialog (modelessDialog dispose:))
+			(if (!= (= temp20 (Save doit: @temp0)) -1)
+				(= parseLang oldLang)
+				(= temp21 (self setCursor: waitCursor 1))
+				(if (not (SaveGame name temp20 @temp0 version))
+					(Print SAVE 0
+						#font 0 #button {OK} 1)
+				)
+				(self setCursor: temp21 (HaveMouse))
+			)
+			(PromptForDiskChange 0)
+		)
+		(Sound pause: temp22)
+		(= parseLang oldLang)
+	)	
+	
+	(method (restore &tmp [temp0 20] temp20 temp21 temp22 oldLang)
+		(= oldLang parseLang)
 		(= parseLang ENGLISH)
 		(Load FONT smallFont)
 		(Load CURSOR waitCursor)
@@ -403,45 +381,21 @@ code_0226:
 				(if (CheckSaveGame name temp20 version)
 					(RestoreGame name temp20 version)
 				else
-					(Print "That game was saved under a different interpreter. It cannot be restored."
+					(Print SAVE 1
 						#font 0 #button {OK} 1)
 					(self setCursor: temp21 (HaveMouse))
-					(= parseLang theParseLang)
+					(= parseLang oldLang)
 				)
 			else
-				(= parseLang theParseLang)
+				(= parseLang oldLang)
 			)
 			(PromptForDiskChange 0)
 		)
 		(Sound pause: temp22)
 	)
 	
-	(method (save &tmp [temp0 20] temp20 temp21 temp22 theParseLang)
-		(= theParseLang parseLang)
-		(= parseLang 1)
-		(Load FONT smallFont)
-		(Load CURSOR waitCursor)
-		(= temp21 (self setCursor: normalCursor))
-		(= temp22 (Sound pause: 1))
-		(if (PromptForDiskChange 1)
-			(if modelessDialog (modelessDialog dispose:))
-			(if (!= (= temp20 (Save doit: @temp0)) -1)
-				(= parseLang theParseLang)
-				(= temp21 (self setCursor: waitCursor 1))
-				(if (not (SaveGame name temp20 @temp0 version))
-					(Print "Your save game disk is full. You must either use another disk or save over an existing saved game."
-						#font 0 #button {OK} 1)
-				)
-				(self setCursor: temp21 (HaveMouse))
-			)
-			(PromptForDiskChange 0)
-		)
-		(Sound pause: temp22)
-		(= parseLang theParseLang)
-	)
-	
-	(method (changeScore param1)
-		(= score (+ score param1))
+	(method (changeScore delta)
+		(= score (+ score delta))
 		(StatusLine doit:)
 	)
 	
@@ -508,21 +462,21 @@ code_0226:
 		(if script (script cue:))
 	)
 	
-	(method (wordFail param1 &tmp [temp0 100])
-		(Printf "I don't understand \"%s\"." param1)
+	(method (wordFail word &tmp [str 100])
+		(Printf GAME 2 word)
 		(return FALSE)
 	)
 	
 	(method (syntaxFail)
-		(Print "That doesn't appear to be a proper sentence.")
+		(Print GAME 3)
 	)
 	
 	(method (semanticFail)
-		(Print "That sentence doesn't make sense.")
+		(Print GAME 4)
 	)
 	
 	(method (pragmaFail)
-		(Print "You've left me responseless.")
+		(Print GAME 5)
 	)
 )
 
@@ -815,4 +769,50 @@ code_0226:
 			(param1 dispose:)
 		)
 	)
+)
+
+(procedure (PromptForDiskChange param1 &tmp temp0 [temp1 40] [temp41 40] [temp81 40])
+	(= temp0 1)
+	(DeviceInfo 0 curSaveDir @temp1)
+	(DeviceInfo 1 @temp41)
+	(if
+		(and
+			(DeviceInfo 2 @temp1 @temp41)
+			(DeviceInfo 3 @temp41)
+		)
+		(Format
+			@temp81
+			GAME 6
+			(if param1 {SAVE GAME} else {GAME})
+			@temp41
+		)
+		(DeviceInfo 4)
+		(if
+			(==
+				(= temp0
+					(if param1
+						(Print
+							@temp81
+							#font
+							0
+							#button
+							{OK}
+							1
+							#button
+							{Cancel}
+							0
+							#button
+							{Change Directory}
+							2
+						)
+					else
+						(Print @temp81 #font 0 #button {OK} 1)
+					)
+				)
+				2
+			)
+			(= temp0 (GetDirectory curSaveDir))
+		)
+	)
+	(return temp0)
 )
