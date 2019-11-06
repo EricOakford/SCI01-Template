@@ -39,7 +39,7 @@
 	PrintNotCloseEnough 13
 	PrintCantDoThat 14
 	PrintCantSeeThat 15
-	AddManyToPics 16
+	AddManyObstacles 16
 	AddManyFeatures 17
 )
 
@@ -215,7 +215,7 @@
 	)
 )		
 
-(procedure (EgoDead &tmp printRet)
+(procedure (EgoDead)
 	;This procedure handles when Ego dies. It closely matches that of QFG1EGA.
 	;To use it: "(EgoDead {death message})".
 	;You can add a title and icon in the same way as a normal Print message.
@@ -225,28 +225,26 @@
 	(theGame setCursor: normalCursor TRUE)
 	(soundFx stop:)
 	(theMusic number: deathMusic play:)
-		(repeat
-			(= printRet
-				(Print
-					&rest
-					#width 250
-					#button	{Restore} 1
-					#button {Restart} 2
-					#button {__Quit__} 3
-				)
+	(repeat
+		(switch
+			(Print
+				&rest
+				#width 250
+				#button	{Restore} 1
+				#button {Restart} 2
+				#button {__Quit__} 3
 			)
-				(switch printRet
-					(1
-						(theGame restore:)
-					)
-					(2
-						(theGame restart:)
-					)
-					(3
-						(= quit TRUE) (break)
-					)
-				)
+			(1
+				(theGame restore:)
+			)
+			(2
+				(theGame restart:)
+			)
+			(3
+				(= quit TRUE) (break)
+			)
 		)
+	)
 )
 (procedure (PrintDontHaveIt)
 	(Print "You don't have it.")
@@ -268,9 +266,9 @@
 	(Print "You see nothing like that here.")
 )
 
-;These two procedures allow for adding multiple features and addToPics at a time.
+;These two procedures allow for adding multiple features and obstacles at a time.
 ;They were used in QFG2, which uses sorted features.
-(procedure (AddManyToPics)
+(procedure (AddManyObstacles)
 	(addToPics add: &rest eachElementDo: #init doit:)
 )
 
@@ -335,7 +333,7 @@
 	)
 )
 
-(instance gameVerbCode of Code
+(instance DoVerbCode of Code
 	(properties)
 	
 	(method (doit description theVerb &tmp [str 100])
@@ -390,7 +388,7 @@
 		(= cIcon deathIcon)
 		(= ego egoObj)
 		(= version {x.yyy.zzz}) ;set game version here
-		(= doVerbCode gameVerbCode)
+		(= doVerbCode DoVerbCode)
 		(User alterEgo: ego verbMessager: GameVerbMessager)
 		(TheMenuBar init: draw: hide: state: FALSE)
 		(StatusLine code: statusCode disable:) ;hide the status code at startup
@@ -482,12 +480,6 @@
 		;Add global parser commands here.
 			(saidEvent
 				(cond
-					((Said 'die') ;this shouldn't be in your game; it's just used to test the EgoDead procedure.
-						(EgoDead "It's all over for now. Please try again."
-							#title {You're dead.}
-							#icon vEgoDeath
-						)
-					)
 					((Said 'cheat')
 						(Print "Okay, you win.")
 						(Print "(Game over.)" #at -1 152)

@@ -67,14 +67,15 @@
 					(`?
 						(Print "Debug Key commands:\n
 							ALT-S Show cast\n
-							ALT-M   Show memory\n
+							ALT-M Show memory\n
 							ALT-T Teleport\n
-							ALT-V   Visual\n
+							ALT-V Visual\n
 							ALT-P Priority\n
-							ALT-C   Control\n
+							ALT-C Control\n
 							ALT-I Get InvItem\n
 							ALT-D Internal debugger\n
-							ALT-E   Show ego\n"
+							ALT-E Show ego\n
+							ALT-K Kill ego"
 							#window SysWindow)
 					)
 					(`@s
@@ -119,6 +120,12 @@
 					(`@i
 						(= castFirst (GetNumber {ID number of the object?}))
 						(ego get: castFirst)
+					)
+					(`@k
+						(EgoDead "It's all over for now. Please try again."
+							#title {You're dead.}
+							#icon vEgoDeath
+						)
 					)
 					(`@m (theGame showMem:))
 					(`@e
