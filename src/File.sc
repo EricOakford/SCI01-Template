@@ -1,14 +1,9 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 ;;;;
-;;;;
 ;;;;	FILE.SC
+;;;;	(c) Sierra On-Line, Inc, 1988
 ;;;;
-;;;;	(c) Sierra On-Line, Inc, 1988, 1990
-;;;;
-;;;;	Authors: Jeff Stephenson, Mark Wilden
-;;;;	Updated:
-;;;;		Brian K. Hughes
-;;;;		August 11, 1992
+;;;;	Author: Jeff Stephenson
 ;;;;
 ;;;;	The File class allows you to open and write to a file on disk. 
 ;;;;	This is useful for logging user input for which you have no
@@ -19,11 +14,14 @@
 ;;;;	Classes:
 ;;;;		File
 
-(script#	FILE)
+
+(script# FILE)
 (include game.sh)
 (use System)
 
-(class File kindof Object
+
+(class File of Object
+
 	(properties
 		handle	0				;private -- the OS's handle for the open file
 	)
@@ -37,9 +35,9 @@
 ;;;		seek						;set file position
 ;;;		close						;close file
 ;;;		delete					;delete the file
-;;;		rename					;rename the file
 ;;;	)
 
+	
 	(method (open mode)
 		;; Open the file.  'mode' is the mode in which to open the file:
 		;;		mode =
@@ -100,6 +98,7 @@
 		(return TRUE)
 	)
 
+	
 	(method (read str len)
 		;; Read len bytes from a file into str
 
@@ -129,16 +128,8 @@
 
 		(return (if handle (FileIO fileFGets str len handle) else NULL))
 	)
-	
-	(method (rename newName &tmp rc)
-		; return 0 if successful
-		(= rc (FileIO fileRename name newName))
-		(if (not rc)
-			(= name newName)
-		)
-		(return rc)
-	)
 
+	
 	(method (seek offset mode &tmp theMode)
 		; Change the position in the file where the next read or write will
 		;	occur.  The new position is specified by means of the mode and offset.
@@ -178,12 +169,13 @@
 		(return (FileIO fileUnlink name))
 	)
 
+
 	(method (dispose)
 		(self close:)
 		(super dispose:)
 	)
 
 	(method (showStr where)
-		(Format where "File: %s" name)
+		(Format where FILE 0 name)
 	)
 )

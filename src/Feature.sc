@@ -31,13 +31,13 @@
 		lookStr 0
 	)
 	
-	(procedure (localproc_0004 param1)
-		(switch param1
+	(procedure (DefaultDoVerb theVerb)
+		(switch theVerb
 			(verbLook
 				(if lookStr
 					(Print lookStr)
 				else
-					(Printf TEXT 0 description description)
+					(Printf FEATURE 0 description description)
 				)
 			)
 			(verbOpen (Printf FEATURE 1 description))
@@ -70,7 +70,7 @@
 		(super dispose:)
 	)
 	
-	(method (handleEvent event &tmp temp0 temp1)
+	(method (handleEvent event &tmp temp0 theVerb)
 		(cond 
 			((event claimed?) (return 1))
 			((not description) (return 0))
@@ -79,8 +79,8 @@
 			(saidEvent
 				(cond 
 					((not (Said noun)))
-					((not (= temp1 (event message?))) (event claimed: 0))
-					((self passedChecks: temp1) (self doVerb: temp1))
+					((not (= theVerb (event message?))) (event claimed: FALSE))
+					((self passedChecks: theVerb) (self doVerb: theVerb))
 					((IsObject actions) (actions handleEvent: event self))
 				)
 			)
@@ -135,7 +135,7 @@
 		(if doVerbCode
 			(self perform: doVerbCode theVerb)
 		else
-			(localproc_0004 theVerb description)
+			(DefaultDoVerb theVerb description)
 		)
 	)
 	
@@ -201,10 +201,10 @@
 					(GetDistance (temp0 x?) (temp0 y?) x y)
 					longRangeDist
 				)
-				(return 1)
+				(return TRUE)
 			else
 				(self notInFar:)
-				(return 0)
+				(return FALSE)
 			)
 		)
 	)

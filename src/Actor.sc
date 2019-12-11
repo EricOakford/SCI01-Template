@@ -98,7 +98,7 @@
 	)
 	
 	(method (stopUpd)
-		(= signal (| signal notUpd))
+		(= signal (| signal stopUpdOn)) ;EO: was "notUpd", which has different values in sci.sh and system.sh
 		(= signal (& signal $fffd))
 	)
 	
@@ -218,15 +218,6 @@
 (class Prop of View
 	(properties
 		signal $0000
-		lsTop 0
-		lsLeft 0
-		lsBottom 0
-		lsRight 0
-		brTop 0
-		brLeft 0
-		brBottom 0
-		brRight 0
-		palette 0
 		cycleSpeed 0
 		script 0
 		cycler 0
@@ -243,9 +234,9 @@
 		(if cycler (cycler doit:))
 	)
 	
-	(method (handleEvent pEvent)
-		(if script (script handleEvent: pEvent))
-		(super handleEvent: pEvent)
+	(method (handleEvent event)
+		(if script (script handleEvent: event))
+		(super handleEvent: event)
 	)
 	
 	(method (delete)

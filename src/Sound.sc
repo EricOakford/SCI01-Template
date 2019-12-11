@@ -61,8 +61,7 @@
 	
 	(method (pause param1)
 		(if (not argc) (= param1 1))
-		(DoSound
-			PauseSound
+		(DoSound PauseSound
 			(if (self isMemberOf: Sound) self else 0)
 			param1
 		)

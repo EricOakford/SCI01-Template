@@ -1,6 +1,6 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# 943)
-(include game.sh)
+(include sci.sh)
 (use Main)
 (use Intrface)
 (use Polygon)
@@ -188,12 +188,12 @@ code_00a3:
 			ldi      2
 			eq?     
 			bnt      code_00fe
-			pushi    #oldMover
+			pushi    #getFreeway
 			pushi    0
 			self     4
 			jmp      code_0104
 code_00fe:
-			pushi    #loopIndex
+			pushi    #getPoly
 			pushi    0
 			self     4
 code_0104:
@@ -676,7 +676,7 @@ code_044a:
 			lsl      local7
 			callk    Graph,  12
 code_047b:
-			pushi    #shiftParser
+			pushi    #modifyPath
 			pushi    0
 			self     4
 			jmp      code_055b
@@ -882,7 +882,7 @@ code_0600:
 code_060a:
 			lal      local657
 			bnt      code_0616
-			pushi    #oldCycler
+			pushi    #savePoints
 			pushi    0
 			self     4
 code_0616:
@@ -911,7 +911,7 @@ code_063d:
 			pushi    0
 			lag      addToPics
 			send     4
-			pushi    #numOfLoops
+			pushi    #drawPath
 			pushi    1
 			pushi    0
 			self     6
@@ -919,12 +919,12 @@ code_063d:
 			ldi      1
 			eq?     
 			bnt      code_065c
-			pushi    #nextLoop
+			pushi    #polyTest
 			pushi    0
 			self     4
 			jmp      code_0662
 code_065c:
-			pushi    #newMover
+			pushi    #freewayTest
 			pushi    0
 			self     4
 code_0662:
@@ -959,7 +959,7 @@ code_0691:
 	(method (handleEvent)
 	)
 	
-	(method (shiftParser &tmp newEvent temp1 temp2 temp3 temp4 temp5 temp6 temp7)
+	(method (modifyPath &tmp newEvent temp1 temp2 temp3 temp4 temp5 temp6 temp7)
 		(= temp7 (= temp3 0))
 		(= temp5 [local73 0])
 		(= temp6 [local73 1])
@@ -968,9 +968,9 @@ code_0691:
 		(theGame
 			setCursor: normalCursor (HaveMouse) (& temp5 $03ff) (& temp6 $03ff)
 		)
-		(DrawPic (curRoom curPic?) 100 dpCLEAR currentPalette)
+		(DrawPic (curRoom curPic?) 100 TRUE currentPalette)
 		(if (!= overlays -1)
-			(DrawPic overlays 100 dpNO_CLEAR currentPalette)
+			(DrawPic overlays 100 FALSE currentPalette)
 		)
 		(addToPics doit:)
 		(Animate (cast elements?) 0)
@@ -994,14 +994,14 @@ code_0691:
 					(ego posn: (newEvent x?) (newEvent y?))
 					(Animate (cast elements?) 0)
 					(= temp1 ((User alterEgo?) onControl:))
-					(Display 943 3 100 3 1 106 0 103 3)
+					(Display 943 3 dsCOORD 3 1 dsWIDTH 0 dsBACKGROUND 3)
 					(= temp1 (>> temp1 $0001))
 					(= temp2 1)
 					(while (< temp2 16)
 						(if (& temp1 $0001)
-							(Display 943 4 106 6 103 temp2)
+							(Display 943 4 dsWIDTH 6 dsBACKGROUND temp2)
 						else
-							(Display 943 4 106 6 103 0)
+							(Display 943 4 dsWIDTH 6 dsBACKGROUND 0)
 						)
 						(= temp1 (>> temp1 $0001))
 						(++ temp2)
@@ -1021,7 +1021,7 @@ code_0691:
 						(localproc_181e (ego y?) (ego x?) local6 local5)
 					)
 				else
-					(Display 943 9 100 3 1 106 0 103 3)
+					(Display 943 9 dsCOORD 3 1 dsWIDTH 0 dsBACKGROUND 3)
 				)
 			)
 			(switch (newEvent type?)
@@ -1047,7 +1047,7 @@ code_0691:
 								(Graph grSAVE_BOX local654 local653 local656 local655 4)
 							)
 							(Graph
-								GDrawLine
+								grDRAW_LINE
 								local6
 								local5
 								(& temp6 $03ff)
@@ -1092,7 +1092,7 @@ code_0691:
 												(= local1 0)
 											)
 											(Graph
-												GDrawLine
+												grDRAW_LINE
 												local6
 												local5
 												(& temp6 $03ff)
@@ -1142,7 +1142,7 @@ code_0691:
 											(Graph grSAVE_BOX local654 local653 local656 local655 4)
 										)
 										(Graph
-											GDrawLine
+											grDRAW_LINE
 											(& temp6 $03ff)
 											(& temp5 $03ff)
 											(& [local73 (+ temp4 1)] $03ff)
@@ -1204,7 +1204,7 @@ code_0691:
 							(if (& [local73 temp4] $c800)
 								(if (and local1 (> temp4 4))
 									(Graph
-										GDrawLine
+										grDRAW_LINE
 										(& [local73 (- temp4 3)] $03ff)
 										(& [local73 (- temp4 4)] $03ff)
 										(& [local73 (- temp4 1)] $03ff)
@@ -1260,7 +1260,7 @@ code_0691:
 									(Graph grSAVE_BOX local654 local653 local656 local655 4)
 								)
 								(Graph
-									GDrawLine
+									grDRAW_LINE
 									local6
 									local5
 									(& temp6 $03ff)
@@ -1304,7 +1304,7 @@ code_0691:
 									(= local1 0)
 								)
 								(Graph
-									GDrawLine
+									grDRAW_LINE
 									local6
 									local5
 									(& temp6 $03ff)
@@ -1365,7 +1365,7 @@ code_0691:
 								(ego hide:)
 							)
 						)
-						(63 (Print 943 10 33 999))
+						(63 (Print 943 10 #font 999))
 						(1 (Print 943 8))
 					)
 				)
@@ -1379,7 +1379,7 @@ code_0691:
 						(Graph grSAVE_BOX local654 local653 local656 local655 4)
 					)
 					(Graph
-						GDrawLine
+						grDRAW_LINE
 						(ego y?)
 						(ego x?)
 						local6
@@ -1414,7 +1414,7 @@ code_0691:
 			)
 			(= local1 0)
 		)
-		(self numOfLoops: 1)
+		(self drawPath: 1)
 		(if (& [local73 (- local3 1)] $8000)
 			(= local5 -1)
 		else
@@ -1424,13 +1424,13 @@ code_0691:
 		)
 	)
 	
-	(method (oldCycler &tmp temp0 temp1 temp2 temp3)
+	(method (savePoints &tmp temp0 temp1 temp2 temp3)
 		(localproc_1869
 			(Format @local573 943 11 (curRoom picture?))
 		)
 		(if (== local0 2)
 			(= temp1 0)
-			(Print 943 12 103)
+			(Print 943 12 #dispose)
 			(localproc_1869 (Format @local573 943 13))
 			(= temp0 1)
 			(while (< temp0 local3)
@@ -1488,7 +1488,7 @@ code_0691:
 			)
 			(localproc_1869 (Format @local573 943 19))
 		else
-			(Print 943 20 103)
+			(Print 943 20 #dispose)
 			(= temp1 1)
 			(= temp3 0)
 			(= temp0 0)
@@ -1569,22 +1569,22 @@ code_0691:
 		(if modelessDialog (modelessDialog dispose:))
 	)
 	
-	(method (oldMover &tmp [temp0 4])
+	(method (getFreeway &tmp [temp0 4])
 	)
 	
-	(method (loopIndex)
+	(method (getPoly)
 		(if (curRoom obstacles?)
 			(= local659 0)
 			((curRoom obstacles?)
 				eachElementDo: #perform addSelfToPath
 			)
 		)
-		(self numOfLoops: 1)
+		(self drawPath: 1)
 	)
 	
-	(method (numOfLoops param1 &tmp temp0)
+	(method (drawPath param1 &tmp temp0)
 		(if (and (!= 0 param1) (!= param1 1)) (= param1 1))
-		(self loopIsCorrect:)
+		(self fixPoints:)
 		(= local4 (= temp0 0))
 		(while (< temp0 local3)
 			(if (not (& [local73 temp0] $c800))
@@ -1603,7 +1603,7 @@ code_0691:
 						(& [local73 temp0] $03ff)
 					)
 					(Graph
-						GDrawLine
+						grDRAW_LINE
 						(& [local73 (- temp0 1)] $03ff)
 						(& [local73 (- temp0 2)] $03ff)
 						(& [local73 (+ temp0 1)] $03ff)
@@ -1629,7 +1629,7 @@ code_0691:
 		)
 	)
 	
-	(method (loopIsCorrect &tmp temp0)
+	(method (fixPoints &tmp temp0)
 		(= temp0 0)
 		(while (< temp0 local3)
 			(cond 
@@ -1652,7 +1652,7 @@ code_0691:
 		)
 	)
 	
-	(method (nextLoop &tmp temp0 temp1)
+	(method (polyTest &tmp temp0 temp1)
 		(if (curRoom obstacles?)
 			((curRoom obstacles?) eachElementDo: #dispose release:)
 		)
@@ -1691,7 +1691,7 @@ code_0691:
 		)
 	)
 	
-	(method (newMover &tmp [temp0 2])
+	(method (freewayTest &tmp [temp0 2])
 	)
 	
 	(method (dispose)

@@ -1,24 +1,24 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 ;;;;
 ;;;;	PATH.SC
+;;;;	(c) Sierra On-Line, Inc, 1988
 ;;;;
-;;;;	(c) Sierra On-Line, Inc, 1992
-;;;;
-;;;;	Author: 	Jeff Stephenson
-;;;;	Updated:	Brian K. Hughes
+;;;;	Author: Jeff Stephenson
 ;;;;
 ;;;;	Motion classes for a path -- i.e. moving to a series of pre-defined
 ;;;;	points.
 ;;;;
 ;;;;	Classes:
 ;;;;		Path
-;;;;		RelPath
+
+
 
 
 (script#	PATH)
 (include game.sh)
 (use Intrface)
 (use Motion)
+
 
 (class Path of MoveTo
 	(properties
@@ -35,14 +35,12 @@
 
 
 	(method (init actor toCall inter)
-		(if argc
-			(= client actor)
-			(= caller (if (>= argc 2) toCall else 0))
-			(= intermediate (if (== argc 3) inter else 0))
-			(= value -1)
-			(= x (client x?))
-			(= y (client y?))
-		)
+		(= client actor)
+		(= caller (if (>= argc 2) toCall else 0))
+		(= intermediate (if (== argc 3) inter else 0))
+		(= value -1)
+		(= x (client x?))
+		(= y (client y?))
 
 		(if (self atEnd:)
 			(self moveDone:)
@@ -83,7 +81,7 @@
 	)
 
 
-	(method (at n &tmp [buffer 20])
+	(method (at n)
 		(Printf PATH 0 name)
 		(return 0)
 	)

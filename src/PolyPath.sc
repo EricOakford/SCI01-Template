@@ -1,20 +1,28 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# POLYPATH)
+(script# 945)
 (include game.sh)
 (use Main)
 (use Motion)
+(use System)
 
-;; Path around an arbitrary set of obstacles, all of which are
-;; defined as Polygons and added to the obstacle list via the
-;; Rooms setObstacle method. 07/24/90 J.M.H.
-
-
-
+;EO: this is WordAt, which is already in SYSTEM.SC
+;;;(public
+;;;	proc945_0 0
+;;;)
+;;;
+;;;(procedure (proc945_0 param1 param2)
+;;;	(return
+;;;		(|
+;;;			(StrAt param1 (* 2 param2))
+;;;			(<< (StrAt param1 (+ 1 (* 2 param2))) $0008)
+;;;		)
+;;;	)
+;;;)
 
 (class PolyPath of Motion
 	(properties
-		value    2  ; current location in path
-		points   0  ; pointer to path array allocated in the kernel
+		value 2
+		points 0
 	)
 	
 	(method (init actor theX theY whoCares opt)
@@ -49,12 +57,11 @@
 	
 	(method (dispose)
 		(if points (Memory MDisposePtr points))
-		(= points NULL)
 		(super dispose:)
 	)
 	
 	(method (moveDone)
-		(if (== (WordAt points value) $7777)
+		(if (== (WordAt points value) 30583)
 			(super moveDone:)
 		else
 			(self init:)

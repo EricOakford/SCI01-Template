@@ -1,6 +1,5 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# MOVEFWD)
-(use Motion)
 ;;;;
 ;;;;	MOVEFWD.SC
 ;;;;	(c) Sierra On-Line, Inc, 1990
@@ -19,6 +18,9 @@
 ;;;;		anActor setMotion: MoveFwd 20 whoToCue
 ;;;;
 
+(include game.sh)
+(use Motion)
+
 
 (class MoveFwd kindof MoveTo
 ;;;	(methods
@@ -26,16 +28,11 @@
 ;;;	)
 
 	(method (init actor dist toCall)
-		(if argc
-			(super init:
-				actor 
-				(+ (actor x?) (SinMult (actor heading?) dist))
-				(- (actor y?) (CosMult (actor heading?) dist))
-				(if (>= argc 3) toCall)
-			) 
-		else
-			(super init:)
-		)
+		(super init:
+			actor 
+			(+ (actor x?) (SinMult (actor heading?) dist))
+			(- (actor y?) (CosMult (actor heading?) dist))
+			(if (>= argc 3) toCall)
+		) 
 	)
 )
-

@@ -1,5 +1,5 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# 255)
+(script# INTRFACE)
 (include game.sh)
 (use Main)
 (use System)
@@ -337,10 +337,7 @@
 			(and
 				(& state $0001)
 				(or
-					(and
-						(== (= eventType (event type?)) 128)
-						(Said said)
-					)
+					(and (== (= eventType (event type?)) saidEvent) (Said said))
 					(and
 						(== eventType keyDown)
 						(== (event message?) key)
@@ -425,7 +422,7 @@
 	(properties
 		type $0002
 		text 0
-		font SYSFONT
+		font USERFONT
 		mode 0
 	)
 	
@@ -443,14 +440,6 @@
 (class DIcon of DItem
 	(properties
 		type $0004
-		state $0000
-		nsTop 0
-		nsLeft 0
-		nsBottom 0
-		nsRight 0
-		key 0
-		said 0
-		value 0
 		view 0
 		loop 0
 		cel 0
@@ -584,13 +573,7 @@
 				)
 			)
 		)
-		(return
-			(if (and (event claimed?) (& state $0002))
-				self
-			else
-				0
-			)
-		)
+		(return (if (and (event claimed?) (& state $0002)) self else 0))
 	)
 	
 	(method (setSize &tmp [temp0 4])

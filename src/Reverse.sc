@@ -4,25 +4,24 @@
 (use Motion)
 
 
-(class Reverse of Cycle
+(class Reverse kindof Cycle
 	;;; Cycles client's cel constantly in reverse, wrapping to the last cel
 	;;; in the client's loop when the cel goes below 0.
+	
 	(properties
 		name "Rev"
-		client 0
-		caller 0
 		cycleDir -1
-		cycleCnt 0
-		completed 0
 	)
 	
 	(method (doit &tmp newCel)
-		(if (< (= newCel (self nextCel:)) 0)
+		(= newCel (self nextCel:))
+		(if (< newCel 0)
 			(self cycleDone:)
 		else
-			(client cel: newCel)
+			(client cel:newCel)
 		)
 	)
+	
 	
 	(method (cycleDone)
 		;; When 'done', reset to last cel and keep going.

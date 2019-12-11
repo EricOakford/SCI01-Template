@@ -1,5 +1,5 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# PRINTD)
+(script# 940)
 (include game.sh)
 (use Main)
 (use Intrface)
@@ -8,48 +8,42 @@
 	PrintD 0
 )
 
-(procedure (PrintD param1 &tmp temp0 newDialog newDText newDTextNsRight temp4 newDTextNsBottom temp6 temp7 temp8 temp9 temp10 temp11 temp12 temp13 temp14)
-	(= temp10 (= temp11 -1))
+(procedure (PrintD param1 &tmp temp0 newDialog newDText newDTextNsRight temp4 newDTextNsBottom temp6 temp7 temp8 temp9 temp10 temp11 temp12 temp13 temp14 temp15)
+	(= temp11 (= temp12 -1))
 	(= newDTextNsRight
 		(= temp4 (= newDTextNsBottom (= temp6 0)))
 	)
-	(= temp12 0)
-	(= temp14 0)
+	(= temp7 1)
+	(= temp13 0)
+	(= temp15 0)
 	((= newDialog (Dialog new:)) window: systemWindow)
 	(= temp0 0)
 	(while (< temp0 argc)
-		(switch (= temp8 [param1 temp0])
+		(switch (= temp9 [param1 temp0])
 			(#new
 				(= newDTextNsBottom (newDText nsBottom?))
 				(= newDTextNsRight 0)
 			)
 			(#at
-				(= temp10 [param1 (++ temp0)])
 				(= temp11 [param1 (++ temp0)])
-			)
-			(#title
 				(= temp12 [param1 (++ temp0)])
 			)
+			(#title
+				(= temp13 [param1 (++ temp0)])
+			)
 			(#first
-				(= temp14 [param1 (++ temp0)])
+				(= temp15 [param1 (++ temp0)])
 			)
 			(else 
 				(++ temp0)
-				(switch temp8
+				(switch temp9
 					(#text
 						((= newDText (DText new:)) text: [param1 temp0])
 					)
 					(#button
 						((= newDText (DButton new:))
 							text: [param1 temp0]
-							value: [param1 (++ temp0)]
-						)
-					)
-					(#icon
-						((= newDText (DIcon new:))
-							view: [param1 temp0]
-							loop: [param1 (++ temp0)]
-							cel: [param1 (++ temp0)]
+							value: (++ temp7)
 						)
 					)
 					(#edit
@@ -89,22 +83,22 @@
 	(newDialog setSize: center:)
 	(newDialog
 		moveTo:
-			(if (== -1 temp10) (newDialog nsLeft?) else temp10)
-			(if (== -1 temp11) (newDialog nsTop?) else temp11)
+			(if (== -1 temp11) (newDialog nsLeft?) else temp11)
+			(if (== -1 temp12) (newDialog nsTop?) else temp12)
 	)
-	(if temp12 (newDialog text: temp12))
-	(= temp13 (newDialog at: temp14))
-	(if (not (& $0001 (temp13 state?))) (= temp13 0))
-	(= temp7
-		(newDialog open: (if temp12 4 else 0) -1 doit: temp13)
+	(if temp13 (newDialog text: temp13))
+	(= temp14 (newDialog at: temp15))
+	(if (not (& $0001 (temp14 state?))) (= temp14 0))
+	(= temp8
+		(newDialog open: (if temp13 4 else 0) -1 doit: temp14)
 	)
-	(if (IsObject temp7)
-		(if (temp7 isKindOf: DButton)
-			(= temp7 (temp7 value?))
+	(if (IsObject temp8)
+		(if (temp8 isKindOf: DButton)
+			(= temp8 (temp8 value?))
 		else
-			(= temp7 1)
+			(= temp8 1)
 		)
 	)
 	(newDialog dispose:)
-	(return temp7)
+	(return temp8)
 )

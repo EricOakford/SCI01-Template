@@ -201,6 +201,10 @@
 		(aTimer init:caller, seconds:secs)
 		(return aTimer)
 	)
+	
+	
+	(method (cue) ;EO: Added for SCI01
+	)
 )
 
 

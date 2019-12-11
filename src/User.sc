@@ -3,8 +3,9 @@
 (include game.sh)
 (use Main)
 (use Intrface)
-(use Sound)
+(use PolyPath)
 (use SortCopy)
+(use Sound)
 (use Motion)
 (use Menu)
 (use Actor)
@@ -168,147 +169,57 @@
 		)
 	)
 	
-	(method (handleEvent event &tmp temp0)
-		(asm
-			pToa     script
-			bnt      code_03bc
-			pushi    #handleEvent
-			pushi    1
-			lsp      event
-			send     6
-code_03bc:
-			pushi    #claimed
-			pushi    0
-			lap      event
-			send     4
-			not     
-			bnt      code_0469
-			pushi    #type
-			pushi    0
-			lap      event
-			send     4
-			push    
-			dup     
-			ldi      1
-			eq?     
-			bnt      code_0424
-			pushi    #controls
-			pushi    0
-			class    User
-			send     4
-			bnt      code_0468
-			pushi    #modifiers
-			pushi    0
-			lap      event
-			send     4
-			not     
-			bnt      code_0468
-			pushi    252
-			pushi    3
-			lag      useObstacles
-			bnt      code_03fb
-			class    34
-			jmp      code_03fd
-code_03fb:
-			class    MoveTo
-code_03fd:
-			push    
-			pushi    #x
-			pushi    0
-			lap      event
-			send     4
-			push    
-			pushi    #y
-			pushi    0
-			lap      event
-			send     4
-			push    
-			self     10
-			pushi    #prevDir
-			pushi    1
-			pushi    0
-			class    User
-			send     6
-			pushi    #claimed
-			pushi    1
-			pushi    1
-			lap      event
-			send     6
-			jmp      code_0468
-code_0424:
-			dup     
-			ldi      64
-			eq?     
-			bnt      code_0468
-			pushi    #message
-			pushi    0
-			lap      event
-			send     4
-			sat      temp0
-			push    
-			pushi    #prevDir
-			pushi    0
-			class    User
-			send     4
-			eq?     
-			bnt      code_044e
-			pushi    1
-			pTos     mover
-			callk    IsObject,  2
-			bnt      code_044e
-			ldi      0
-			sat      temp0
-code_044e:
-			pushi    #prevDir
-			pushi    1
-			lst      temp0
-			class    User
-			send     6
-			pushi    #setDirection
-			pushi    1
-			lst      temp0
-			self     6
-			pushi    #claimed
-			pushi    1
-			pushi    1
-			lap      event
-			send     6
-code_0468:
-			toss    
-code_0469:
-			pushi    #claimed
-			pushi    0
-			lap      event
-			send     4
-			ret     
+	(method (handleEvent event &tmp eventMessage)
+		(if script (script handleEvent: event))
+		(if (not (event claimed?))
+			(switch (event type?)
+				(mouseDown
+					(if
+					(and (User controls?) (not (event modifiers?)))
+						(self
+							setMotion: (if useObstacles PolyPath else MoveTo) (event x?) (event y?)
+						)
+						(User prevDir: dirStop)
+						(event claimed: TRUE)
+					)
+				)
+				(direction
+					(if
+						(and
+							(== (= eventMessage (event message?)) (User prevDir?))
+							(IsObject mover)
+						)
+						(= eventMessage 0)
+					)
+					(User prevDir: eventMessage)
+					(self setDirection: eventMessage)
+					(event claimed: TRUE)
+				)
+			)
+		)
+		(event claimed?)
+	)
+	
+	(method (get param1 &tmp temp0)
+		(= temp0 0)
+		(while (< temp0 argc)
+			((inventory at: [param1 temp0]) moveTo: self)
+			(++ temp0)
 		)
 	)
 	
-	(method (get what &tmp i)
-		;; Put a number of items into Ego's inventory.
-		
-		(for	((= i 0))
-			(< i argc)
-			((++ i))
-			
-			((inventory at:[what i]) moveTo:self)
+	(method (put param1 param2)
+		(if (self has: param1)
+			((inventory at: param1)
+				moveTo: (if (== argc 1) -1 else param2)
+			)
 		)
 	)
 	
-	(method (put what recipient)
-		;; Put an item of Ego's inventory into the inventory of 'recipient'.
-		;; If recipient is not present, put item into limbo (-1 owner).
-		
-		(if (self has:what)
-			((inventory at:what) moveTo:(if (== argc 1) -1 else recipient))
+	(method (has param1 &tmp temp0)
+		(if (= temp0 (inventory at: param1))
+			(temp0 ownedBy: self)
 		)
-	)
-	
-	(method (has what &tmp theItem)
-		;; Return TRUE if Ego has 'what' in inventory.
-		
-		(= theItem (inventory at:what))
-		(return (and theItem (theItem ownedBy:self)))
 	)
 )
 

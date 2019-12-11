@@ -1,8 +1,9 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# 994)
+(script# GAME)
 (include game.sh)
 (use Main)
 (use Intrface)
+(use Polygon)
 (use Sound)
 (use Save)
 (use Motion)
@@ -88,137 +89,26 @@
 	)
 	
 	(method (doit param1 &tmp temp0 temp1)
-		(asm
-			pushi    #signal
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			ldi      16384
-			or      
-			not     
-			bnt      code_0226
-			pushi    #xStep
-			pushi    0
-			lag      ego
-			send     4
-			push    
-			pushi    3
-			pushi    #view
-			pushi    0
-			lag      ego
-			send     4
-			push    
-			pushi    2
-			pushi    0
-			callk    CelWide,  6
-			push    
-			ldi      2
-			div     
-			add     
-			sat      temp0
-			pushi    #yStep
-			pushi    0
-			lag      ego
-			send     4
-			push    
-			ldi      2
-			mul     
-			sat      temp1
-			pushi    297
-			pushi    1
-			pushi    102
-			pushi    8
-			pushi    #brLeft
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			lat      temp0
-			sub     
-			push    
-			pushi    2
-			pushi    1
-			pushi    1
-			pushi    #y
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			callk    CoordPri,  2
-			push    
-			callk    CoordPri,  4
-			push    
-			lat      temp1
-			sub     
-			push    
-			pushi    #brRight
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			lat      temp0
-			add     
-			push    
-			pushi    2
-			pushi    1
-			pushi    1
-			pushi    #y
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			callk    CoordPri,  2
-			push    
-			callk    CoordPri,  4
-			push    
-			lat      temp1
-			sub     
-			push    
-			pushi    #brRight
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			lat      temp0
-			add     
-			push    
-			pushi    #y
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			lat      temp1
-			add     
-			push    
-			pushi    #brLeft
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			lat      temp0
-			sub     
-			push    
-			pushi    #y
-			pushi    0
-			lap      param1
-			send     4
-			push    
-			lat      temp1
-			add     
-			push    
-			pushi    109
-			pushi    0
-			pushi    #new
-			pushi    0
-			class    35
-			send     4
-			send     24
-			push    
-			lag      curRoom
-			send     6
-code_0226:
-			ret     
+		(if (not (| (param1 signal?) $4000))
+			(= temp0
+				(+ (ego xStep?) (/ (CelWide (ego view?) 2 0) 2))
+			)
+			(= temp1 (* (ego yStep?) 2))
+			(curRoom
+				addObstacle:
+					((Polygon new:)
+						init:
+							(- (param1 brLeft?) temp0)
+							(- (CoordPri 1 (CoordPri (param1 y?))) temp1)
+							(+ (param1 brRight?) temp0)
+							(- (CoordPri 1 (CoordPri (param1 y?))) temp1)
+							(+ (param1 brRight?) temp0)
+							(+ (param1 y?) temp1)
+							(- (param1 brLeft?) temp0)
+							(+ (param1 y?) temp1)
+						yourself:
+					)
+			)
 		)
 	)
 )
@@ -318,7 +208,7 @@ code_0226:
 		(= curRoomNum newRoomNumber)
 		(= newRoomNum newRoomNumber)
 		(FlushResources newRoomNumber)
-		(= temp4 (self setCursor: waitCursor 1))
+		(= temp4 (self setCursor: waitCursor TRUE))
 		(self
 			startRoom: curRoomNum
 			checkAni:
@@ -341,48 +231,46 @@ code_0226:
 	(method (restart)
 		(if modelessDialog (modelessDialog dispose:))
 		(RestartGame)
-	)
+	)	
 	
-	(method (save &tmp [temp0 20] temp20 temp21 temp22 oldLang)
+	(method (save &tmp [temp0 20] temp20 temp21 oldPause oldLang)
 		(= oldLang parseLang)
-		(= parseLang 1)
+		(= parseLang ENGLISH)
 		(Load FONT smallFont)
 		(Load CURSOR waitCursor)
 		(= temp21 (self setCursor: normalCursor))
-		(= temp22 (Sound pause: 1))
+		(= oldPause (Sound pause: TRUE))
 		(if (PromptForDiskChange 1)
 			(if modelessDialog (modelessDialog dispose:))
 			(if (!= (= temp20 (Save doit: @temp0)) -1)
 				(= parseLang oldLang)
 				(= temp21 (self setCursor: waitCursor 1))
 				(if (not (SaveGame name temp20 @temp0 version))
-					(Print SAVE 0
-						#font 0 #button {OK} 1)
+					(Print GAME 0 #font 0 #button {OK} 1)
 				)
 				(self setCursor: temp21 (HaveMouse))
 			)
 			(PromptForDiskChange 0)
 		)
-		(Sound pause: temp22)
+		(Sound pause: oldPause)
 		(= parseLang oldLang)
-	)	
+	)
 	
-	(method (restore &tmp [temp0 20] temp20 temp21 temp22 oldLang)
+	(method (restore &tmp [temp0 20] temp20 temp21 oldPause oldLang)
 		(= oldLang parseLang)
 		(= parseLang ENGLISH)
 		(Load FONT smallFont)
 		(Load CURSOR waitCursor)
 		(= temp21 (self setCursor: normalCursor))
-		(= temp22 (Sound pause: TRUE))
+		(= oldPause (Sound pause: TRUE))
 		(if (PromptForDiskChange 1)
 			(if modelessDialog (modelessDialog dispose:))
 			(if (!= (= temp20 (Restore doit: &rest)) -1)
-				(self setCursor: waitCursor 1)
+				(self setCursor: waitCursor TRUE)
 				(if (CheckSaveGame name temp20 version)
 					(RestoreGame name temp20 version)
 				else
-					(Print SAVE 1
-						#font 0 #button {OK} 1)
+					(Print GAME 1 #font 0 #button {OK} TRUE)
 					(self setCursor: temp21 (HaveMouse))
 					(= parseLang oldLang)
 				)
@@ -391,28 +279,28 @@ code_0226:
 			)
 			(PromptForDiskChange 0)
 		)
-		(Sound pause: temp22)
+		(Sound pause: oldPause)
 	)
-	
+
 	(method (changeScore delta)
 		(= score (+ score delta))
 		(StatusLine doit:)
 	)
 	
-	(method (handleEvent pEvent)
+	(method (handleEvent event)
 		(cond 
 			(
 				(and
-					(not (if useSortedFeatures (== (pEvent type?) saidEvent)))
+					(not (if useSortedFeatures (== (event type?) saidEvent)))
 					(or
-						(regions handleEvent: pEvent)
-						(locales handleEvent: pEvent)
+						(regions handleEvent: event)
+						(locales handleEvent: event)
 					)
 				)
 			)
-			(script (script handleEvent: pEvent))
+			(script (script handleEvent: event))
 		)
-		(pEvent claimed?)
+		(event claimed?)
 	)
 	
 	(method (showMem)
@@ -439,13 +327,13 @@ code_0226:
 	)
 	
 	(method (checkAni &tmp temp0)
-		(Animate (cast elements?) 0)
+		(Animate (cast elements?) FALSE)
 		(Wait 0)
-		(Animate (cast elements?) 0)
+		(Animate (cast elements?) FALSE)
 		(while (> (Wait 0) aniThreshold)
 			(breakif (== (= temp0 (cast firstTrue: #isExtra)) 0))
 			(temp0 addToPic:)
-			(Animate (cast elements?) 0)
+			(Animate (cast elements?) FALSE)
 			(cast eachElementDo: #delete)
 		)
 	)
@@ -536,11 +424,6 @@ code_0226:
 (class Room of Region
 	(properties
 		name "Rm"
-		script 0
-		number 0
-		timer 0
-		keep 0
-		initialized 0
 		picture 0
 		style $ffff
 		horizon 0
@@ -599,12 +482,12 @@ code_0226:
 		(super dispose:)
 	)
 	
-	(method (handleEvent pEvent)
+	(method (handleEvent event)
 		(cond 
-			((super handleEvent: pEvent))
-			(controls (controls handleEvent: pEvent))
+			((super handleEvent: event))
+			(controls (controls handleEvent: event))
 		)
-		(pEvent claimed?)
+		(event claimed?)
 	)
 	
 	(method (newRoom newRoomNumber)
@@ -715,12 +598,12 @@ code_0226:
 	)
 	
 	(method (enable)
-		(= state 1)
+		(= state TRUE)
 		(self doit:)
 	)
 	
 	(method (disable)
-		(= state 0)
+		(= state FALSE)
 		(self doit:)
 	)
 )

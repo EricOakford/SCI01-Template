@@ -48,11 +48,6 @@
 (class Forward of Cycle
 	(properties
 		name "Fwd"
-		client 0
-		caller 0
-		cycleDir 1
-		cycleCnt 0
-		completed 0
 	)
 	
 	(method (doit &tmp fwdNextCel)
@@ -70,13 +65,7 @@
 )
 
 (class Walk of Forward
-	(properties
-		client 0
-		caller 0
-		cycleDir 1
-		cycleCnt 0
-		completed 0
-	)
+	(properties)
 	
 	(method (doit &tmp temp0)
 		(if (not (client isStopped:)) (super doit:))
@@ -86,11 +75,6 @@
 (class CycleTo of Cycle
 	(properties
 		name "CT"
-		client 0
-		caller 0
-		cycleDir 1
-		cycleCnt 0
-		completed 0
 		endCel 0
 	)
 	
@@ -135,12 +119,6 @@
 (class EndLoop of CycleTo
 	(properties
 		name "End"
-		client 0
-		caller 0
-		cycleDir 1
-		cycleCnt 0
-		completed 0
-		endCel 0
 	)
 	
 	(method (init param1 param2)
@@ -153,12 +131,6 @@
 (class BegLoop of CycleTo
 	(properties
 		name "Beg"
-		client 0
-		caller 0
-		cycleDir 1
-		cycleCnt 0
-		completed 0
-		endCel 0
 	)
 	
 	(method (init param1 param2)
@@ -168,11 +140,6 @@
 
 (class SyncWalk of Forward
 	(properties
-		client 0
-		caller 0
-		cycleDir 1
-		cycleCnt 0
-		completed 0
 		xLast 0
 		yLast 0
 	)

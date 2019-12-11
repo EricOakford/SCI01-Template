@@ -16,6 +16,7 @@
 (include game.sh)
 (use Main)
 (use Intrface)
+(use Window)
 (use Save)
 (use System)
 

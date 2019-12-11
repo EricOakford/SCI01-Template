@@ -1,5 +1,5 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# 984)
+(script# SORTCOPY)
 (include game.sh)
 (use Main)
 (use Sight)
@@ -14,7 +14,7 @@
 	backList
 	outList
 )
-(procedure (SortedAdd &tmp newEventHandler_4 newEventHandler_5 newEventHandler_6)
+(procedure (SortedAdd &tmp frontList2 outList2 backList2)
 	((= frontList (EventHandler new:))
 		add:
 		name: {fl}
@@ -27,19 +27,19 @@
 		add:
 		name: {bl}
 	)
-	((= newEventHandler_4 (EventHandler new:)) name: {fl2})
-	((= newEventHandler_5 (EventHandler new:)) name: {ol2})
-	((= newEventHandler_6 (EventHandler new:)) name: {bl2})
+	((= frontList2 (EventHandler new:)) name: {fl2})
+	((= outList2 (EventHandler new:)) name: {ol2})
+	((= backList2 (EventHandler new:)) name: {bl2})
 	(cast eachElementDo: #perform preSortCode)
 	(features eachElementDo: #perform preSortCode)
-	(Sort frontList newEventHandler_4 frontSortCode)
-	(sortedFeatures add: newEventHandler_4)
-	(Sort outList newEventHandler_5 frontSortCode)
-	(sortedFeatures add: newEventHandler_5)
+	(Sort frontList frontList2 frontSortCode)
+	(sortedFeatures add: frontList2)
+	(Sort outList outList2 frontSortCode)
+	(sortedFeatures add: outList2)
 	(sortedFeatures add: regions)
 	(sortedFeatures add: locales)
-	(Sort backList newEventHandler_6 backSortCode)
-	(sortedFeatures add: newEventHandler_6)
+	(Sort backList backList2 backSortCode)
+	(sortedFeatures add: backList2)
 	(frontList release: dispose:)
 	(outList release: dispose:)
 	(backList release: dispose:)

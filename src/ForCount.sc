@@ -1,5 +1,8 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
 (script# FORCOUNT)
+(include game.sh)
+(use Motion)
+
 
 ;;; ForwardCounter Cycle Class
 ;;; Author J.Mark Hood 
@@ -7,29 +10,19 @@
 ;;; then cueing on completion.
 ;;; Usage : propName setCycle:ForwardCounter numOfCycles whoCares
 
-(include game.sh)
-(use Motion)
-
-
-(class ForwardCounter of Forward
+(class ForwardCounter kindof Forward
 	(properties
-		client 0
-		caller 0
-		cycleDir 1
-		cycleCnt 0
-		completed 0
-		count 0
+		count		0
 	)
-	
+
 	(method (init theObj num whoCares)
 		(super init: theObj)
-		(if (>= argc 2)
-			(= count num)
-			(if (>= argc 3) (= caller whoCares)
+		(if (>= argc 2)			(= count num)
+			(if (>= argc 3)		(= caller whoCares)
 			)
 		)
 	); init
-	
+
 	(method (cycleDone)
 		(if (-- count)
 			(super cycleDone:)
@@ -37,7 +30,6 @@
 			(= completed TRUE)
 			(self motionCue:)
 		)
-   ); cycleDone
+	); cycleDone
 
 ); ForwardCounter
-
