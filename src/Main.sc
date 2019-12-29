@@ -13,6 +13,7 @@
 (use DCIcon)
 (use LoadMany)
 (use StopWalk)
+(use Window)
 (use Sound)
 (use Save)
 (use Motion)
@@ -24,7 +25,7 @@
 
 (public
 	SCI01 0 ;Replace "SCI01" with the game's internal name here (up to 6 characters)
-	AnimateCast 1
+	RedrawCast 1
 	HandsOn 2
 	HandsOff 3
 	NormalEgo 4
@@ -34,13 +35,13 @@
 	Bclr 8
 	SolvePuzzle 9
 	EgoDead	10
-	PrintDontHaveIt 11
-	PrintAlreadyDoneThat 12
-	PrintNotCloseEnough 13
-	PrintCantDoThat 14
-	PrintCantSeeThat 15
-	AddManyObstacles 16
-	AddManyFeatures 17
+	DontHave 11
+	AlreadyDone 12
+	NotClose 13
+	CantDo 14
+	CantSee 15
+	InitAddToPics 16
+	InitFeatures 17
 )
 
 (local
@@ -105,49 +106,49 @@
 	firstSaidHandler		
 	useObstacles =  FALSE	;will Ego use PolyPath or not? (default is FALSE)
 	;77 to 99 are unused
-	global77
-	global78
-	global79
-	global80
-	global81
-	global82
-	global83
-	global84
-	global85
-	global86
-	global87
-	global88
-	global89
-	global90
-	global91
-	global92
-	global93
-	global94
-	global95
-	global96
-	global97
-	global98
+		global77
+		global78
+		global79
+		global80
+		global81
+		global82
+		global83
+		global84
+		global85
+		global86
+		global87
+		global88
+		global89
+		global90
+		global91
+		global92
+		global93
+		global94
+		global95
+		global96
+		global97
+		global98
 	lastSysGlobal
 	;globals 100 and above are for game use
 	isHandsOff
 	deathMusic	= sDeath	;default death music
-	musicChannels
-	global103
-	debugging	;debug mode enabled
-	detailLevel		;detail level (0 = low, 1 = mid, 2 = high, 3 = ultra)
-	theMusic			;music object, current playing music
-	colorCount
-	howFast			;used to test how fast the system is
-					;and used in determining detail level. (used in conjunction with detailLevel)
-	cIcon
-	soundFx				;sound effect being played
-	[gameFlags 10]	;each global can have 16 flags. 10 globals * 16 flags = 160 flags. If you need more flags, just increase the array!
-	curTextColor ;color of text in message boxes
-	curBackColor ;color of message boxes
+	numColors
+	numVoices
+	debugging		;debug mode enabled
+	howFast			;machine speed level (0 = slow, 1 = medium, 2 = fast, 3 = fastest)
+	machineSpeed	;used to test how fast the system is
+					; and used in determining game speed. (used in conjunction with howFast)
+	theMusic		;music object, current playing music
+	soundFx			;sound effect being played
+	cIcon			;global pointer to cycling icon
+	[gameFlags 10]	;each global can have 16 flags. 10 globals * 16 flags = 160 flags.
+					; If you need more flags, just increase the array!
+	myTextColor		;color of text in message boxes
+	myBackColor		;color of message boxes
 )
 
-(procedure (AnimateCast)
-	;Used to animate the cast, generally in a room's init() method.
+(procedure (RedrawCast)
+	;Used to re-animate the cast without cycling
 	(Animate (cast elements?) FALSE)
 )
 
@@ -177,7 +178,7 @@
 		cycleSpeed: 0
 		moveSpeed: 0
 		setStep: 3 2
-		ignoreActors: 0
+		ignoreActors: FALSE
 		looper: 0
 	)
 )
@@ -206,19 +207,18 @@
 	oldState
 )
 
-(procedure (SolvePuzzle flag points)
+(procedure (SolvePuzzle flagEnum points)
 	;Adds an amount to the player's current score. A flag (one used with
 	;Bset, Bclr, and Btst) is used so that a score is only added once.
-		(if (not (Btst flag))
+		(if (not (Btst flagEnum))
 		(theGame changeScore: points)
-		(Bset flag)
+		(Bset flagEnum)
 	)
 )		
 
 (procedure (EgoDead)
 	;This procedure handles when Ego dies. It closely matches that of QFG1EGA.
-	;To use it: "(EgoDead {death message})".
-	;You can add a title and icon in the same way as a normal Print message.
+	;It's used in the same way as a normal Print message.
 	(HandsOff)
 	(Wait 100)
 	(= normalCursor ARROW_CURSOR)
@@ -246,33 +246,33 @@
 		)
 	)
 )
-(procedure (PrintDontHaveIt)
+(procedure (DontHave)
 	(Print "You don't have it.")
 )
 
-(procedure (PrintAlreadyDoneThat)
+(procedure (AlreadyDone)
 	(Print "You've already done that.")
 )
 
-(procedure (PrintNotCloseEnough)
+(procedure (NotClose)
 	(Print "You're not close enough.")
 )
 
-(procedure (PrintCantDoThat)
+(procedure (CantDo)
 	(Print "You can't do that now.")
 )
 
-(procedure (PrintCantSeeThat)
+(procedure (CantSee)
 	(Print "You see nothing like that here.")
 )
 
-;These two procedures allow for adding multiple features and obstacles at a time.
+;These two procedures allow for adding multiple ATPs and features at a time.
 ;They were used in QFG2, which uses sorted features.
-(procedure (AddManyObstacles)
+(procedure (InitAddToPics)
 	(addToPics add: &rest eachElementDo: #init doit:)
 )
 
-(procedure (AddManyFeatures)
+(procedure (InitFeatures)
 	(features add: &rest eachElementDo: #init doit:)
 )
 
@@ -311,10 +311,8 @@
 ;	GameVerbMessager can be customized for additional verbs
 ;	that are not part of the stock USER.SC. This was done in Quest for Glory II.
 
-(class GameVerbMessager of VerbMessager
-	(properties
-		ssTalk 0
-	)
+(instance verbWords of VerbMessager
+	(properties)
 	
 	(method (doit)
 		(return
@@ -336,38 +334,38 @@
 (instance DoVerbCode of Code
 	(properties)
 	
-	(method (doit description theVerb &tmp [str 100])
+	(method (doit theObj theVerb &tmp [str 100])
 		(switch theVerb
 			(verbLook
-				(if (description lookStr?)
-					(Print (description lookStr?))
+				(if (theObj lookStr?)
+					(Print (theObj lookStr?))
 				else
-					(Print (Format @str "Why, look! It's %s." (description description?)))
+					(Print (Format @str "Why, look! It's %s." (theObj description?)))
 				)
 			)
 			(verbOpen
-				(Print (Format @str "You can't open %s." (description description?)))
+				(Print (Format @str "You can't open %s." (theObj description?)))
 			)
 			(verbClose
-				(Print (Format @str "You can't close %s." (description description?)))
+				(Print (Format @str "You can't close %s." (theObj description?)))
 			)
 			(verbSmell
-				(Print (Format @str "To you, %s has no distinct smell." (description description?)))
+				(Print (Format @str "To you, %s has no distinct smell." (theObj description?)))
 			)
 			(verbMove
-				(Print (Format @str "You can't move %s." (description description?)))
+				(Print (Format @str "You can't move %s." (theObj description?)))
 			)
 			(verbEat
-				(Print (Format @str "Don't be silly, you can't eat %s!" (description description?)))
+				(Print (Format @str "Don't be silly, you can't eat %s!" (theObj description?)))
 			)
 			(verbGet
-				(Print (Format @str "You can't get %s." (description description?)))
+				(Print (Format @str "You can't get %s." (theObj description?)))
 			)
 			(verbClimb
-				(Print (Format @str "You can't climb %s." (description description?)))
+				(Print (Format @str "You can't climb %s." (theObj description?)))
 			)
 			(verbTalk
-				(Print (Format @str "Don't bother trying to talk to %s." (description description?)))
+				(Print (Format @str "Don't bother trying to talk to %s." (theObj description?)))
 			)
 		)
 	)
@@ -383,16 +381,21 @@
 	)
 	
 	(method (init)
+		;load some important modules
+		Cycle
+		StopWalk
+		Window
+		DCIcon
+		TheMenuBar
 		;set up various aspects of the game
 		(super init:)
 		(= cIcon deathIcon)
 		(= ego egoObj)
 		(= version {x.yyy.zzz}) ;set game version here
 		(= doVerbCode DoVerbCode)
-		(User alterEgo: ego verbMessager: GameVerbMessager)
+		(User alterEgo: ego verbMessager: verbWords)
 		(TheMenuBar init: draw: hide: state: FALSE)
-		(StatusLine code: statusCode disable:) ;hide the status code at startup
-		(StopWalk init:)
+		(StatusLine code: statusCode disable:) ;hide the status line at startup
 		(if debugging
 			(self setCursor: normalCursor (HaveMouse) 300 170)
 		else
@@ -502,13 +505,13 @@
 							)
 							((item ownedBy: curRoomNum)
 								(if (Said 'get')
-									(PrintCantDoThat)
+									(CantDo)
 								else
-									(PrintDontHaveIt)
+									(DontHave)
 								)
 							)
 							(else
-								(PrintCantSeeThat)
+								(CantSee)
 							)
 						)
 						(event claimed: TRUE)
@@ -519,12 +522,22 @@
 	)
 )
 
+(class GameInvItem of InvItem
+	;this subclass will allow item descriptions to be called
+	;from TEXT.003 (item descriptions)
+	(method (showSelf)
+		(Print INVDESC description
+			#title name
+			#icon view 0 0
+		)
+	)
+)
+
 ;add inventory items here
 
-(instance Test_Object of InvItem
+(instance Test_Object of GameInvItem
 	(properties
 		name {Test Object}
-		description {This is a test object.}
 		said '/object'
 		owner 0
 		view vTestObject

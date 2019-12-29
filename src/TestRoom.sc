@@ -31,7 +31,7 @@
 				(ego posn: 146 153 loop: 1)
 			)
 		)
-		(AnimateCast)
+		(RedrawCast)
 		(ego init:)
 		(ego get: iTestObject)
 	)

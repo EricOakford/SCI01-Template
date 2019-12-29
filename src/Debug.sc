@@ -16,54 +16,42 @@
 (instance debugRm of Locale
 	(properties)
 	
-	(method (handleEvent event &tmp newEvent temp1 [temp2 2] castFirst [str 80] temp85 temp86)
+	(method (handleEvent event &tmp evt obj i [str 80] nullStr nextRoom)
 		(switch (event type?)
 			(mouseDown
 				(cond 
 					((& (event modifiers?) ctrlDown)
 						(event claimed: TRUE)
 						(User canControl: TRUE)
-						(while (!= 2 ((= newEvent (Event new:)) type?))
-							(GlobalToLocal newEvent)
-							(Animate (cast elements?) 0)
-							(ego posn: (newEvent x?) (newEvent y?) setMotion: 0)
-							(newEvent dispose:)
+						(while (!= mouseUp ((= evt (Event new:)) type?))
+							(GlobalToLocal evt)
+							(Animate (cast elements?) FALSE)
+							(ego posn: (evt x?) (evt y?) setMotion: 0)
+							(evt dispose:)
 						)
-						(newEvent dispose:)
+						(evt dispose:)
 					)
 					((& (event modifiers?) shiftDown)
 						(event claimed: TRUE)
-						(= temp1
+						(= obj
 							(Print
-								(Format @str {%d/%d} (event x?) (event y?))
-								#at
-								(- (event x?) 21)
-								(- (event y?) 17)
-								#font
-								999
+								(Format @str "%d/%d" (event x?) (event y?))
+								#at (- (event x?) 21) (- (event y?) 17)
+								#font 999
 								#dispose
 							)
 						)
-						(while (!= 2 ((= newEvent (Event new:)) type?))
-							(newEvent dispose:)
+						(while (!= mouseUp ((= evt (Event new:)) type?))
+							(evt dispose:)
 						)
-						(temp1 dispose:)
-						(newEvent dispose:)
+						(obj dispose:)
+						(evt dispose:)
 					)
 				)
 			)
 			(keyDown
 				(event claimed: TRUE)
 				(switch (event message?)
-					(`@t
-						(if
-							(and
-								(> 105 (= temp85 (GetNumber {Which room number?})))
-								(> temp85 0)
-							)
-							(curRoom newRoom: temp85)
-						)
-					)
 					(`?
 						(Print "Debug Key commands:\n
 							ALT-S Show cast\n
@@ -76,71 +64,70 @@
 							ALT-D Internal debugger\n
 							ALT-E Show ego\n
 							ALT-K Kill ego"
-							#window SysWindow)
+						)
+					)
+					(`@t
+						(if
+							(and
+								(> 105 (= nextRoom (GetNumber {Which room number?})))
+								(> nextRoom 0)
+							)
+							(curRoom newRoom: nextRoom)
+						)
 					)
 					(`@s
-						(= castFirst (cast first:))
-						(while castFirst
-							(= temp1 (NodeValue castFirst))
+						(= nullStr {*})
+						(StrAt nullStr 0 0)
+						(= i (cast first:))
+						(while i
+							(= obj (NodeValue i))
 							(Print
-								(Format
-									@str
-									{view: %d\n
+								(Format @str
+									"view: %d\n
 									(x,y):%d,%d\n
 									STOPUPD=%d\n
 									IGNRACT=%d\n
-									ILLBITS=$%x}
-									(temp1 view?)
-									(temp1 x?)
-									(temp1 y?)
-									(/ (& (temp1 signal?) $0004) 4)
-									(/ (& (temp1 signal?) $4000) 16384)
+									ILLBITS=$%x"
+									(obj view?)
+									(obj x?)
+									(obj y?)
+									(if (& (obj signal?) notUpd) {stopUpd:\n} else nullStr)
+									(if (& (obj signal?) ignrAct) {ignoreActors:\n} else nullStr)
 									(if
 										(or
-											(== (temp1 superClass?) Actor)
-											(== (temp1 superClass?) Ego)
+											(== (obj superClass?) Actor)
+											(== (obj superClass?) Ego)
 										)
-										(temp1 illegalBits?)
+										(obj illegalBits?)
 									else
 										-1
 									)
 								)
-								#window
-								SysWindow
-								#title
-								(temp1 name?)
-								#icon
-								(temp1 view?)
-								(temp1 loop?)
-								(temp1 cel?)
+								#title (obj name?)
+								#icon (obj view?) (obj loop?) (obj cel?)
 							)
-							(= castFirst (cast next: castFirst))
+							(= i (cast next: i))
 						)
 					)
 					(`@i
-						(= castFirst (GetNumber {ID number of the object?}))
-						(ego get: castFirst)
+						(= i (GetNumber {ID number of the object?}))
+						(ego get: i)
 					)
 					(`@k
 						(EgoDead "It's all over for now. Please try again."
 							#title {You're dead.}
-							#icon vEgoDeath
+							#icon vStaticIcons
 						)
 					)
 					(`@m (theGame showMem:))
 					(`@e
-						(Format
-							@str
-							{ego\n
-							x:%d y:%d\n
-							loop:%d\n
-							cel:%d}
-							(ego x?)
-							(ego y?)
-							(ego loop?)
-							(ego cel?)
+						(Format @str "ego\nx:%d y:%d\nloop:%d\ncel:%d"
+							(ego x?) (ego y?) (ego loop?) (ego cel?)
 						)
-						(Print @str #icon (ego view?) 0 0)
+						(Print @str
+							#title {Ego}
+							#icon (ego view?) 0 0
+						)
 					)
 					(`@v (Show VMAP))
 					(`@p (Show PMAP))

@@ -22,7 +22,7 @@
 )
 
 (local
-	endTime
+	doneTime
 )
 (instance fred of Actor
 	(properties)
@@ -49,21 +49,21 @@
 			init:
 		)
 		(theGame setSpeed: 0)
-		(= howFast 0)
+		(= machineSpeed 0)
 	)
 	
 	(method (doit)
 		(super doit:)
-		(if (== (++ howFast) 1)
-			(= endTime (+ 60 (GetTime)))
+		(if (== (++ machineSpeed) 1)
+			(= doneTime (+ 60 (GetTime)))
 		)
 		(if
-		(and (u< endTime (GetTime)) (not (self script?)))
+		(and (u< doneTime (GetTime)) (not (self script?)))
 			(cond 
-				((<= howFast 25) (= detailLevel 0))
-				((<= howFast 40) (= detailLevel 1))
-				((<= howFast 60) (= detailLevel 2))
-				(else (= detailLevel 3))
+				((<= machineSpeed 25) (= howFast slow))
+				((<= machineSpeed 40) (= howFast medium))
+				((<= machineSpeed 60) (= howFast fast))
+				(else (= howFast fastest))
 			)
 			(self setScript: speedScript)
 		)

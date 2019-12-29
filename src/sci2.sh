@@ -291,7 +291,7 @@
 
 ;
 ; * signal property on features
-;(define notUpd $0001)
+;(define notUpd $0001) ;is $0004 in SSCI
 ;(define fixPriOn $0010)
 (define isExtra $0200)
 (define noTurn $0800)

@@ -13,19 +13,25 @@
 
 ; Commonly-used header files are nested here, so most scripts only need to include this one.
 
-;Game modules
+; howFast values
+(enum
+	slow
+	medium
+	fast
+	fastest
+)
+
+; Game modules
 (enum
 	MAIN			;0
 	SPEEDTEST		;1
 	DEBUG			;2
-	GAME_INV		;3	;unused, as it is more memory-efficient to place inventory items
-						;in MAIN.SC. However, this will remain in case you want to move the
-						;items there.
+	INVDESC			;3	;inventory item descriptions (text-only)
 	GAME_INIT		;4
 	DISPOSE_CODE	;5
 )
 
-;Actual rooms
+; Actual rooms
 (enum 10
 	TITLE		;10
 	TESTROOM	;11
@@ -36,12 +42,12 @@
 (define sDeath 11)
 
 ; Inventory items
-;Make sure they are in the same order you put them in the inventory list in GAMEINV.SC.
+;Make sure they are in the same order you put them in the inventory list in MAIN.SC.
 ;To avoid name conflicts, prefix the items with the letter "i".
 (enum
 	iTestObject
 )
 
 ; Event flags
-;These flags are used by Bset, Btst, and Bclr.
-;Example: fBabaFrog (original Sierra naming)
+	;These flags are used by Bset, Btst, and Bclr.
+	;Example: fBabaFrog (original Sierra naming)

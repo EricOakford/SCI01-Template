@@ -10,4 +10,4 @@
 (define vEgoStand 1)
 (define vSpeedTest 98)
 (define vTestObject 800)
-(define vEgoDeath 998)
+(define vStaticIcons 998)
