@@ -33,18 +33,22 @@
 		)
 	)
 	
-	(method (nextCel &tmp temp0)
+	(method (nextCel &tmp newCel)
 		(while
 			(==
-				(= temp0 (Random 0 (client lastCel:)))
+				(= newCel (Random 0 (client lastCel:)))
 				(client cel?)
 			)
 		)
-		(return temp0)
+		(return newCel)
 	)
 	
 	(method (cycleDone)
-		(= completed 1)
-		(if caller (= doMotionCue 1) else (self motionCue:))
+		(= completed TRUE)
+		(if caller
+			(= doMotionCue TRUE)
+		else
+			(self motionCue:)
+		)
 	)
 )
