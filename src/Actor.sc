@@ -1,5 +1,5 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# 998)
+(script# ACTOR)
 (include game.sh)
 (use Main)
 (use Intrface)
@@ -14,7 +14,7 @@
 		loop 0
 		cel 0
 		priority -1
-		signal $0000
+		signal 0
 		palette 0
 	)
 	
@@ -34,7 +34,9 @@
 	)
 	
 	(method (onMe)
-		(if (& signal $0080) 0 else (super onMe: &rest))
+		(if (& signal actorHidden) FALSE
+		else (super onMe: &rest)
+		)
 	)
 )
 
@@ -46,7 +48,7 @@
 		cel 0
 		priority 0
 		underBits 0
-		signal $0101
+		signal (| stopUpdOn staticView)
 		lsTop 0
 		lsLeft 0
 		lsBottom 0
@@ -58,11 +60,11 @@
 		palette 0
 	)
 	
-	(method (init param1)
-		(= signal (& signal $7fff))
+	(method (init theInitializer)
+		(= signal (& signal (~ delObj)))
 		(if (not (cast contains: self))
 			(= lsRight (= lsBottom (= lsLeft (= lsTop 0))))
-			(= signal (& signal $ff77))
+			(= signal (& signal (~ (| hideActor actorHidden))))
 		)
 		(BaseSetter self)
 		(super init: &rest)
@@ -70,7 +72,7 @@
 	
 	(method (dispose)
 		(self startUpd: hide:)
-		(= signal (| signal $8000))
+		(= signal (| signal delObj))
 	)
 	
 	(method (showSelf)
@@ -78,19 +80,21 @@
 	)
 	
 	(method (isNotHidden)
-		(return (not (& signal $0008)))
+		(return (not (& signal hideActor)))
 	)
 	
 	(method (onMe)
-		(if (& signal $0080) 0 else (super onMe: &rest))
+		(if (& signal actorHidden) FALSE
+		else (super onMe: &rest)
+		)
 	)
 	
-	(method (posn theX theY theZ)
+	(method (posn newX newY newZ)
 		(if (>= argc 1)
-			(= x theX)
+			(= x newX)
 			(if (>= argc 2)
-				(= y theY)
-				(if (>= argc 3) (= z theZ))
+				(= y newY)
+				(if (>= argc 3) (= z newZ))
 			)
 		)
 		(BaseSetter self)
@@ -98,48 +102,65 @@
 	)
 	
 	(method (stopUpd)
-		(= signal (| signal stopUpdOn)) ;EO: was "notUpd", which has different values in sci.sh and system.sh
-		(= signal (& signal $fffd))
+		(= signal (| signal stopUpdOn))
+		(= signal (& signal (~ startUpdOn)))
 	)
 	
 	(method (forceUpd)
-		(= signal (| signal $0040))
+		(= signal (| signal forceUpdOn))
 	)
 	
 	(method (startUpd)
-		(= signal (| signal $0002))
-		(= signal (& signal $fffe))
+		(= signal (| signal startUpdOn))
+		(= signal (& signal (~ stopUpdOn)))
 	)
 	
-	(method (setPri thePriority)
+	(method (setPri newPri)
 		(cond 
-			((== argc 0) (= signal (| signal fixPriOn)))
-			((== thePriority -1) (= signal (& signal $ffef)))
-			(else (= priority thePriority) (= signal (| signal fixPriOn)))
-		)
-		(self forceUpd:)
-	)
-	
-	(method (setLoop theLoop)
-		(cond 
-			((== argc 0) (= signal (| signal noTurn)))
-			((== theLoop -1) (= signal (& signal $f7ff)))
-			(else (= loop theLoop) (= signal (| signal noTurn)))
-		)
-		(self forceUpd:)
-	)
-	
-	(method (setCel param1)
-		(cond 
-			((== argc 0) (= signal (| signal skipCheck)))
-			((== param1 -1) (= signal (& signal $efff)))
+			((== argc 0)
+				(= signal (| signal fixPriOn))
+			)
+			((== newPri -1)
+				(= signal (& signal (~ fixPriOn)))
+			)
 			(else
-				(= signal (| signal skipCheck))
+				(= priority newPri) (= signal (| signal fixPriOn))
+			)
+		)
+		(self forceUpd:)
+	)
+	
+	(method (setLoop newLoop)
+		(cond 
+			((== argc 0)
+				(= signal (| signal fixedLoop))
+			)
+			((== newLoop -1)
+				(= signal (& signal (~ fixedLoop)))
+			)
+			(else
+				(= loop newLoop)
+				(= signal (| signal fixedLoop))
+			)
+		)
+		(self forceUpd:)
+	)
+	
+	(method (setCel newCel)
+		(cond 
+			((== argc 0)
+				(= signal (| signal fixedCel))
+			)
+			((== newCel -1)
+				(= signal (& signal (~ fixedCel)))
+			)
+			(else
+				(= signal (| signal fixedCel))
 				(= cel
-					(if (>= param1 (self lastCel:))
+					(if (>= newCel (self lastCel:))
 						(self lastCel:)
 					else
-						param1
+						newCel
 					)
 				)
 			)
@@ -147,28 +168,28 @@
 		(self forceUpd:)
 	)
 	
-	(method (ignoreActors param1)
-		(if (or (== 0 argc) param1)
-			(= signal (| signal ignAct))
+	(method (ignoreActors arg)
+		(if (or (== 0 argc) arg)
+			(= signal (| signal ignrAct))
 		else
-			(= signal (& signal $bfff))
+			(= signal (& signal (~ ignrAct)))
 		)
 	)
 	
 	(method (hide)
-		(= signal (| signal $0008))
+		(= signal (| signal hideActor))
 	)
 	
 	(method (show)
-		(= signal (& signal $fff7))
+		(= signal (& signal (~ hideActor)))
 	)
 	
 	(method (delete)
-		(if (& signal $8000)
-			(= signal (& signal $7fff))
+		(if (& signal delObj)
+			(= signal (& signal (~ delObj)))
 			(cast delete: self)
-			(if underBits (UnLoad 133 underBits) (= underBits 0))
-			(if (& signal $0020)
+			(if underBits (UnLoad MEMORY underBits) (= underBits 0))
+			(if (& signal viewAdded)
 				(addToPics
 					add:
 						((PicView new:)
@@ -192,23 +213,23 @@
 	
 	(method (addToPic)
 		(if (not (cast contains: self)) (self init:))
-		(self signal: (| signal $8021))
+		(self signal: (| signal ADDTOPIC))
 	)
 	
 	(method (lastCel)
 		(return (- (NumCels self) 1))
 	)
 	
-	(method (isExtra param1 &tmp temp0)
-		(= temp0 (& signal isExtra))
+	(method (isExtra value &tmp ret)
+		(= ret (& signal anExtra))
 		(if argc
-			(if param1
-				(= signal (| signal isExtra))
+			(if value
+				(= signal (| signal anExtra))
 			else
-				(= signal (& signal $fdff))
+				(= signal (& signal (~ anExtra)))
 			)
 		)
-		(return temp0)
+		(return ret)
 	)
 	
 	(method (motionCue)
@@ -217,18 +238,18 @@
 
 (class Prop of View
 	(properties
-		signal $0000
+		signal 0
 		cycleSpeed 0
 		script 0
 		cycler 0
 		timer 0
 	)
 	
-	(method (doit &tmp temp0)
+	(method (doit &tmp aState)
 		(SetNowSeen self nsTop)
-		(if (& signal $8000) (return))
+		(if (& signal delObj) (return))
 		(if script (script doit:))
-		(if (and (& signal $0004) (not (& signal $0002)))
+		(if (and (& signal notUpd) (not (& signal startUpdOn)))
 			(return)
 		)
 		(if cycler (cycler doit:))
@@ -240,7 +261,7 @@
 	)
 	
 	(method (delete)
-		(if (& signal $8000)
+		(if (& signal delObj)
 			(self setScript: 0 setCycle: 0)
 			(if timer (timer dispose:))
 			(super delete:)
@@ -253,17 +274,13 @@
 		)
 	)
 	
-	(method (setCycle theCycler)
+	(method (setCycle cType)
 		(if cycler (cycler dispose:))
-		(if theCycler
+		(if cType
 			(self setCel: -1)
 			(self startUpd:)
 			(= cycler
-				(if (& (theCycler -info-?) $8000)
-					(theCycler new:)
-				else
-					theCycler
-				)
+				(if (& (cType -info-?) CLASS) (cType new:) else cType)
 			)
 			(cycler init: self &rest)
 		else
@@ -271,9 +288,9 @@
 		)
 	)
 	
-	(method (setScript theScript)
+	(method (setScript newScript)
 		(if (IsObject script) (script dispose:))
-		(if theScript (theScript init: self &rest))
+		(if newScript (newScript init: self &rest))
 	)
 	
 	(method (cue)
@@ -303,11 +320,11 @@
 		(= yLast y)
 	)
 	
-	(method (doit &tmp temp0 theBrLeft theBrRight)
-		(if (& signal $8000) (return))
+	(method (doit &tmp aState left right)
+		(if (& signal delObj) (return))
 		(if script (script doit:))
 		(if code (code doit: self))
-		(if (and (& signal $0004) (not (& signal $0002)))
+		(if (and (& signal notUpd) (not (& signal startUpdOn)))
 			(return)
 		)
 		(if viewer (viewer doit: self))
@@ -316,8 +333,8 @@
 			(mover (mover doit:))
 		)
 		(if cycler
-			(= theBrLeft brLeft)
-			(= theBrRight brRight)
+			(= left brLeft)
+			(= right brRight)
 			(cycler doit:)
 			(if baseSetter
 				(baseSetter doit: self)
@@ -326,7 +343,7 @@
 			)
 			(if
 				(and
-					(or (!= theBrLeft brLeft) (!= theBrRight brRight))
+					(or (!= left brLeft) (!= right brRight))
 					(not (self canBeHere:))
 				)
 				(self findPosn:)
@@ -336,30 +353,30 @@
 		(= yLast y)
 	)
 	
-	(method (posn theXLast theYLast)
-		(super posn: theXLast theYLast &rest)
-		(= xLast theXLast)
-		(= yLast theYLast)
+	(method (posn newX newY)
+		(super posn: newX newY &rest)
+		(= xLast newX)
+		(= yLast newY)
 		(if (not (self canBeHere:)) (self findPosn:))
 	)
 	
-	(method (setLoop param1 &tmp theLooper)
+	(method (setLoop l &tmp newLooper)
 		(if
-			(= theLooper
+			(= newLooper
 				(cond 
 					((== argc 0) (super setLoop:) 0)
-					((not (IsObject param1)) (super setLoop: param1 &rest) 0)
-					((& (param1 -info-?) $8000) (param1 new:))
-					(else param1)
+					((not (IsObject l)) (super setLoop: l &rest) 0)
+					((& (l -info-?) CLASS) (l new:))
+					(else l)
 				)
 			)
 			(if looper (looper dispose:))
-			((= looper theLooper) init: self &rest)
+			((= looper newLooper) init: self &rest)
 		)
 	)
 	
 	(method (delete)
-		(if (& signal $8000)
+		(if (& signal delObj)
 			(if (!= mover -1) (self setMotion: 0))
 			(self setAvoider: 0)
 			(if baseSetter (baseSetter dispose:) (= baseSetter 0))
@@ -377,16 +394,12 @@
 		(super motionCue:)
 	)
 	
-	(method (setMotion theMover &tmp [temp0 40])
+	(method (setMotion mType &tmp [str 40])
 		(if (and mover (!= mover -1)) (mover dispose:))
-		(if theMover
+		(if mType
 			(self startUpd:)
 			(= mover
-				(if (& (theMover -info-?) $8000)
-					(theMover new:)
-				else
-					theMover
-				)
+				(if (& (mType -info-?) CLASS) (mType new:) else mType)
 			)
 			(mover init: self &rest)
 		else
@@ -394,43 +407,40 @@
 		)
 	)
 	
-	(method (setAvoider theAvoider)
+	(method (setAvoider aType)
 		(if avoider (avoider dispose:))
 		(= avoider
 			(if
-				(and
-					(IsObject theAvoider)
-					(& (theAvoider -info-?) $8000)
-				)
-				(theAvoider new:)
+			(and (IsObject aType) (& (aType -info-?) CLASS))
+				(aType new:)
 			else
-				theAvoider
+				aType
 			)
 		)
 		(if avoider (avoider init: self &rest))
 	)
 	
-	(method (ignoreHorizon param1)
-		(if (or (not argc) param1)
-			(= signal (| signal ignoreHorizon))
+	(method (ignoreHorizon arg)
+		(if (or (not argc) arg)
+			(= signal (| signal ignrHrz))
 		else
-			(= signal (& signal $dfff))
+			(= signal (& signal (~ ignrHrz)))
 		)
 	)
 	
-	(method (observeControl bits &tmp temp0)
-		(= temp0 0)
-		(while (< temp0 argc)
-			(= illegalBits (| illegalBits [bits temp0]))
-			(++ temp0)
+	(method (observeControl ctrl &tmp i)
+		(= i 0)
+		(while (< i argc)
+			(= illegalBits (| illegalBits [ctrl i]))
+			(++ i)
 		)
 	)
 	
-	(method (ignoreControl bits &tmp temp0)
-		(= temp0 0)
-		(while (< temp0 argc)
-			(= illegalBits (& illegalBits (~ [bits temp0])))
-			(++ temp0)
+	(method (ignoreControl ctrl &tmp i)
+		(= i 0)
+		(while (< i argc)
+			(= illegalBits (& illegalBits (~ [ctrl i])))
+			(++ i)
 		)
 	)
 	
@@ -457,51 +467,51 @@
 		(return (& signal $0400))
 	)
 	
-	(method (findPosn &tmp temp0 temp1 theX theY temp4)
-		(= theX x)
-		(= theY y)
-		(= temp4 0)
-		(= temp1 1)
-		(while (not temp4)
-			(= temp0 0)
-			(while (and (not temp4) (< temp0 8))
+	(method (findPosn &tmp legDir legLen xOrg yOrg goodPosn)
+		(= xOrg x)
+		(= yOrg y)
+		(= goodPosn FALSE)
+		(= legLen 1)
+		(while (not goodPosn)
+			(= legDir 0)
+			(while (and (not goodPosn) (< legDir 8))
 				(= x
-					(+ theX (* temp1 (sign (CosMult (* temp0 45) 100))))
+					(+ xOrg (* legLen (sign (CosMult (* legDir 45) 100))))
 				)
 				(= y
-					(- theY (* temp1 (sign (SinMult (* temp0 45) 100))))
+					(- yOrg (* legLen (sign (SinMult (* legDir 45) 100))))
 				)
-				(= temp4
+				(= goodPosn
 					(if (self canBeHere:) (self onControl:) else 0)
 				)
-				(++ temp0)
+				(++ legDir)
 			)
-			(++ temp1)
+			(++ legLen)
 		)
 		(self posn: x y)
 	)
 	
-	(method (inRect param1 param2 param3 param4)
+	(method (inRect lx uy rx by)
 		(return
 			(if
-			(and (<= param1 x) (< x param3) (<= param2 y))
-				(< y param4)
+			(and (<= lx x) (< x rx) (<= uy y))
+				(< y by)
 			else
 				0
 			)
 		)
 	)
 	
-	(method (onControl fUsePoint)
-		(if (and argc fUsePoint)
-			(OnControl 4 x y)
+	(method (onControl org)
+		(if (and argc org)
+			(OnControl CMAP x y)
 		else
-			(OnControl 4 brLeft brTop brRight brBottom)
+			(OnControl CMAP brLeft brTop brRight brBottom)
 		)
 	)
 	
-	(method (distanceTo pObj)
-		(GetDistance x y (pObj x?) (pObj y?) perspective)
+	(method (distanceTo anObj)
+		(GetDistance x y (anObj x?) (anObj y?) perspective)
 	)
 	
 	(method (canBeHere)
@@ -513,11 +523,11 @@
 		(if
 			(and
 				(or
-					(and (== illegalBits 0) (& signal ignAct))
+					(and (== illegalBits 0) (& signal ignrAct))
 					(CanBeHere self (cast elements?))
 				)
 				(or
-					(& signal ignoreHorizon)
+					(& signal ignrHrz)
 					(not (IsObject curRoom))
 					(>= y (curRoom horizon?))
 				)
@@ -526,101 +536,102 @@
 		)
 	)
 	
-	(method (setStep newX newY)
-		(if (and (>= argc 1) (!= newX -1)) (= xStep newX))
-		(if (and (>= argc 2) (!= newY -1)) (= yStep newY))
+	(method (setStep xs ys)
+		(if (and (>= argc 1) (!= xs -1)) (= xStep xs))
+		(if (and (>= argc 2) (!= ys -1)) (= yStep ys))
 		(if
 		(and mover (!= -1 mover) (mover isMemberOf: MoveTo))
 			((self mover?) init:)
 		)
 	)
 	
-	(method (setDirection newDirection &tmp temp0 curRoomVanishingY temp2 temp3 temp4 temp5 temp6 curRoomObstacles)
-		(= temp0
+	(method (setDirection dir &tmp vx vy xIncr yIncr ang maxCoord pathPts obs)
+		(= vx
 			(if
-			(== (= curRoomVanishingY (curRoom vanishingY?)) -30000)
+			(== (= vy (curRoom vanishingY?)) -30000)
 				x
 			else
 				(curRoom vanishingX?)
 			)
 		)
 		(if (and (== xStep 0) (== yStep 0)) (return))
-		(= temp5 (/ 32000 (Max xStep yStep)))
-		(switch newDirection
-			(0 (self setMotion: 0) (return))
-			(1
-				(= temp2 (- temp0 x))
-				(= temp3 (- curRoomVanishingY y))
+		(= maxCoord (/ 32000 (Max xStep yStep)))
+		(switch dir
+			(dirStop
+				(self setMotion: 0)
+				(return)
 			)
-			(5
-				(= temp2 (- x temp0))
-				(= temp3 (- y curRoomVanishingY))
+			(dirN
+				(= xIncr (- vx x))
+				(= yIncr (- vy y))
 			)
-			(3 (= temp2 temp5) (= temp3 0))
-			(7
-				(= temp2 (- temp5))
-				(= temp3 0)
+			(dirS
+				(= xIncr (- x vx))
+				(= yIncr (- y vy))
+			)
+			(dirE
+				(= xIncr maxCoord)
+				(= yIncr 0)
+			)
+			(dirW
+				(= xIncr (- maxCoord))
+				(= yIncr 0)
 			)
 			(else 
 				(if
-				(< 180 (= temp4 (GetAngle x y temp0 curRoomVanishingY)))
-					(= temp4 (- temp4 360))
+				(< 180 (= ang (GetAngle x y vx vy)))
+					(= ang (- ang 360))
 				)
-				(= temp4
-					(+ (/ (+ temp4 90) 2) (* 45 (- newDirection 2)))
-				)
-				(= temp2 (SinMult temp4 100))
-				(= temp3 (- (CosMult temp4 100)))
+				(= ang (+ (/ (+ ang 90) 2) (* 45 (- dir 2))))
+				(= xIncr (SinMult ang 100))
+				(= yIncr (- (CosMult ang 100)))
 			)
 		)
-		(= temp5 (/ temp5 5))
+		(= maxCoord (/ maxCoord 5))
 		(while
-		(and (< (Abs temp3) temp5) (< (Abs temp2) temp5))
-			(= temp2 (* temp2 5))
-			(= temp3 (* temp3 5))
+		(and (< (Abs yIncr) maxCoord) (< (Abs xIncr) maxCoord))
+			(= xIncr (* xIncr 5))
+			(= yIncr (* yIncr 5))
 		)
 		(if
 			(and
-				(= curRoomObstacles (curRoom obstacles?))
+				(= obs (curRoom obstacles?))
 				useObstacles
 			)
-			(= temp6
+			(= pathPts
 				(AvoidPath
 					x
 					y
-					(+ x temp2)
-					(+ y temp3)
-					(curRoomObstacles elements?)
-					(curRoomObstacles size?)
+					(+ x xIncr)
+					(+ y yIncr)
+					(obs elements?)
+					(obs size?)
 					0
 				)
 			)
-			(= temp2 (- (WordAt temp6 2) x))
-			(= temp3 (- (WordAt temp6 3) y))
-			(Memory 3 temp6)
+			(= xIncr (- (WordAt pathPts 2) x))
+			(= yIncr (- (WordAt pathPts 3) y))
+			(Memory MDisposePtr pathPts)
 		)
 		(cond 
-			((or temp2 temp3) (self setMotion: MoveTo (+ x temp2) (+ y temp3)))
-			(newDirection
-				(self
-					setMotion: 0
-					setHeading: (* (- newDirection 1) 45)
-				)
-			)
+			((or xIncr yIncr) (self setMotion: MoveTo (+ x xIncr) (+ y yIncr)))
+			(dir (self setMotion: 0 setHeading: (* (- dir 1) 45)))
 			(else (self setMotion: 0))
 		)
 	)
 	
-	(method (setHeading theHeading param2)
-		(if argc (= heading theHeading))
+	(method (setHeading h whoCares)
+		(if argc (= heading h))
 		(if looper
 			(looper
-				doit: self heading (if (>= argc 2) param2 else 0)
+				doit: self heading (if (>= argc 2) whoCares else 0)
 			)
 		else
 			(DirLoop self heading)
-			(Animate (cast elements?) 0)
-			(if (and (>= argc 2) (IsObject param2)) (param2 cue:))
+			(Animate (cast elements?) FALSE)
+			(if (and (>= argc 2) (IsObject whoCares))
+				(whoCares cue:)
+			)
 		)
 		(return heading)
 	)

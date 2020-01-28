@@ -63,7 +63,7 @@
 (define	POLYGON			946)
 (define	POLYPATH		945)
 (define	FILESEL			944)
-(define	POLYEDIT		943)
+(define	PATHER			943)
 (define	MOVECYC			942)
 (define	RANDCYC			941)
 (define	PRINTD			940)
@@ -135,7 +135,8 @@
 (define	PORTUGUESE	351)
 
 ;Verb defines (added for SCI01 by EO)
-(enum 1
+(enum
+	verbNone
 	verbLook
 	verbOpen
 	verbClose
@@ -245,6 +246,17 @@
 	loopSW
 	loopNE
 	loopNW
+)
+
+(enum
+	facingEast
+	facingWest
+	facingSouth
+	facingNorth
+ 	facingSE
+	facingSW
+	facingNE
+	facingNW
 )
 
 ; some keycode definitions
@@ -418,6 +430,10 @@
 	fileSeekCur		; seek from current position of file (positively/negatively)
 	fileSeekEnd		; seek from end of file (negative offset)
 )
+
+;Define for features shiftClick and contClick properties
+;	that say don't do proximity checks if clicked on.
+(define NOCHECKMOUSE $8000)
 
 ;Definitions for sound.
 (define	SND_DONE			-1)	;sound finished playing

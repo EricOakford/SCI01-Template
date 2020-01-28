@@ -1,5 +1,5 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# 954)
+(script# GOTOSAID)
 (include game.sh)
 (use Main)
 (use Intrface)
@@ -22,19 +22,19 @@
 	oldLooper
 	oldAvoider
 )
-(procedure (GoToIfSaid param1 param2 param3 param4 param5 &tmp temp0 temp1)
+(procedure (GoToIfSaid obj event theTargetOrX theDistanceOrY optSpec &tmp motion ret)
 	(switch
-		(= temp1
+		(= ret
 			(ISSc
-				init: param1 (if (and (>= argc 5) param5) param5 else '*/*') 1 0
+				init: obj (if (and (>= argc 5) optSpec) optSpec else '*/*') 1 0
 			)
 		)
 		(1
 			(ego
 				setMotion:
-					(if (IsObject param3) Approach else MoveTo)
-					param3
-					param4
+					(if (IsObject theTargetOrX) Approach else MoveTo)
+					theTargetOrX
+					theDistanceOrY
 					ISSc
 				setAvoider: Avoider
 			)
@@ -43,12 +43,12 @@
 			(if (>= argc 6) (Print &rest))
 		)
 	)
-	(return temp1)
+	(return ret)
 )
 
-(procedure (TurnIfSaid param1 param2 param3 &tmp temp0)
-	(= temp0
-		(GetAngle (ego x?) (ego y?) (param1 x?) (param1 y?))
+(procedure (TurnIfSaid obj event optSpec &tmp theAngle)
+	(= theAngle
+		(GetAngle (ego x?) (ego y?) (obj x?) (obj y?))
 	)
 	(return
 		(if
@@ -56,10 +56,10 @@
 				1
 				(ISSc
 					init:
-						param1
-						(if (>= argc 3) param3 else '*/*')
+						obj
+						(if (>= argc 3) optSpec else '*/*')
 						(CantBeSeen
-							param1
+							obj
 							ego
 							(/ 360 (Max 4 (* (/ (NumLoops ego) 4) 4)))
 						)
@@ -70,11 +70,11 @@
 			(= oldLooper (ego looper?))
 			(ego
 				looper: 0
-				heading: temp0
+				heading: theAngle
 				setMotion: 0
 				setLoop: GradualLooper
 			)
-			((ego looper?) doit: ego temp0 ISSc)
+			((ego looper?) doit: ego theAngle ISSc)
 			1
 		else
 			0
@@ -85,27 +85,27 @@
 (instance ISSc of Script
 	(properties)
 	
-	(method (init theTurnToWhom param2 param3 param4)
+	(method (init obj spec otherTest turning)
 		(return
-			(if param3
+			(if otherTest
 				(if
 					(and
-						(not (if param4 turnToWhom else goToWhom))
-						(Said param2)
+						(not (if turning turnToWhom else goToWhom))
+						(Said spec)
 					)
 					(if (User canControl:)
 						(if (IsObject oldAvoider) (oldAvoider dispose:))
 						(= oldAvoider (ego avoider?))
 						(ego avoider: 0)
-						(if param4
-							(= turnToWhom theTurnToWhom)
+						(if turning
+							(= turnToWhom obj)
 						else
-							(= goToWhom theTurnToWhom)
+							(= goToWhom obj)
 						)
-						(User canControl: 0 canInput: 0)
+						(User canControl: FALSE canInput: FALSE)
 						1
 					else
-						((User curEvent?) claimed: 0)
+						((User curEvent?) claimed: FALSE)
 						2
 					)
 				)
@@ -115,26 +115,26 @@
 		)
 	)
 	
-	(method (cue &tmp newEvent)
+	(method (cue &tmp evt)
 		(User canControl: TRUE canInput: TRUE)
-		((= newEvent (Event new:)) type: saidEvent)
-		(Parse (User inputLineAddr?) newEvent)
+		((= evt (Event new:)) type: saidEvent)
+		(Parse (User inputLineAddr?) evt)
 		(ego setAvoider: oldAvoider)
-		(= oldAvoider 0)
+		(= oldAvoider NULL)
 		(if turnToWhom
 			((ego looper?) dispose:)
 			(ego looper: oldLooper)
-			(= oldLooper 0)
-			(turnToWhom handleEvent: newEvent)
-			(= turnToWhom 0)
+			(= oldLooper NULL)
+			(turnToWhom handleEvent: evt)
+			(= turnToWhom NULL)
 		else
-			(goToWhom handleEvent: newEvent)
-			(= goToWhom 0)
+			(goToWhom handleEvent: evt)
+			(= goToWhom NULL)
 		)
-		(if (not (newEvent claimed?))
-			(regions eachElementDo: #handleEvent newEvent 1)
-			(theGame handleEvent: newEvent 1)
+		(if (not (evt claimed?))
+			(regions eachElementDo: #handleEvent evt 1)
+			(theGame handleEvent: evt 1)
 		)
-		(newEvent dispose:)
+		(evt dispose:)
 	)
 )

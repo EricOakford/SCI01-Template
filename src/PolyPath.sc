@@ -1,28 +1,20 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# 945)
+(script# POLYPATH)
 (include game.sh)
 (use Main)
 (use Motion)
 (use System)
 
-;EO: this is WordAt, which is already in SYSTEM.SC
-;;;(public
-;;;	proc945_0 0
-;;;)
-;;;
-;;;(procedure (proc945_0 param1 param2)
-;;;	(return
-;;;		(|
-;;;			(StrAt param1 (* 2 param2))
-;;;			(<< (StrAt param1 (+ 1 (* 2 param2))) $0008)
-;;;		)
-;;;	)
-;;;)
 
-(class PolyPath of Motion
+;; Path around an arbitrary set of obstacles, all of which are
+;; defined as Polygons and added to the obstacle list via the
+;; Rooms setObstacle method. 07/24/90 J.M.H.
+
+
+(class PolyPath	kindof Motion
 	(properties
-		value 2
-		points 0
+		value		2	; current location in path
+		points	0	; pointer to path array allocated in the kernel
 	)
 	
 	(method (init actor theX theY whoCares opt)
@@ -33,22 +25,27 @@
 					(AvoidPath
 						(actor x?)
 						(actor y?)
-						theX
-						theY
+						theX theY
 						(if (curRoom obstacles?)
 							((curRoom obstacles?) elements?)
 						else
-							0
+							FALSE
 						)
 						(if (curRoom obstacles?)
 							((curRoom obstacles?) size?)
 						else
-							0
+							FALSE
 						)
-						(if (>= argc 5) opt else 1)
+						(if (>= argc 5)
+							opt
+						else
+							TRUE
+						)
 					)
 				)
-				(if (> argc 3) (= caller whoCares))
+				(if (> argc 3)
+					(= caller whoCares)
+				)
 			)
 		)
 		(self setTarget:)
@@ -61,7 +58,7 @@
 	)
 	
 	(method (moveDone)
-		(if (== (WordAt points value) 30583)
+		(if (== (WordAt points value) $7777)
 			(super moveDone:)
 		else
 			(self init:)

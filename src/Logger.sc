@@ -9,52 +9,46 @@
 	sysLogger 0
 )
 
-(procedure (localproc_000c param1 &tmp temp0)
-	(= temp0 (GetTime 2))
-	(Format
-		param1
-		952
-		0
-		(>> temp0 $000b)
-		(& (>> temp0 $0005) $003f)
-		(* (& temp0 $001f) 2)
+(procedure (GetTimeStr str &tmp tm)
+	(= tm (GetTime SYSTIME2))
+	(Format str LOGGER 0
+		(>> tm 11)
+		(& (>> tm 5) %111111)
+		(* (& tm %11111) 2)
 	)
-	(return param1)
+	(return str)
 )
 
-(procedure (localproc_003c param1 &tmp temp0)
-	(= temp0 (GetTime 3))
-	(Format
-		param1
-		952
-		1
-		(& (>> temp0 $0005) $000f)
-		(& temp0 $001f)
-		(+ 80 (>> temp0 $0009))
+(procedure (GetDateStr str &tmp tm)
+	(= tm (GetTime SYSDATE))
+	(Format str LOGGER 1
+		(& (>> tm 5) %1111)
+		(& tm %11111)
+		(+ 80 (>> tm 9))
 	)
-	(return param1)
+	(return str)
 )
 
-(procedure (localproc_006c param1)
+(procedure (AddMover str)
 	(if (IsObject (ego mover?))
-		(StrCat param1 ((ego mover?) name?))
-		(StrCat param1 {_})
+		(StrCat str ((ego mover?) name?))
+		(StrCat str {_})
 	)
 )
 
-(procedure (localproc_0099 param1)
+(procedure (AddCycler str)
 	(if (IsObject (ego cycler?))
-		(StrCat param1 ((ego cycler?) name?))
-		(StrCat param1 {_})
+		(StrCat str ((ego cycler?) name?))
+		(StrCat str {_})
 	)
 )
 
-(procedure (localproc_00c8 param1 &tmp [temp0 10])
+(procedure (AddScript str &tmp [fmt 10])
 	(if (IsObject (ego script?))
-		(StrCat param1 ((ego script?) name?))
+		(StrCat str ((ego script?) name?))
 		(StrCat
-			param1
-			(Format @temp0 952 2 ((ego script?) state?))
+			str
+			(Format @fmt LOGGER 2 ((ego script?) state?))
 		)
 	)
 )
@@ -62,64 +56,46 @@
 (instance sysLogger of Code
 	(properties)
 	
-	(method (doit param1 param2 &tmp temp0 temp1 [temp2 200] [temp202 10] [temp212 10] temp222 [temp223 9] [temp232 30])
-		(if (not (StrLen param1))
-			(StrCpy @temp232 {})
-			(GetInput
-				@temp232
-				30
-				{Enter drive letter and your name...}
+	(method (doit path callBack &tmp logHandle cfgHandle [str 200] [timeStr 10] [_dateStr 10] whoTo [tmpPath 30])
+		(if (not (StrLen path))
+			(StrCpy @tmpPath {})
+			(GetInput @tmpPath 30 {Enter drive letter and your name...})
+			(StrCat @tmpPath {.log})
+			(StrCpy path @tmpPath 19)
+			(= logHandle (FileIO fileOpen path fAppend))
+			(FileIO fileFPuts logHandle {CONFIGURATION~})
+			(FileIO fileFPuts logHandle path)
+			(FileIO fileFPuts logHandle {~})
+			(= cfgHandle (FileIO fileOpen {resource.cfg} fRead))
+			(while (FileIO fileFGets @str 80 cfgHandle)
+				(FileIO fileFPuts logHandle @str)
+				(FileIO fileFPuts logHandle {_})
 			)
-			(StrCat @temp232 {.log})
-			(StrCpy param1 @temp232 19)
-			(= temp0 (FileIO 0 param1 0))
-			(FileIO 6 temp0 {CONFIGURATION~})
-			(FileIO 6 temp0 param1)
-			(FileIO 6 temp0 {~})
-			(= temp1 (FileIO 0 {resource.cfg} 1))
-			(while (FileIO 5 @temp2 80 temp1)
-				(FileIO 6 temp0 @temp2)
-				(FileIO 6 temp0 {_})
-			)
-			(FileIO 6 temp0 {\0D\n\0D\n})
-			(FileIO 1 temp1)
-			(FileIO 1 temp0)
+			(FileIO fileFPuts logHandle {\0D\n\0D\n})
+			(FileIO fileClose cfgHandle)
+			(FileIO fileClose logHandle)
 		)
-		(= temp0 (FileIO 0 param1 0))
+		(= logHandle (FileIO fileOpen path fAppend))
 		(switch
-			(Print
-				952
-				3
-				#button
-				{PROG}
-				0
-				#button
-				{ART}
-				1
-				#button
-				{DESIGN}
-				2
+			(Print LOGGER 3
+				#button {PROG} 0
+				#button {ART} 1
+				#button {DESIGN} 2
 			)
-			(0 (= temp222 {PROG}))
-			(1 (= temp222 { ART_}))
-			(2 (= temp222 {DESIGN}))
+			(0 (= whoTo {PROG}))
+			(1 (= whoTo { ART_}))
+			(2 (= whoTo {DESIGN}))
 		)
-		(Format
-			@temp2
-			952
-			4
+		(Format @str LOGGER 4
 			curRoomNum
 			version
-			(localproc_003c @temp212)
-			(localproc_000c @temp202)
-			temp222
-			param1
+			(GetDateStr @_dateStr)
+			(GetTimeStr @timeStr)
+			whoTo
+			path
 		)
-		(FileIO 6 temp0 @temp2)
-		(Format
-			@temp2
-			952
-			5
+		(FileIO fileFPuts logHandle @str)
+		(Format @str LOGGER 5
 			(ego x?)
 			(ego y?)
 			(ego heading?)
@@ -128,23 +104,25 @@
 			(ego cel?)
 			(ego signal?)
 		)
-		(localproc_006c @temp2)
-		(localproc_0099 @temp2)
-		(localproc_00c8 @temp2)
-		(if (IsObject param2) (param2 doit: (StrEnd @temp2)))
-		(StrCat @temp2 {\0D\n~})
-		(FileIO 6 temp0 @temp2)
+		(AddMover @str)
+		(AddCycler @str)
+		(AddScript @str)
+		(if (IsObject callBack)
+			(callBack doit: (StrEnd @str))
+		)
+		(StrCat @str {\0D\n~})
+		(FileIO fileFPuts logHandle @str)
 		(repeat
-			(= temp2 0)
-			(GetInput @temp2 50 {Log Entry...})
-			(if (== (StrLen @temp2) 0)
-				(FileIO 6 temp0 {~\0D\n\0D\n})
-				(FileIO 1 temp0)
+			(= str 0)
+			(GetInput @str 50 {Log Entry...})
+			(if (== (StrLen @str) 0)
+				(FileIO fileFPuts logHandle {~\0D\n\0D\n})
+				(FileIO fileClose logHandle)
 				(break)
 			)
-			(FileIO 6 temp0 @temp2)
-			(FileIO 6 temp0 {\0D\n})
+			(FileIO fileFPuts logHandle @str)
+			(FileIO fileFPuts logHandle {\0D\n})
 		)
-		(DisposeScript 952)
+		(DisposeScript LOGGER)
 	)
 )

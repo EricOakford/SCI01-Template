@@ -31,7 +31,7 @@
 		lookStr 0
 	)
 	
-	(procedure (DefaultDoVerb theVerb)
+	(procedure (PrintVerbMsg theVerb)
 		(switch theVerb
 			(verbLook
 				(if lookStr
@@ -40,23 +40,45 @@
 					(Printf FEATURE 0 description description)
 				)
 			)
-			(verbOpen (Printf FEATURE 1 description))
-			(verbClose (Printf FEATURE 2 description))
-			(verbSmell (Printf FEATURE 3 description))
-			(verbMove (Printf FEATURE 4 description))
-			(verbEat (Printf FEATURE 5 description))
-			(verbGet (Printf FEATURE 6 description))
-			(verbClimb (Printf FEATURE 7 description))
-			(verbTalk (Printf FEATURE 8 description))
+			(verbOpen
+				(Printf FEATURE 1 description)
+			)
+			(verbClose
+				(Printf FEATURE 2 description)
+			)
+			(verbSmell
+				(Printf FEATURE 3 description)
+			)
+			(verbMove
+				(Printf FEATURE 4 description)
+			)
+			(verbEat
+				(Printf FEATURE 5 description)
+			)
+			(verbGet
+				(Printf FEATURE 6 description)
+			)
+			(verbClimb
+				(Printf FEATURE 7 description)
+			)
+			(verbTalk
+				(Printf FEATURE 8 description)
+			)
 		)
 	)
 	
 	
-	(method (init param1)
+	(method (init theInitializer)
 		(cond 
-			((and argc param1) (self perform: param1))
-			(ftrInitializer (self perform: ftrInitializer))
-			(else (self perform: dftFtrInit))
+			((and argc theInitializer)
+				(self perform: theInitializer)
+			)
+			(ftrInitializer
+				(self perform: ftrInitializer)
+			)
+			(else
+				(self perform: dftFtrInit)
+			)
 		)
 		(if (self respondsTo: #underBits)
 			(cast add: self)
@@ -70,10 +92,14 @@
 		(super dispose:)
 	)
 	
-	(method (handleEvent event &tmp temp0 theVerb)
+	(method (handleEvent event &tmp theMods theVerb)
 		(cond 
-			((event claimed?) (return 1))
-			((not description) (return 0))
+			((event claimed?)
+				(return TRUE)
+			)
+			((not description)
+				(return FALSE)
+			)
 		)
 		(switch (event type?)
 			(saidEvent
@@ -86,22 +112,22 @@
 			)
 			(mouseDown
 				(cond 
-					((not (& (= temp0 (event modifiers?)) $0007)))
+					((not (& (= theMods (event modifiers?)) (| shiftDown ctrlDown))))
 					((not (self onMe: event)))
-					((& temp0 $0003)
+					((& theMods shiftDown)
 						(if
 							(or
-								(& shiftClick $8000)
+								(& shiftClick NOCHECKMOUSE)
 								(self passedChecks: shiftClick)
 							)
-							(self doVerb: (& $7fff shiftClick))
+							(self doVerb: (& (~ NOCHECKMOUSE) shiftClick))
 						)
-						(event claimed: 1)
+						(event claimed: TRUE)
 					)
-					((& temp0 $0004)
+					((& theMods ctrlDown)
 						(if
-						(or (& contClick $8000) (self passedChecks: contClick))
-							(self doVerb: (& $7fff contClick))
+						(or (& contClick NOCHECKMOUSE) (self passedChecks: contClick))
+							(self doVerb: (& (~ NOCHECKMOUSE) contClick))
 						)
 						(event claimed: TRUE)
 					)
@@ -111,22 +137,22 @@
 		(return (event claimed?))
 	)
 	
-	(method (setChecks param1 param2 &tmp temp0 temp1)
-		(= temp0
-			(<< param2 (= temp1 (* 4 (mod (- param1 1) 4))))
+	(method (setChecks theVerb theChecks &tmp theVal theShift)
+		(= theVal
+			(<< theChecks (= theShift (* 4 (mod (- theVerb 1) 4))))
 		)
 		(cond 
-			((<= param1 4)
-				(= verbChecks1 (& verbChecks1 (~ (<< $000f temp1))))
-				(= verbChecks1 (| verbChecks1 temp0))
+			((<= theVerb 4)
+				(= verbChecks1 (& verbChecks1 (~ (<< $F theShift))))
+				(= verbChecks1 (| verbChecks1 theVal))
 			)
-			((<= param1 8)
-				(= verbChecks2 (& verbChecks2 (~ (<< $000f temp1))))
-				(= verbChecks2 (| verbChecks2 temp0))
+			((<= theVerb 8)
+				(= verbChecks2 (& verbChecks2 (~ (<< $F theShift))))
+				(= verbChecks2 (| verbChecks2 theVal))
 			)
 			(else
-				(= verbChecks3 (& verbChecks3 (~ (<< $000f temp1))))
-				(= verbChecks3 (| verbChecks3 temp0))
+				(= verbChecks3 (& verbChecks3 (~ (<< $F theShift))))
+				(= verbChecks3 (| verbChecks3 theVal))
 			)
 		)
 	)
@@ -135,7 +161,7 @@
 		(if doVerbCode
 			(self perform: doVerbCode theVerb)
 		else
-			(DefaultDoVerb theVerb description)
+			(PrintVerbMsg theVerb description)
 		)
 	)
 	
@@ -147,28 +173,28 @@
 		(Printf FEATURE 10 description)
 	)
 	
-	(method (notFacing &tmp temp0)
+	(method (notFacing &tmp event)
 		(Printf FEATURE 11 description)
 	)
 	
-	(method (facingMe param1 &tmp temp0 temp1)
-		(= temp0 (if argc param1 else ego))
+	(method (facingMe act &tmp theActor theAngle)
+		(= theActor (if argc act else ego))
 		(if
 			(>
-				(= temp1
+				(= theAngle
 					(Abs
 						(-
-							(GetAngle (temp0 x?) (temp0 y?) x y)
-							(temp0 heading?)
+							(GetAngle (theActor x?) (theActor y?) x y)
+							(theActor heading?)
 						)
 					)
 				)
 				180
 			)
-			(= temp1 (- 360 temp1))
+			(= theAngle (- 360 theAngle))
 		)
 		(return
-			(if (<= temp1 sightAngle)
+			(if (<= theAngle sightAngle)
 				(return TRUE)
 			else
 				(self notFacing:)
@@ -177,12 +203,12 @@
 		)
 	)
 	
-	(method (nearCheck param1 &tmp temp0)
-		(= temp0 (if argc param1 else ego))
+	(method (nearCheck obj &tmp theObj)
+		(= theObj (if argc obj else ego))
 		(return
 			(if
 				(<=
-					(GetDistance (temp0 x?) (temp0 y?) x y)
+					(GetDistance (theObj x?) (theObj y?) x y)
 					closeRangeDist
 				)
 				(return TRUE)
@@ -193,12 +219,12 @@
 		)
 	)
 	
-	(method (farCheck param1 &tmp temp0)
-		(= temp0 (if argc param1 else ego))
+	(method (farCheck obj &tmp theObj)
+		(= theObj (if argc obj else ego))
 		(return
 			(if
 				(<=
-					(GetDistance (temp0 x?) (temp0 y?) x y)
+					(GetDistance (theObj x?) (theObj y?) x y)
 					longRangeDist
 				)
 				(return TRUE)
@@ -210,60 +236,60 @@
 	)
 	
 	(method (isNotHidden)
-		(return 1)
+		(return TRUE)
 	)
 	
-	(method (onMe param1 param2 &tmp temp0 temp1)
-		(if (IsObject param1)
-			(= temp0 (param1 x?))
-			(= temp1 (param1 y?))
+	(method (onMe theObjOrX theY &tmp oX oY)
+		(if (IsObject theObjOrX)
+			(= oX (theObjOrX x?))
+			(= oY (theObjOrX y?))
 		else
-			(= temp0 param1)
-			(= temp1 param2)
+			(= oX theObjOrX)
+			(= oY theY)
 		)
 		(return
 			(if
 				(and
-					(<= nsLeft temp0)
-					(<= temp0 nsRight)
-					(<= nsTop temp1)
-					(<= temp1 nsBottom)
+					(<= nsLeft oX)
+					(<= oX nsRight)
+					(<= nsTop oY)
+					(<= oY nsBottom)
 				)
 				(if control
-					(& control (OnControl 4 temp0 temp1))
+					(& control (OnControl CMAP oX oY))
 				else
-					1
+					TRUE
 				)
 			else
-				0
+				FALSE
 			)
 		)
 	)
 	
-	(method (passedChecks param1 &tmp temp0)
+	(method (passedChecks theVerb &tmp theChecks)
 		(if
 			(and
 				(or
 					(not
 						(&
-							(= temp0
+							(= theChecks
 								(&
 									(>>
-										(if (<= param1 4) verbChecks1 else verbChecks2)
-										(* 4 (mod (- param1 1) 4))
+										(if (<= theVerb 4) verbChecks1 else verbChecks2)
+										(* 4 (mod (- theVerb 1) 4))
 									)
-									$000f
+									$F
 								)
 							)
-							$0008
+							ISNOTHIDDEN
 						)
 					)
 					(self isNotHidden:)
 				)
-				(or (not (& temp0 $0004)) (self farCheck:))
-				(or (not (& temp0 $0002)) (self nearCheck:))
+				(or (not (& theChecks FARCHECK)) (self farCheck:))
+				(or (not (& theChecks NEARCHECK)) (self nearCheck:))
 			)
-			(if (not (& temp0 $0001)) else (self facingMe:))
+			(if (not (& theChecks FACINGME)) else (self facingMe:))
 		)
 	)
 )
@@ -271,32 +297,36 @@
 (instance dftFtrInit of Code
 	(properties)
 	
-	(method (doit param1)
-		(if (== (param1 sightAngle?) ftrDefault)
-			(param1 sightAngle: 90)
+	(method (doit theObj)
+		(if (== (theObj sightAngle?) ftrDefault)
+			(theObj sightAngle: 90)
 		)
-		(if (== (param1 closeRangeDist?) ftrDefault)
-			(param1 closeRangeDist: 50)
+		(if (== (theObj closeRangeDist?) ftrDefault)
+			(theObj closeRangeDist: 50)
 		)
-		(if (== (param1 longRangeDist?) ftrDefault)
-			(param1 longRangeDist: 100)
+		(if (== (theObj longRangeDist?) ftrDefault)
+			(theObj longRangeDist: 100)
 		)
-		(if (== (param1 shiftClick?) ftrDefault)
-			(param1 shiftClick: -32767)
+		(if (== (theObj shiftClick?) ftrDefault)
+			(theObj shiftClick: (| NOCHECKMOUSE verbLook))
 		)
-		(if (== (param1 contClick?) ftrDefault)
-			(param1 contClick: 7)
+		(if (== (theObj contClick?) ftrDefault)
+			(theObj contClick: verbGet)
 		)
-		(if (== (param1 actions?) ftrDefault) (param1 actions: 0))
-		(if (== (param1 control?) ftrDefault) (param1 control: 0))
-		(if (== (param1 verbChecks1?) ftrDefault)
-			(param1 verbChecks1: -17483)
+		(if (== (theObj actions?) ftrDefault)
+			(theObj actions: 0)
 		)
-		(if (== (param1 verbChecks2?) ftrDefault)
-			(param1 verbChecks2: -17477)
+		(if (== (theObj control?) ftrDefault)
+			(theObj control: 0)
 		)
-		(if (== (param1 verbChecks3?) ftrDefault)
-			(param1 verbChecks3: -17477)
+		(if (== (theObj verbChecks1?) ftrDefault)
+			(theObj verbChecks1: $bbb5)
+		)
+		(if (== (theObj verbChecks2?) ftrDefault)
+			(theObj verbChecks2: $bbbb)
+		)
+		(if (== (theObj verbChecks3?) ftrDefault)
+			(theObj verbChecks3: $bbbb)
 		)
 	)
 )

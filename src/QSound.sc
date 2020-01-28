@@ -37,7 +37,7 @@
 			(return)
 		)
 		(while (!= (= theSignal signal) prevSignal)
-			;EO: In the SCI16 QSOUND.SC, the original code messed up the dance scene.
+			;EO: In the SCI16 QSOUND.SC, the original code messed up the dance scene in QFG2.
 			;So the code being used is from the decompiled script.
 ;;;			(if (IsObject client)
 ;;;				(for

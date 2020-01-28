@@ -1,5 +1,5 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# 977)
+(script# GROOPER)
 (include game.sh)
 (use Main)
 (use Sight)
@@ -20,27 +20,27 @@
 		caller 0
 	)
 	
-	(method (doit theClient param2 theCaller param4 &tmp theTrans1 temp1)
-		(if (not client) (= client theClient))
+	(method (doit c h whoCares dontGroop &tmp lastDir numLoops)
+		(if (not client) (= client c))
 		(if (& (client signal?) fixedLoop)
 			(if caller (caller cue:))
 			(= caller 0)
 			(return)
 		)
-		(if (>= argc 3) (= caller theCaller))
-		(= temp1 (if (< (NumLoops client) 8) 4 else 8))
+		(if (>= argc 3) (= caller whoCares))
+		(= numLoops (if (< (NumLoops client) 8) 4 else 8))
 		(if
 			(or
 				(not (cast contains: client))
-				(and (>= argc 4) param4)
+				(and (>= argc 4) dontGroop)
 			)
 			(client
 				loop:
 					[trans2 (*
-						(if (== temp1 4) 2 else 1)
+						(if (== numLoops 4) 2 else 1)
 						(/
-							(umod (+ (client heading?) (/ 180 temp1)) 360)
-							(/ 360 temp1)
+							(umod (+ (client heading?) (/ 180 numLoops)) 360)
+							(/ 360 numLoops)
 						)
 					)]
 			)
@@ -48,7 +48,7 @@
 			(= caller 0)
 			(return)
 		)
-		(= theTrans1 [trans1 (client loop?)])
+		(= lastDir [trans1 (client loop?)])
 		(if oldMover (oldMover dispose:) (= oldMover 0))
 		(if
 			(and
@@ -74,7 +74,7 @@
 			cycler: 0
 			mover: 0
 			setMotion: 0
-			setCycle: GradualCycler self theTrans1
+			setCycle: GradualCycler self lastDir
 		)
 	)
 	
@@ -91,14 +91,14 @@
 		(super dispose:)
 	)
 	
-	(method (cue &tmp theCaller)
+	(method (cue &tmp oldCaller)
 		(if (not (IsObject (client mover?)))
 			(client mover: oldMover)
 		)
 		(if (IsObject oldCycler) (client cycler: oldCycler))
-		(= theCaller caller)
+		(= oldCaller caller)
 		(= caller (= oldMover (= oldCycler 0)))
-		(if theCaller (theCaller cue: &rest))
+		(if oldCaller (oldCaller cue: &rest))
 	)
 )
 
@@ -109,18 +109,18 @@
 		numOfLoops 0
 	)
 	
-	(method (init param1 theCaller theLoopIndex)
-		(super init: param1)
-		(= caller theCaller)
+	(method (init act whoCares oldDir)
+		(super init: act)
+		(= caller whoCares)
 		(= numOfLoops (if (< (NumLoops client) 8) 4 else 8))
 		(= cycleDir
 			(-
 				(sign
-					(AngleDiff (* theLoopIndex 45) (param1 heading?))
+					(AngleDiff (* oldDir 45) (act heading?))
 				)
 			)
 		)
-		(= loopIndex theLoopIndex)
+		(= loopIndex oldDir)
 		(if (self loopIsCorrect:) (self cycleDone:))
 	)
 	
@@ -150,7 +150,8 @@
 	)
 	
 	(method (cycleDone)
-		(= doMotionCue (= completed 1))
+		(= completed TRUE)
+		(= doMotionCue TRUE)
 	)
 	
 	(method (loopIsCorrect)

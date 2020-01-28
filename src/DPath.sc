@@ -28,7 +28,7 @@
 
 	(method (init theClient thePoints &tmp i)
 		(= points (if points else (List new:)))
-		;EO: The following line of code causes a "Not an Object: $1" error in room 7
+		;EO: The following line of code causes "Not an Object" errors
 ;		(= points (or points (List new:)))	;create only once
 		
 		(if argc	

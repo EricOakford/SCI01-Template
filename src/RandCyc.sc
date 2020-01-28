@@ -1,5 +1,5 @@
 ;;; Sierra Script 1.0 - (do not remove this comment)
-(script# 941)
+(script# RANDCYC)
 (include game.sh)
 (use Main)
 (use Motion)
@@ -7,19 +7,14 @@
 
 (class RandCycle of Cycle
 	(properties
-		client 0
-		caller 0
-		cycleDir 1
-		cycleCnt 0
-		completed 0
 		count -1
 	)
 	
-	(method (init param1 theCount theCaller)
-		(super init: param1)
+	(method (init obj theTime whoCares)
+		(super init: obj)
 		(if (>= argc 2)
-			(= count theCount)
-			(if (>= argc 3) (= caller theCaller))
+			(= count theTime)
+			(if (>= argc 3) (= caller whoCares))
 		else
 			(= count -1)
 		)

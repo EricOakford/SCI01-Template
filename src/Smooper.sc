@@ -42,13 +42,6 @@
 ;;;(define HEADINGSOUTH 	(<= theHeading 225	))
 ;;;(define HEADINGWEST 	(<= theHeading 315	))
 
-(enum												;**	Standard loops
-	facingEast
-	facingWest
-	facingSouth
-	facingNorth
-)
-
 (class SmoothLooper of Code
 	(properties
 		nextLoop	 		0
