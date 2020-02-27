@@ -194,6 +194,10 @@
 		;; Pass a said event parsed from user input to the various elements of
 		;; the game.
 		
+		(event
+			message: (if verbMessager (verbMessager doit:) else 0)
+		)
+		
 		(if useSortedFeatures
 			(SortedAdd)
 		else
@@ -263,16 +267,12 @@
 				((<= x westEdge)
 					WEST
 				)
-;;;				((<= y (curRoom horizon?))
-;;;					NORTH
-;;;				)
 				((>= x eastEdge)
 					EAST
 				)
 				((>= y southEdge)
 					SOUTH
 				)
-				;EO: moved horizon code here per 4/2/90 update
 				((<= y (curRoom horizon?))
 					NORTH
 				)				

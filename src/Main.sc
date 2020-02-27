@@ -145,6 +145,8 @@
 					; If you need more flags, just increase the array!
 	myTextColor		;color of text in message boxes
 	myBackColor		;color of message boxes
+	egoWalk			;pointer for ego's Walk object
+	egoStopWalk		;pointer for ego's StopWalk object
 )
 
 (procedure (RedrawCast)
@@ -173,7 +175,7 @@
 		setLoop: -1
 		setPri: -1
 		setMotion: 0
-		setCycle: StopWalk vEgoStand
+		setCycle: egoStopWalk vEgoStand
 		illegalBits: cWHITE
 		cycleSpeed: 0
 		moveSpeed: 0
@@ -283,6 +285,10 @@
 	)
 )
 
+(instance egoW of Walk)
+
+(instance egoSW of StopWalk)
+
 (instance statusCode of Code
 	(properties)
 	
@@ -308,7 +314,7 @@
 	(properties)
 )
 
-;	GameVerbMessager can be customized for additional verbs
+;	This instance can be customized for additional verbs
 ;	that are not part of the stock USER.SC. This was done in Quest for Glory II.
 
 (instance verbWords of VerbMessager
@@ -391,6 +397,8 @@
 		(super init:)
 		(= cIcon deathIcon)
 		(= ego egoObj)
+		(= egoWalk egoW)
+		(= egoStopWalk egoSW)
 		(= version {x.yyy.zzz}) ;set game version here
 		(= doVerbCode DoVerbCode)
 		(User alterEgo: ego verbMessager: verbWords)
@@ -448,26 +456,9 @@
 		(super startRoom: roomNum)
 	)
 	
-	(method (handleEvent event &tmp item)
+	(method (handleEvent event &tmp i)
+		(super handleEvent: event)
 		(if debugging
-			(if
-				(and
-					(== (event type?) mouseDown)
-					(& (event modifiers?) shiftDown)
-				)
-				(if (not (User canInput:))
-					(event claimed: TRUE)
-				else
-					(cast eachElementDo: #handleEvent event)
-					(if (event claimed?)
-						(return)
-					)
-				)
-			)
-			(super handleEvent: event)
-			(if (event claimed?)
-				(return)
-			)
 			(switch (event type?)
 				(keyDown
 					((ScriptID DEBUG) handleEvent: event)
@@ -476,8 +467,6 @@
 					((ScriptID DEBUG) handleEvent: event)
 				)
 			)
-		else
-			(super handleEvent: event)
 		)
 		(switch (event type?)
 		;Add global parser commands here.
@@ -488,33 +477,16 @@
 						(Print "(Game over.)" #at -1 152)
 						(= quit TRUE)
 					)
-					;interactions with inventory items
-					(
-						(and
-							(Said '/*>')
-							(= item (inventory saidMe:))
+					((Said 'look[<at]>') ;look at inventory items
+						(if (= i (inventory saidMe:))
+							(if (i ownedBy: ego)
+								(i showSelf:)
+								else (DontHave)
+							)
+							;if not an inventory item
+						else ;this will handle "look anyword"
+							(CantSee)
 						)
-						(event claimed: FALSE)
-						(cond 
-							((item ownedBy: ego)
-								(cond 
-									((Said 'look[<at]')
-										(item showSelf:)
-									)
-								)
-							)
-							((item ownedBy: curRoomNum)
-								(if (Said 'get')
-									(CantDo)
-								else
-									(DontHave)
-								)
-							)
-							(else
-								(CantSee)
-							)
-						)
-						(event claimed: TRUE)
 					)
 				)
 			)
