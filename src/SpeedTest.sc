@@ -83,7 +83,7 @@
 			(0 (= cycles 1))
 			(1
 				(theGame setSpeed: 6)
-				(= cycles (if debugging 1 else 30))
+				(= cycles 1)
 			)
 			(2
 				(if debugging

@@ -34,7 +34,7 @@
 	Bset 7
 	Bclr 8
 	SolvePuzzle 9
-	EgoDead	10
+	EgoDead 10
 	DontHave 11
 	AlreadyDone 12
 	NotClose 13
@@ -105,7 +105,7 @@
 							;no feature claims a user event
 	firstSaidHandler		
 	useObstacles =  FALSE	;will Ego use PolyPath or not? (default is FALSE)
-	;77 to 99 are unused
+	;globals 77-99 are unused
 		global77
 		global78
 		global79
@@ -147,6 +147,9 @@
 	myBackColor		;color of message boxes
 	egoWalk			;pointer for ego's Walk object
 	egoStopWalk		;pointer for ego's StopWalk object
+	keyDownHandler
+	directionHandler
+	mouseDownHandler
 )
 
 (procedure (RedrawCast)
@@ -248,6 +251,7 @@
 		)
 	)
 )
+
 (procedure (DontHave)
 	(Print "You don't have it.")
 )
@@ -277,7 +281,6 @@
 (procedure (InitFeatures)
 	(features add: &rest eachElementDo: #init doit:)
 )
-
 
 (instance egoObj of Ego
 	(properties
@@ -312,6 +315,39 @@
 
 (instance deathIcon of DCIcon
 	(properties)
+)
+
+(instance ftrInitCode of Code
+	(properties)
+	
+	(method (doit obj)
+		(if (== (obj sightAngle?) ftrDefault)
+			(obj sightAngle: 180)
+		)
+		(if (== (obj closeRangeDist?) ftrDefault)
+			(obj closeRangeDist: 500)
+		)
+		(if (== (obj longRangeDist?) ftrDefault)
+			(obj longRangeDist: 500)
+		)
+		(if (== (obj shiftClick?) ftrDefault)
+			(obj shiftClick: verbLook)
+		)
+		(if (== (obj contClick?) ftrDefault)
+			(obj contClick: verbNone)
+		)
+		(if (== (obj actions?) ftrDefault) (obj actions: 0))
+		(if (== (obj control?) ftrDefault) (obj control: 0))
+		(if (== (obj verbChecks1?) ftrDefault)
+			(obj verbChecks1: $bbb5)
+		)
+		(if (== (obj verbChecks2?) ftrDefault)
+			(obj verbChecks2: $bbbb)
+		)
+		(if (== (obj verbChecks3?) ftrDefault)
+			(obj verbChecks3: $bbbb)
+		)
+	)
 )
 
 ;	This instance can be customized for additional verbs
@@ -377,6 +413,12 @@
 	)
 )
 
+(instance keyH of EventHandler)		;get keyDown events
+
+(instance dirH of EventHandler)		;get direction events
+
+(instance mouseH of EventHandler)	;get mouseDown events
+
 (instance SCI01 of Game ;Replace "SCI01" with the game's internal name here (up to 6 characters)
 	; The main game instance. It adds game-specific functionality.
 	(properties
@@ -401,6 +443,11 @@
 		(= egoStopWalk egoSW)
 		(= version {x.yyy.zzz}) ;set game version here
 		(= doVerbCode DoVerbCode)
+		((= keyDownHandler keyH) add:)
+		((= directionHandler dirH) add:)
+		((= mouseDownHandler mouseH) add:)
+		(= useSortedFeatures TRUE)
+		(= ftrInitializer ftrInitCode)
 		(User alterEgo: ego verbMessager: verbWords)
 		(TheMenuBar init: draw: hide: state: FALSE)
 		(StatusLine code: statusCode disable:) ;hide the status line at startup
@@ -433,8 +480,8 @@
 			(if (DoSound SoundOn) {Sound off} else {Sound on})
 		)
 		(super replay:)
-	)	
-	
+	)
+
 	(method (startRoom roomNum)
 		((ScriptID DISPOSE_CODE 0) doit:)
 		(cls)
@@ -452,26 +499,36 @@
 			)
 			(User canInput: TRUE)
 		)
+		(mouseDownHandler add: cast features)
 		(NormalEgo)
 		(super startRoom: roomNum)
+		(if debugging
+			(curRoom setLocales: DEBUG)
+		)
 	)
 	
 	(method (handleEvent event &tmp i)
-		(super handleEvent: event)
-		(if debugging
-			(switch (event type?)
-				(keyDown
-					((ScriptID DEBUG) handleEvent: event)
-				)
-				(mouseDown
-					((ScriptID DEBUG) handleEvent: event)
-				)
-			)
-		)
 		(switch (event type?)
+			(keyDown
+				(keyDownHandler handleEvent: event)
+			)
+			(direction
+				(directionHandler handleEvent: event)
+			)
+			(mouseDown
+				(mouseDownHandler handleEvent: event)
+			)
+			(mouseUp
+				(cast handleEvent: event)
+			)
+			(joyDown
+				(event type: keyDown message: ENTER)
+				(keyDownHandler handleEvent: event)
+			)			
 		;Add global parser commands here.
 			(saidEvent
 				(cond
+					((super handleEvent: event)) ;for rooms, regions, and locales
 					((Said 'cheat')
 						(Print "Okay, you win.")
 						(Print "(Game over.)" #at -1 152)
@@ -489,7 +546,7 @@
 						)
 					)
 				)
-			)
+			);end of saidEvents
 		)
 	)
 )

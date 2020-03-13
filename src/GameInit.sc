@@ -34,7 +34,6 @@
 		(DoSound MasterVol 12)	;ensure that the initial volume is the default 12
 		(= numColors (Graph GDetect))
 		(= numVoices (DoSound NumVoices))
-		(= useSortedFeatures TRUE)
 		(= possibleScore 0)	;Set the maximum score here
 		(= showStyle HSHUTTER)
 		(DisposeScript GAME_INIT)	;and finally, trash this script from memory

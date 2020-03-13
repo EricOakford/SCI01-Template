@@ -20,8 +20,16 @@
 
 	(method (init)
 		(super init:)
+		(keyDownHandler add: self)
+		(mouseDownHandler add: self)
 		(TheMenuBar state: FALSE)
 		(self setScript: titleScreen)
+	)
+	
+	(method (dispose)
+		(keyDownHandler delete: self)
+		(mouseDownHandler delete: self)
+		(super dispose:)
 	)
 )
 
@@ -51,6 +59,7 @@
 			)
 		)
 	)
+	
 	(method (handleEvent event)
 		(super handleEvent: event)
 		(if (not (event claimed?))
