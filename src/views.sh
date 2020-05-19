@@ -6,8 +6,8 @@
 ;***
 ;********************************************************************
 
-(define vEgoWalk 0)
-(define vEgoStand 1)
-(define vSpeedTest 98)
-(define vTestObject 800)
-(define vStaticIcons 998)
+(define vEgoWalk		0)
+(define vEgoStand		1)
+(define vSpeedTest		98)
+(define vTestObject		800)
+(define vStaticIcons	998)

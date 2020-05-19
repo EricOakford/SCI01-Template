@@ -5,7 +5,7 @@
 ;	This is the script that checks the machine speed, then starts the game proper.
 ;
 ;
-(script# SPEEDTEST)
+(script# SPEED)
 (include game.sh)
 (use Main)
 (use Intrface)
@@ -24,9 +24,7 @@
 (local
 	doneTime
 )
-(instance fred of Actor
-	(properties)
-)
+(instance fred of Actor)
 
 (instance speedTest of Room
 	(properties
@@ -57,13 +55,20 @@
 		(if (== (++ machineSpeed) 1)
 			(= doneTime (+ 60 (GetTime)))
 		)
-		(if
-		(and (u< doneTime (GetTime)) (not (self script?)))
+		(if (and (u< doneTime (GetTime)) (not (self script?)))
 			(cond 
-				((<= machineSpeed 25) (= howFast slow))
-				((<= machineSpeed 40) (= howFast medium))
-				((<= machineSpeed 60) (= howFast fast))
-				(else (= howFast fastest))
+				((<= machineSpeed 25)
+					(= howFast slow)
+				)
+				((<= machineSpeed 40)
+					(= howFast medium)
+				)
+				((<= machineSpeed 60)
+					(= howFast fast)
+				)
+				(else
+					(= howFast fastest)
+				)
 			)
 			(self setScript: speedScript)
 		)
@@ -76,11 +81,12 @@
 )
 
 (instance speedScript of Script
-	(properties)
 	
 	(method (changeState newState &tmp nextRoom [str 20])
 		(switch (= state newState)
-			(0 (= cycles 1))
+			(0
+				(= cycles 1)
+			)
 			(1
 				(theGame setSpeed: 6)
 				(= cycles 1)
@@ -95,8 +101,12 @@
 								#window SysWindow
 							)
 						)
-						(if str (= nextRoom (ReadNumber @str)))
-						(if (> nextRoom NULL) (break))
+						(if str
+							(= nextRoom (ReadNumber @str))
+						)
+						(if (> nextRoom NULL)
+							(break)
+						)
 					)
 				else
 					(= nextRoom TITLE)

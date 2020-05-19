@@ -85,11 +85,19 @@
 			;**************		SIERRA MENU		**************
 
 			(aboutI
-				(Print (Format @str
-					"SCI01 Template Game\n
-					By Eric Oakford\n\n
-					Version %s" version) ;this brings up the version number defined in MAIN.SC.
-					#title "About"
+				(Print
+					(Format @str
+						"SCI01 Template Game\n
+						By Eric Oakford\n\n
+						Version %s" version ;this brings up the version number defined in MAIN.SC.
+					)
+						#title "About"
+				)
+				(Print
+					(Format @str
+						"You've been playing for %d hours, %d minutes, and %d seconds."
+						gameHours gameMinutes gameSeconds
+					)
 				)
 			)
 			(helpI

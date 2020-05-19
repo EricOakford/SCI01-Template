@@ -76,7 +76,8 @@
 							ALT-I Get InvItem\n
 							ALT-D Internal debugger\n
 							ALT-E Show ego\n
-							ALT-K Kill ego"
+							ALT-K Kill ego\n
+							ALT-W Write feature"
 						)
 					)
 					(`@t
@@ -132,7 +133,9 @@
 							#icon vStaticIcons
 						)
 					)
-					(`@m (theGame showMem:))
+					(`@m
+						(theGame showMem:)
+					)
 					(`@e
 						(Format @str "ego\nx:%d y:%d\nloop:%d\ncel:%d"
 							(ego x?) (ego y?) (ego loop?) (ego cel?)

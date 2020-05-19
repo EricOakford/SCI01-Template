@@ -6,8 +6,6 @@
 ;***
 ;**************************************************************
 
-; 
-
 (include pics.sh) (include views.sh) ;graphical defines
 (include system.sh) (include sci2.sh) ;system and kernel functions
 
@@ -22,20 +20,16 @@
 )
 
 ; Game modules
-(enum
-	MAIN			;0
-	SPEEDTEST		;1
-	DEBUG			;2
-	INVDESC			;3	;inventory item descriptions (text-only)
-	GAME_INIT		;4
-	DISPOSE_CODE	;5
-)
+(define MAIN			0)
+(define SPEED			1)
+(define DEBUG			2)
+(define	INVDESC			3)	;inventory item descriptions (text-only)
+(define GAME_INIT		4)
+(define DISPOSE_CODE	5)
 
 ; Actual rooms
-(enum 10
-	TITLE		;10
-	TESTROOM	;11
-)
+(define	TITLE		10)
+(define	TESTROOM	11)
 
 ; Sound defines
 (define sQuake 10)
@@ -46,8 +40,11 @@
 ;To avoid name conflicts, prefix the items with the letter "i".
 (enum
 	iTestObject
+	iLastInvItem	;this MUST be last
 )
 
 ; Event flags
 	;These flags are used by Bset, Btst, and Bclr.
 	;Example: fBabaFrog (original Sierra naming)
+	(define FLAG_ARRAY 10)	;used for the gameFlags array. If you need more flags, increase this.
+							;each global can have 16 flags. 10 globals * 16 flags = 160 flags.
