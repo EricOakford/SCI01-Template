@@ -13,6 +13,7 @@
 (use DCIcon)
 (use LoadMany)
 (use StopWalk)
+(use Grooper)
 (use Window)
 (use Sound)
 (use Save)
@@ -42,6 +43,8 @@
 	CantSee 15
 	InitAddToPics 16
 	InitFeatures 17
+	MouseClaimed 18
+	Face 19
 )
 
 (local
@@ -141,6 +144,8 @@
 	myBackColor				;color of message boxes
 	egoWalk					;pointer for ego's static Walk object
 	egoStopWalk				;pointer for ego's static StopWalk object
+	egoLooper				;pointer for ego's static Grooper object
+	egoBaseSetter			;pointer for ego's baseSetter code
 	keyDownHandler			;pointer for keyDown EventHandler
 	directionHandler		;pointer for direction EventHandler
 	mouseDownHandler		;pointer for mouseDown EventHandler
@@ -174,15 +179,13 @@
 	;normalizes ego's animation
 	(ego
 		setLoop: -1
+		looper: egoLooper
 		setPri: -1
 		setMotion: 0
 		setCycle: egoStopWalk vEgoStand
 		illegalBits: cWHITE
-		cycleSpeed: 0
-		moveSpeed: 0
-		setStep: 3 2
+		baseSetter: egoBaseSetter
 		ignoreActors: FALSE
-		looper: 0
 	)
 )
 
@@ -291,6 +294,38 @@
 	)
 )
 
+(procedure (MouseClaimed obj event shifts)
+	;check for right-click on an object and claim the event
+	(return
+		(if (MousedOn obj event shifts)
+			(event claimed: TRUE)
+			(return TRUE)
+		else
+			(return FALSE)
+		)
+	)
+)
+
+(procedure (Face actor1 actor2 both whoToCue &tmp ang1To2)
+	;make one actor face another
+	(= ang1To2
+		(GetAngle
+			(actor1 x?)
+			(actor1 y?)
+			(actor2 x?)
+			(actor2 y?)
+		)
+	)
+	(if (and (>= argc 3) both)
+		(actor2 setHeading: (+ 180 ang1To2))
+	)
+	(if (>= argc 4)
+		(actor1 setHeading: ang1To2 whoToCue)
+	else
+		(actor1 setHeading: ang1To2)
+	)
+)
+
 (instance egoObj of Ego
 	(properties
 		name "ego"
@@ -300,6 +335,22 @@
 (instance egoW of Walk)
 
 (instance egoSW of StopWalk)
+
+(instance egoGL of GradualLooper)
+
+(instance egoBase of Code
+	
+	(method (doit theActor &tmp theX theY)
+		(= theX (theActor x?))
+		(= theY (+ 1 (theActor y?)))
+		(theActor
+			brTop: (- theY 2)
+			brBottom: theY
+			brLeft: (- theX 9)
+			brRight: (+ theX 9)
+		)
+	)
+)
 
 (instance statusCode of Code
 	
@@ -457,6 +508,7 @@
 	
 	(method (init)
 		;load some important modules
+		(= systemWindow SysWindow)
 		Cycle
 		StopWalk
 		Window
@@ -468,6 +520,8 @@
 		(= ego egoObj)
 		(= egoWalk egoW)
 		(= egoStopWalk egoSW)
+		(= egoLooper egoGL)
+		(= egoBaseSetter egoBase)
 		(= version {x.yyy.zzz}) ;set game version here
 		(= doVerbCode DoVerbCode)
 		((= keyDownHandler keyH) add:)
@@ -562,7 +616,12 @@
 				(directionHandler handleEvent: event)
 			)
 			(mouseDown
-				(mouseDownHandler handleEvent: event)
+				(cond
+					((mouseDownHandler handleEvent: event))
+					((MouseClaimed ego event shiftDown)
+						(Print "Why, that's me!")
+					)
+				)
 			)
 			(mouseUp
 				(cast handleEvent: event)

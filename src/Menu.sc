@@ -74,7 +74,6 @@
 		(SetMenu normalI		p_said 'normal')
 		(SetMenu fasterI		p_said 'faster')
 		(SetMenu slowerI		p_said 'slower')
-;		(SetMenu teleportI	p_said 'tp')
 	)
 
 
