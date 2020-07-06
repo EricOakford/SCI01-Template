@@ -71,9 +71,6 @@
 		(SetMenu quitI			p_said 'quit[/game]')
 		(SetMenu	pauseI		p_said 'pause[/game]')
 		(SetMenu invI			p_said 'inventory')
-		(SetMenu normalI		p_said 'normal')
-		(SetMenu fasterI		p_said 'faster')
-		(SetMenu slowerI		p_said 'slower')
 	)
 
 
