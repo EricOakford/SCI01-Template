@@ -153,6 +153,7 @@
 	gameSeconds				;elapsed seconds
 	gameMinutes				;elapsed minutes
 	gameHours				;elapsed hours
+	isVGA					;TRUE if driver is VGA, FALSE if otherwise
 )
 
 (procedure (RedrawCast)
@@ -499,12 +500,6 @@
 
 (instance SCI01 of Game ;Replace "SCI01" with the game's internal name here (up to 6 characters)
 	; The main game instance. It adds game-specific functionality.
-	(properties
-		;Set your game's language here.
-		;Supported langauges can be found in SYSTEM.SH.		
-		parseLang ENGLISH
-		printLang ENGLISH
-	)
 	
 	(method (init)
 		;load some important modules

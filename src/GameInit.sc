@@ -36,6 +36,15 @@
 		(= numVoices (DoSound NumVoices))
 		(= possibleScore 0)	;Set the maximum score here
 		(= showStyle HSHUTTER)
+		(if
+			(and
+				(>= (= numColors (Graph GDetect)) 2)
+				(<= numColors 16)
+			)
+			(= isVGA FALSE)
+		else
+			(= isVGA TRUE)
+		)		
 		(DisposeScript GAME_INIT)	;and finally, trash this script from memory
 	)
 )

@@ -126,6 +126,9 @@
 )
 
 ;Language defines (added for SCI01 by EO)
+;NOTE: It is not simple to write SCI0(1) games in foreign languages.
+; The games that were translated (SQ3, LSL3, QFG1EGA) used customized interpreters and scripts.
+; However, you are free to fork this if you think you can translate this template.
 (define	ENGLISH		1)
 (define	FRENCH		33)
 (define	SPANISH		34)
