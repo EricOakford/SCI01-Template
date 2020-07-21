@@ -25,25 +25,32 @@
 (instance gameInitCode of Code
 	(method (init)
 		(= debugging TRUE) ;Set to TRUE if you want to enable the debug features.
-		(= systemWindow Window)
-		(systemWindow
-			;These colors can be changed to suit your preferences.
-			color: (= myTextColor vBLACK)
-			back: (= myBackColor vWHITE)
-		)
-		(DoSound MasterVol 12)	;ensure that the initial volume is the default 12
+		(DoSound MasterVol volume)	;ensure that the initial volume is the default
 		(= numColors (Graph GDetect))
 		(= numVoices (DoSound NumVoices))
 		(= possibleScore 0)	;Set the maximum score here
-		(= showStyle HSHUTTER)
 		(if
 			(and
 				(>= (= numColors (Graph GDetect)) 2)
 				(<= numColors 16)
 			)
-			(= isVGA FALSE)
+			(Bclr fIsVGA)
 		else
-			(= isVGA TRUE)
+			(Bset fIsVGA)
+		)
+		;initialize the colors
+		(if (Btst fIsVGA)
+			(= myTextColor 0)
+			(= myBackColor 7)
+			(= showStyle FADEOUT)
+		else
+			(= myTextColor vBLACK)
+			(= myBackColor vWHITE)
+			(= showStyle HSHUTTER)			
+		)
+		(systemWindow
+			color: myTextColor
+			back: myBackColor
 		)		
 		(DisposeScript GAME_INIT)	;and finally, trash this script from memory
 	)

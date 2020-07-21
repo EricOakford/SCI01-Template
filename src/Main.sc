@@ -153,7 +153,6 @@
 	gameSeconds				;elapsed seconds
 	gameMinutes				;elapsed minutes
 	gameHours				;elapsed hours
-	isVGA					;TRUE if driver is VGA, FALSE if otherwise
 )
 
 (procedure (RedrawCast)

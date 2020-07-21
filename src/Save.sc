@@ -220,8 +220,17 @@
 		(self
 			add: textI,
 			setSize:, 
-			center:,
-			open: wTitled 15
+			center:
+			;open: wTitled 15
+		)
+		;EO: This prevents the VGA interpreter from crashing when
+		; bringing up the save/restore dialog. However, this creates
+		; the side-effect of actors popping into the dialog box if
+		; a Print message is displayed.
+		(if (Btst fIsVGA)
+			(self open: wTitled -1)
+		else
+			(self open: wTitled 15)
 		)
 
 		(return TRUE)

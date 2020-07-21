@@ -46,5 +46,8 @@
 ; Event flags
 	;These flags are used by Bset, Btst, and Bclr.
 	;Example: fBabaFrog (original Sierra naming)
-	(define FLAG_ARRAY 10)	;used for the gameFlags array. If you need more flags, increase this.
-							;each global can have 16 flags. 10 globals * 16 flags = 160 flags.
+(enum
+	fIsVGA
+)
+(define FLAG_ARRAY 10)	;used for the gameFlags array. If you need more flags, increase this.
+						;each global can have 16 flags. 10 globals * 16 flags = 160 flags.
