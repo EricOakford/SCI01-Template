@@ -153,6 +153,7 @@
 	gameSeconds				;elapsed seconds
 	gameMinutes				;elapsed minutes
 	gameHours				;elapsed hours
+	graphicsDriver
 )
 
 (procedure (RedrawCast)
@@ -570,6 +571,7 @@
 	(method (replay)
 		(TheMenuBar draw:)
 		(StatusLine enable:)
+		(DisposeScript GAME_INIT)		;then trash the script
 		(SetMenu soundI p_text
 			(if (DoSound SoundOn) {Sound off} else {Sound on})
 		)

@@ -14,44 +14,62 @@
 (include game.sh)
 (use Main)
 (use Window)
+(use Intrface)
 (use Save)
 (use User)
 (use System)
 
 (public
 	gameInitCode 0
+	driverInit 1
 )
 
 (instance gameInitCode of Code
 	(method (init)
 		(= debugging TRUE) ;Set to TRUE if you want to enable the debug features.
+		(= possibleScore 0)	;Set the maximum score here		
+		(driverInit doit:)
 		(DoSound MasterVol volume)	;ensure that the initial volume is the default
-		(= numColors (Graph GDetect))
+		(DisposeScript GAME_INIT)	;and finally, trash this script from memory
+	)
+)
+
+(instance driverInit of Code
+	;initialize the colors and sound based on the graphics and sound drivers
+	(method (doit &tmp dftStyle)
+		;initialize number of voices the sound driver supports
 		(= numVoices (DoSound NumVoices))
-		(= possibleScore 0)	;Set the maximum score here
-		(if
-			(and
-				(>= (= numColors (Graph GDetect)) 2)
-				(<= numColors 16)
+		;initialize the number of colors the graphics driver supports	
+		(= numColors (Graph GDetect))
+		(cond
+			((<= numColors 8)
+				(= graphicsDriver CGA)
+				(= myTextColor vBLACK)
+				(= myBackColor vWHITE)
+				(= dftStyle HSHUTTER)
 			)
-			(Bclr fIsVGA)
-		else
-			(Bset fIsVGA)
+			((<= numColors 16)
+				(= graphicsDriver EGA)
+				(= myTextColor vBLACK)
+				(= myBackColor vWHITE)
+				(= dftStyle HSHUTTER)
+			)
+			(else	;is VGA
+				(= graphicsDriver VGA)
+				(= myTextColor 0)
+				(= myBackColor 7)
+				(= dftStyle FADEOUT)			
+			)
 		)
-		;initialize the colors
-		(if (Btst fIsVGA)
-			(= myTextColor 0)
-			(= myBackColor 7)
-			(= showStyle FADEOUT)
-		else
-			(= myTextColor vBLACK)
-			(= myBackColor vWHITE)
-			(= showStyle HSHUTTER)			
-		)
+		(= showStyle dftStyle)
 		(systemWindow
 			color: myTextColor
 			back: myBackColor
-		)		
-		(DisposeScript GAME_INIT)	;and finally, trash this script from memory
+		)
+		;here for testing different drivers
+		;(Printf "numVoices is %d" numVoices)
+		;(Printf "numColors is %d" numColors)
+		;(Printf "graphicsDriver value is %d" graphicsDriver)
+		(self dispose:)
 	)
 )

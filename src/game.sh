@@ -19,6 +19,13 @@
 	fastest
 )
 
+; graphicsDriver values
+(enum
+	CGA	
+	EGA
+	VGA
+)
+
 ; Game modules
 (define MAIN			0)
 (define SPEED			1)
@@ -46,8 +53,5 @@
 ; Event flags
 	;These flags are used by Bset, Btst, and Bclr.
 	;Example: fBabaFrog (original Sierra naming)
-(enum
-	fIsVGA
-)
 (define FLAG_ARRAY 10)	;used for the gameFlags array. If you need more flags, increase this.
 						;each global can have 16 flags. 10 globals * 16 flags = 160 flags.
