@@ -571,6 +571,7 @@
 	(method (replay)
 		(TheMenuBar draw:)
 		(StatusLine enable:)
+		((ScriptID GAME_INIT 1) doit:)	;set up the colors and sound again, in case the drivers were changed
 		(DisposeScript GAME_INIT)		;then trash the script
 		(SetMenu soundI p_text
 			(if (DoSound SoundOn) {Sound off} else {Sound on})
