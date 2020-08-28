@@ -265,10 +265,10 @@
 ; some keycode definitions
 (define	ESC			27)
 (define	SPACEBAR		32)
-(define	ENTER       $000d)		;(define ENTER	`^m) in SSCI
-(define	TAB         $0009)		;(define TAB	`^i) in SSCI
+(define ENTER	`^m)
+(define TAB	`^i)
 (define	SHIFTTAB		$0f00)
-(define	BACKSPACE	$0008)		;(define	BACKSPACE	`^h)
+(define	BACKSPACE	`^h)
 
 
 ; Numeric key code in scan code order with missing codes added

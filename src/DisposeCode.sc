@@ -17,7 +17,6 @@
 )
 
 (instance disposeCode of Code
-	(properties)
 	
 	(method (doit roomNum)
 		(LoadMany FALSE

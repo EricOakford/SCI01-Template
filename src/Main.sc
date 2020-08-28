@@ -627,7 +627,7 @@
 				(event type: keyDown message: ENTER)
 				(keyDownHandler handleEvent: event)
 			)			
-		;Add global parser commands here.
+			;Add global parser commands here.
 			(saidEvent
 				(cond
 					((super handleEvent: event)) ;for rooms, regions, and locales
@@ -642,8 +642,8 @@
 								(i showSelf:)
 								else (DontHave)
 							)
-							;if not an inventory item
-						else ;this will handle "look anyword"
+								;if not an inventory item
+						else 	;this will handle "look anyword"
 							(CantSee)
 						)
 					)
@@ -670,7 +670,6 @@
 	(properties
 		name {Test Object}
 		said '/object'
-		owner 0
 		view vTestObject
 		loop 0
 		cel 0

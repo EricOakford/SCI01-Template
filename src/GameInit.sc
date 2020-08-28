@@ -67,9 +67,11 @@
 			back: myBackColor
 		)
 		;here for testing different drivers
-		;(Printf "numVoices is %d" numVoices)
-		;(Printf "numColors is %d" numColors)
-		;(Printf "graphicsDriver value is %d" graphicsDriver)
+		(if debugging
+			(Printf "numVoices is %d" numVoices)
+			(Printf "numColors is %d" numColors)
+			(Printf "graphicsDriver value is %d" graphicsDriver)
+		)
 		(self dispose:)
 	)
 )
