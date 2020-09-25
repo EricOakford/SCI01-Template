@@ -85,6 +85,10 @@
 	(method (changeState newState &tmp nextRoom [str 20])
 		(switch (= state newState)
 			(0
+				(if debugging
+					(Printf "machineSpeed is %d" machineSpeed)
+					(Printf "howFast is %d" howFast)
+				)				
 				(= cycles 1)
 			)
 			(1

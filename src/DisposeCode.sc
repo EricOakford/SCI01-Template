@@ -18,7 +18,22 @@
 
 (instance disposeCode of Code
 	
-	(method (doit roomNum)
+	(method (doit roomNum &tmp event)
+		(theGame setCursor: waitCursor TRUE)
+		
+		;clear any events and stray nodes in the event handlers
+		(while ((= event (Event new:)) type?)
+			(event dispose:)
+		)
+		(event dispose:)
+		(mouseDownHandler release:)
+		(keyDownHandler release:)
+		(directionHandler release:)
+		
+		;clear any modeless dialog
+		(cls)
+		
+		;dispose any scripts that are only occasionally used
 		(LoadMany FALSE
 			AVOIDER JUMP ORBIT PATH EXTRA TEXTRA RFEATURE DEMO
 			NAMEFIND CHASE FOLLOW WANDER REVERSE TIMER SORT COUNT DPATH
@@ -26,6 +41,7 @@
 			APPROACH MOVEFWD POLYGON POLYPATH BLOCK PRINTD
 			SIGHT QSOUND SMOOPER
 		)
+		;and finally, trash this script
 		(DisposeScript DISPOSE_CODE)
 	)
 )
