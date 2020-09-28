@@ -25,7 +25,7 @@
 )
 
 (instance gameInitCode of Code
-	(method (init)
+	(method (doit)
 		(= debugging TRUE) ;Set to TRUE if you want to enable the debug features.
 		(= possibleScore 0)	;Set the maximum score here		
 		(driverInit doit:)
@@ -68,9 +68,12 @@
 		)
 		;here for testing different drivers
 		(if debugging
-			(Printf "numVoices is %d" numVoices)
-			(Printf "numColors is %d" numColors)
-			(Printf "graphicsDriver value is %d" graphicsDriver)
+			(Printf
+				"numVoices is %d\n
+				numColors is %d\n
+				graphicsDriver value is %d"
+				numVoices numColors graphicsDriver
+			)
 		)
 		(self dispose:)
 	)

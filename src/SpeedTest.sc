@@ -24,7 +24,15 @@
 (local
 	doneTime
 )
-(instance fred of Actor)
+(instance fred of Actor
+	(properties
+		view vSpeedTest
+		loop 0
+		illegalBits 0
+		x 20
+		y 99
+	)
+)
 
 (instance speedTest of Room
 	(properties
@@ -37,10 +45,6 @@
 		(super init:)
 		(sounds eachElementDo: #stop)
 		(fred
-			view: vSpeedTest
-			setLoop: 0
-			illegalBits: 0
-			posn: 20 99
 			setStep: 1 1
 			setMotion: MoveTo 300 100
 			setCycle: Forward
@@ -70,6 +74,7 @@
 					(= howFast fastest)
 				)
 			)
+			(= dftHowFast howFast)	;save the original howFast in case detail was changed in the menu
 			(self setScript: speedScript)
 		)
 	)
@@ -85,10 +90,6 @@
 	(method (changeState newState &tmp nextRoom [str 20])
 		(switch (= state newState)
 			(0
-				(if debugging
-					(Printf "machineSpeed is %d" machineSpeed)
-					(Printf "howFast is %d" howFast)
-				)				
 				(= cycles 1)
 			)
 			(1
@@ -97,6 +98,11 @@
 			)
 			(2
 				(if debugging
+					(Printf
+						"machineSpeed is %d\n
+						howFast is %d"
+						machineSpeed howFast
+					)
 					(repeat
 						(= str NULL)
 						(= nextRoom

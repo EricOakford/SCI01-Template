@@ -20,6 +20,7 @@
 (script# MENU)									;**	output to script.997
 (use Main)
 (use Intrface)
+(use PrintD)
 (use Gauge)
 (use User)
 (include game.sh) (include menu.sh)
@@ -49,7 +50,8 @@
 		)
 
 		(AddMenu { Speed }
-			{Change...`^s:--!:Faster`+:Normal`=:Slower`-}
+			{Change...`^s:--!:Faster`+:Normal`=:Slower`-:--!
+			:Detail Level`#6}
 		)
 
 		(AddMenu { Sound }
@@ -74,7 +76,7 @@
 	)
 
 
-	(method (handleEvent event &tmp i oldPause [str 250])
+	(method (handleEvent event &tmp i oldPause but1 but2 but3 but4 [str 250])
 		(switch (super handleEvent: event)
 
 
@@ -208,7 +210,46 @@
 			(slowerI
 				(theGame setSpeed: (++ speed))
 			)
-
+			
+			(detailI
+				(= but1 {Low})
+				(= but2 {Medium})
+				(= but3 {High})
+				(= but4 {Ultra})
+				(switch dftHowFast
+					(slow
+						(= but1 {Optimal})
+					)
+					(medium
+						(= but2 {Optimal})
+					)
+					(fast
+						(= but3 {Optimal})
+					)
+					(fastest
+						(= but4 {Optimal})
+					)
+				)
+				(= i
+					(PrintD
+						#title {Game Detail Level}
+						#button but1
+						#button but2
+						#button but3
+						#button but4
+						#first i
+					)
+				)
+				(if i
+					(= howFast (- i 2))
+					(if (and (== howFast fast) (>= dftHowFast fastest))
+						(= howFast dftHowFast)
+					)
+				)
+				(if debugging
+					(Printf {howFast is now %d. dftHowFast is %d.} howFast dftHowFast)
+				)
+			)
 
 			;**************		SOUND MENU		**************
 

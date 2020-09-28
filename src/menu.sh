@@ -37,6 +37,8 @@ $400 speedM
 	fasterI
 	normalI
 	slowerI
+		divider402I
+	detailI
 )
 
 (enum

@@ -136,6 +136,7 @@
 	howFast					;machine speed level (0 = slow, 1 = medium, 2 = fast, 3 = fastest)
 	machineSpeed			;used by the speed tester to test how fast the system is
 							; and used in determining game speed. (used in conjunction with howFast)
+	dftHowFast				;best howFast for player's hardware
 	theMusic				;music object, current playing music
 	soundFx					;sound effect being played
 	cIcon					;global pointer to cycling icon
@@ -548,7 +549,7 @@
 			Test_Object
 		)
 		;moved any code not requiring any objects in this script into its own script
-		((ScriptID GAME_INIT 0) init:)
+		((ScriptID GAME_INIT 0) doit:)
 		;and finally, now that the game's been initialized, we can move on to the speed tester.
 		(self newRoom: SPEED)
 	)
