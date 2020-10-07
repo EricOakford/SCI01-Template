@@ -541,7 +541,7 @@
 						(== illegalBits 0)
 						(& signal ignrAct)
 					)
-					(CanBeHere self (cast elements?))
+					(CantBeHere self (cast elements?))
 				)
 				(or
 					(& signal ignrHrz)
