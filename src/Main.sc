@@ -437,8 +437,7 @@
 ;	that are not part of the stock USER.SC. This was done in Quest for Glory II.
 
 (instance verbWords of VerbMessager
-	(properties)
-	
+
 	(method (doit)
 		(return
 			(cond 
@@ -475,8 +474,7 @@
 )
 
 (instance DoVerbCode of Code
-	(properties)
-	
+
 	(method (doit theObj theVerb &tmp [str 100])
 		(switch theVerb
 			(verbLook
@@ -657,15 +655,25 @@
 						(Print "(Game over.)" #at -1 152)
 						(= quit TRUE)
 					)
-					((Said 'look[<at]>') ;look at inventory items
-						(if (= i (inventory saidMe:))
-							(if (i ownedBy: ego)
-								(i showSelf:)
-								else (DontHave)
+					((Said 'look[<at]>')
+						(cond
+							;look at inventory items
+							((= i (inventory saidMe:))
+								(if (i ownedBy: ego)
+									(i showSelf:)
+								else
+									(DontHave)
+								)
 							)
-								;if not an inventory item
-						else 	;this will handle "look anyword"
-							(CantSee)
+							;other things to look at
+							((Said '/head')
+								(Print "There's nothing going on in your stupid little head.")
+							)
+							;this handles "look anyword"
+							(else
+								(CantSee)
+								(event claimed: TRUE)
+							)
 						)
 					)
 				)
