@@ -183,7 +183,7 @@
 	;normalizes ego's animation
 	(ego
 		setLoop: -1
-		looper: egoLooper
+		setLoop: egoLooper
 		setPri: -1
 		setMotion: 0
 		setCycle: egoStopWalk vEgoStand
@@ -353,6 +353,15 @@
 	(properties
 		name "ego"
 	)
+	
+	(method (handleEvent event)
+		(cond
+			((super handleEvent: event))
+			((MouseClaimed self event shiftDown)
+				(Print "Why, that's me!")
+			)
+		)
+	)
 )
 
 (instance egoW of Walk)
@@ -362,7 +371,6 @@
 (instance egoGL of GradualLooper)
 
 (instance egoBase of Code
-	
 	(method (doit theActor &tmp theX theY)
 		(= theX (theActor x?))
 		(= theY (+ 1 (theActor y?)))
@@ -376,7 +384,6 @@
 )
 
 (instance statusCode of Code
-	
 	(method (doit strg)
 		(Format strg "___Template Game_______________Score: %d of %d" score possibleScore)
 	)
@@ -398,7 +405,6 @@
 (instance deathIcon of DCIcon)
 
 (instance ftrInitCode of Code
-	
 	(method (doit obj)
 		(if (== (obj sightAngle?) ftrDefault)
 			(obj sightAngle: 180)
@@ -437,7 +443,6 @@
 ;	that are not part of the stock USER.SC. This was done in Quest for Glory II.
 
 (instance verbWords of VerbMessager
-
 	(method (doit)
 		(return
 			(cond 
@@ -474,7 +479,6 @@
 )
 
 (instance DoVerbCode of Code
-
 	(method (doit theObj theVerb &tmp [str 100])
 		(switch theVerb
 			(verbLook
@@ -544,8 +548,11 @@
 		((= mouseDownHandler mouseH) add:)
 		(= useSortedFeatures TRUE)
 		(= ftrInitializer ftrInitCode)
-		(User alterEgo: ego verbMessager: verbWords)
-		(TheMenuBar init: draw: hide: state: FALSE)
+		(User
+			alterEgo: ego
+			verbMessager: verbWords
+		)
+		(TheMenuBar init:)
 		(StatusLine code: statusCode disable:) ;hide the status line at startup
 		(if debugging
 			(self setCursor: normalCursor (HaveMouse) 300 170)
@@ -554,12 +561,10 @@
 			(self setCursor: normalCursor FALSE 350 200)
 		)
 		((= theMusic music)
-			number: sDeath
 			owner: self
 			init:
 		)
 		((= soundFx SFX)
-			number: sDeath
 			owner: self
 			init:
 		)
@@ -606,8 +611,7 @@
 				(and
 					;if memory is fragmented and debugging is on, bring up a warning and the internal debugger
 					(u> (MemoryInfo FreeHeap) (+ 20 (MemoryInfo LargestPtr)))
-					(Print
-						"Memory fragmented."
+					(Print "Memory fragmented."
 						#button {Debug} TRUE
 					)
 				)
@@ -632,12 +636,7 @@
 				(directionHandler handleEvent: event)
 			)
 			(mouseDown
-				(cond
-					((mouseDownHandler handleEvent: event))
-					((MouseClaimed ego event shiftDown)
-						(Print "Why, that's me!")
-					)
-				)
+				(mouseDownHandler handleEvent: event)
 			)
 			(mouseUp
 				(cast handleEvent: event)

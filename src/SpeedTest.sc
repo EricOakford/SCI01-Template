@@ -86,7 +86,6 @@
 )
 
 (instance speedScript of Script
-	
 	(method (changeState newState &tmp nextRoom [str 20])
 		(switch (= state newState)
 			(0
