@@ -156,7 +156,7 @@
 	gameSeconds				;elapsed seconds
 	gameMinutes				;elapsed minutes
 	gameHours				;elapsed hours
-	graphicsDriver
+	isVGA
 )
 
 (procedure (RedrawCast)
@@ -523,8 +523,7 @@
 (instance mouseH of EventHandler)	;get mouseDown events
 
 (instance SCI01 of Game ;Replace "SCI01" with the game's internal name here (up to 6 characters)
-	; The main game instance. It adds game-specific functionality.
-	
+	; The main game instance. It adds game-specific functionality.	
 	(method (init)
 		;load some important modules
 		(= systemWindow SysWindow)
@@ -546,7 +545,6 @@
 		((= keyDownHandler keyH) add:)
 		((= directionHandler dirH) add:)
 		((= mouseDownHandler mouseH) add:)
-		(= useSortedFeatures TRUE)
 		(= ftrInitializer ftrInitCode)
 		(User
 			alterEgo: ego

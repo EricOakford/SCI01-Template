@@ -97,11 +97,12 @@
 			)
 			(2
 				(if debugging
-					(Printf
-						"machineSpeed is %d\n
-						howFast is %d"
-						machineSpeed howFast
-					)
+					(HandsOn)
+;;;					(Printf
+;;;						"machineSpeed is %d\n
+;;;						howFast is %d"
+;;;						machineSpeed howFast
+;;;					)
 					(repeat
 						(= str NULL)
 						(= nextRoom

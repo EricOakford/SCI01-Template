@@ -227,7 +227,7 @@
 		; bringing up the save/restore dialog. However, this creates
 		; the side-effect of actors popping into the dialog box if
 		; a Print message is displayed.
-		(if (== graphicsDriver VGA)
+		(if isVGA
 			(self open: wTitled -1)
 		else
 			(self open: wTitled 15)

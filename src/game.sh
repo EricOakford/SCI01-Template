@@ -26,6 +26,14 @@
 	VGA
 )
 
+;door states
+(enum
+	doorClosed
+	doorOpening
+	doorOpen
+	doorClosing
+)
+
 ; Game modules
 (define MAIN			0)
 (define SPEED			1)
@@ -33,6 +41,7 @@
 (define	INVDESC			3)	;inventory item descriptions (text-only)
 (define GAME_INIT		4)
 (define DISPOSE_CODE	5)
+(define DOOR			6)
 
 ; Actual rooms
 (define	TITLE		10)
