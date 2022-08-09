@@ -97,7 +97,7 @@
 				(NotClose)
 			)
 			(locked
-				(Print 50 0)
+				(Print "The door is locked.")
 			)
 			((or (== doorState doorClosing) (== doorState doorClosed))
 				(Print "It's already closed.")

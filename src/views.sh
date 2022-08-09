@@ -6,7 +6,7 @@
 ;***
 ;********************************************************************
 
-(define vEgoWalk		0)
+(define vEgo		0)
 (define vEgoStand		1)
 (define vSpeedTest		98)
 (define vTestObject		800)

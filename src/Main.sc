@@ -156,6 +156,7 @@
 	gameSeconds				;elapsed seconds
 	gameMinutes				;elapsed minutes
 	gameHours				;elapsed hours
+	currentEgoView	= vEgo	;ego's current view
 	isVGA
 )
 
@@ -182,6 +183,7 @@
 (procedure (NormalEgo)
 	;normalizes ego's animation
 	(ego
+		view: currentEgoView
 		setLoop: -1
 		setLoop: egoLooper
 		setPri: -1
